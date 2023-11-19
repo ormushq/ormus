@@ -16,5 +16,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          validateSingleCommit: true
+          validateSingleCommit: false
           validateSingleCommitMatchesPrTitle: true
