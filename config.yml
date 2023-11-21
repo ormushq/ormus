@@ -1,7 +1,1 @@
-debug: false
-complex_config_variable: "I'm complex in config.yml"
-db:
-  host: "localhost"
-  username: "ali"
-  password: "passwd"
-  multi_word_config: "WHAT??"
+
