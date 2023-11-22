@@ -1,4 +1,4 @@
-package config
+package config_test
 
 import (
 	"github.com/knadh/koanf"
@@ -8,6 +8,7 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -27,6 +28,18 @@ type db struct {
 
 type nestedMultiWordConfig struct {
 	DownHere string `koanf:"down_here"`
+}
+
+const (
+	prefix    = "ORMUS_"
+	delimiter = "."
+	separator = "__"
+)
+
+func callbackEnv(source string) string {
+	base := strings.ToLower(strings.TrimPrefix(source, prefix))
+
+	return strings.ReplaceAll(base, separator, delimiter)
 }
 
 func TestLoadingDefaultConfigFromStruct(t *testing.T) {
