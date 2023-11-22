@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
-	"log"
-	"strings"
 )
 
 const (
@@ -19,7 +20,6 @@ const (
 
 // our environment variables must prefix with `ORMUS_`
 // for nested env should use `__` aka: ORMUS_DB__HOST
-
 func callbackEnv(source string) string {
 	base := strings.ToLower(strings.TrimPrefix(source, prefix))
 
