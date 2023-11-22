@@ -19,13 +19,14 @@ const (
 
 // our environment variables must prefix with `ORMUS_`
 // for nested env should use `__` aka: ORMUS_DB__HOST
+
 func callbackEnv(source string) string {
 	base := strings.ToLower(strings.TrimPrefix(source, prefix))
 
 	return strings.ReplaceAll(base, separator, delimiter)
 }
 
-func New() Config {
+func Load() Config {
 	// dot means the delimiter
 	k := koanf.New(".")
 
