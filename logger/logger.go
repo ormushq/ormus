@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-var Logger = slog.New(newHandler(nil))
+var L = slog.New(newHandler(nil))
 
 const (
 	reset      = "\033[0m"
@@ -39,6 +39,7 @@ func newHandler(opts *slog.HandlerOptions) *handler {
 		opts = &slog.HandlerOptions{}
 	}
 	b := &bytes.Buffer{}
+
 	return &handler{
 		b: b,
 		h: slog.NewJSONHandler(b, &slog.HandlerOptions{
@@ -76,7 +77,7 @@ func (h *handler) Handle(ctx context.Context, r slog.Record) error {
 		level = colorize(lightRed, level)
 	}
 
-	bytes, err := h.appendAttrs(ctx, r)
+	result, err := h.appendAttrs(ctx, r)
 	if err != nil {
 		return err
 	}
@@ -85,7 +86,7 @@ func (h *handler) Handle(ctx context.Context, r slog.Record) error {
 		colorize(lightGray, r.Time.Format(timeFormat)),
 		level,
 		colorize(lightGreen, r.Message),
-		colorize(white, string(bytes)),
+		colorize(white, string(result)),
 	)
 
 	return nil
@@ -103,6 +104,7 @@ func (h *handler) appendAttrs(ctx context.Context, r slog.Record) ([]byte, error
 	}
 
 	res := bytes.Trim(h.b.Bytes(), "\n")
+
 	return res, nil
 }
 
@@ -116,6 +118,7 @@ func overwriteDefaults(next func([]string, slog.Attr) slog.Attr) func([]string, 
 		if next == nil {
 			return a
 		}
+
 		return next(groups, a)
 	}
 }
