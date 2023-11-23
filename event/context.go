@@ -69,7 +69,8 @@ type UserAgentData struct {
 	//}
 	// This is an example which I've collected from js SDK of segment my browser's name is ARC which is not identified by segment so the brand field is Not?A_brand by also the engine of my browser which is chromioum based is stored
 
-	FullVersionList []AgentBrandVersion // TODO: i don't know why this exists??
+	//nolint
+	fullVersionList []AgentBrandVersion // TODO: i don't know why this exists??
 	// uaFullVersion   string // also this field is logged as deprecated in segment so i left it as a comment
 }
 
