@@ -19,7 +19,7 @@ const (
 )
 
 // our environment variables must prefix with `ORMUS_`
-// for nested env should use `__` aka: ORMUS_DB__HOST
+// for nested env should use `__` aka: ORMUS_DB__HOST.
 func callbackEnv(source string) string {
 	base := strings.ToLower(strings.TrimPrefix(source, prefix))
 
