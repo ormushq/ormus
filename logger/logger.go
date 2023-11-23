@@ -119,9 +119,3 @@ func overwriteDefaults(next func([]string, slog.Attr) slog.Attr) func([]string, 
 		return next(groups, a)
 	}
 }
-
-var bufferPool = sync.Pool{
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
