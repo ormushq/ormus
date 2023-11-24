@@ -1,42 +1,37 @@
 package logger
 
 import (
-	"context"
 	"log/slog"
 	"os"
+	"sync"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var L = slog.New(newLoggerHandler(nil))
+const (
+	fileName         = "logs/logs.json"
+	fileMaxSizeInMB  = 10
+	fileMaxAgeInDays = 30
+)
 
-type handler struct {
-	h slog.Handler
-}
+var L *slog.Logger
 
-func newLoggerHandler(opts *slog.HandlerOptions) *handler {
-	if opts == nil {
-		opts = &slog.HandlerOptions{}
-	}
+var once = sync.Once{}
 
-	return &handler{
-		h: slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level:     opts.Level,
-			AddSource: true,
-		}),
-	}
-}
+func init() {
+	once.Do(func() {
+		fileWriter := addSync(&lumberjack.Logger{
+			Filename:  fileName,
+			LocalTime: false,
+			MaxSize:   fileMaxSizeInMB,
+			MaxAge:    fileMaxAgeInDays,
+		})
 
-func (h *handler) Enabled(ctx context.Context, level slog.Level) bool {
-	return h.h.Enabled(ctx, level)
-}
-
-func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &handler{h: h.h.WithAttrs(attrs)}
-}
-
-func (h *handler) WithGroup(name string) slog.Handler {
-	return &handler{h: h.h.WithGroup(name)}
-}
-
-func (h *handler) Handle(ctx context.Context, r slog.Record) error {
-	return h.h.Handle(ctx, r)
+		L = slog.New(
+			fanout(
+				slog.NewJSONHandler(fileWriter, &slog.HandlerOptions{}), // pass to first handler: logstash over tcp
+				slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{}),  // then to second handler: stderr
+			),
+		)
+	})
 }
