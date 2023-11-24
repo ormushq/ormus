@@ -8,30 +8,34 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const (
-	fileName         = "logs/logs.json"
-	fileMaxSizeInMB  = 10
-	fileMaxAgeInDays = 30
+type Config struct {
+	FinePath         string
+	UseLocalTime     bool
+	FileMaxSizeInMB  int
+	FineMaxAgeInDays int
+}
+
+var (
+	l    *slog.Logger
+	once = sync.Once{}
 )
 
-var L *slog.Logger
-
-var once = sync.Once{}
-
-func init() {
+func Logger(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
 	once.Do(func() {
 		fileWriter := addSync(&lumberjack.Logger{
-			Filename:  fileName,
-			LocalTime: false,
-			MaxSize:   fileMaxSizeInMB,
-			MaxAge:    fileMaxAgeInDays,
+			Filename:  cfg.FinePath,
+			LocalTime: cfg.UseLocalTime,
+			MaxSize:   cfg.FileMaxSizeInMB,
+			MaxAge:    cfg.FineMaxAgeInDays,
 		})
 
-		L = slog.New(
+		l = slog.New(
 			fanout(
-				slog.NewJSONHandler(fileWriter, &slog.HandlerOptions{}), // pass to first handler: logstash over tcp
-				slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{}),  // then to second handler: stderr
+				slog.NewJSONHandler(fileWriter, opt),
+				slog.NewJSONHandler(os.Stdout, opt),
 			),
 		)
 	})
+
+	return l
 }
