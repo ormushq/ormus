@@ -9,11 +9,18 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const (
+	defaultFilePath        = "logs/json.log"
+	defaultUseLocalTime    = false
+	defaultFileMaxSizeInMB = 10
+	defaultFileAgeInDays   = 30
+)
+
 type Config struct {
-	FinePath         string
+	FilePath         string
 	UseLocalTime     bool
 	FileMaxSizeInMB  int
-	FineMaxAgeInDays int
+	FileMaxAgeInDays int
 }
 
 var (
@@ -22,18 +29,12 @@ var (
 )
 
 func init() {
-	defaultConfig := Config{
-		FinePath:         "logs/logs.json",
-		UseLocalTime:     false,
-		FileMaxSizeInMB:  10,
-		FineMaxAgeInDays: 30,
-	}
 
 	fileWriter := addSync(&lumberjack.Logger{
-		Filename:  defaultConfig.FinePath,
-		LocalTime: defaultConfig.UseLocalTime,
-		MaxSize:   defaultConfig.FileMaxSizeInMB,
-		MaxAge:    defaultConfig.FineMaxAgeInDays,
+		Filename:  defaultFilePath,
+		LocalTime: defaultUseLocalTime,
+		MaxSize:   defaultFileMaxSizeInMB,
+		MaxAge:    defaultFileAgeInDays,
 	})
 	L = slog.New(
 		slog.NewJSONHandler(io.MultiWriter(fileWriter, os.Stdout), &slog.HandlerOptions{}),
@@ -43,10 +44,10 @@ func init() {
 func New(cfg Config, opt *slog.HandlerOptions) {
 	once.Do(func() {
 		fileWriter := addSync(&lumberjack.Logger{
-			Filename:  cfg.FinePath,
+			Filename:  cfg.FilePath,
 			LocalTime: cfg.UseLocalTime,
 			MaxSize:   cfg.FileMaxSizeInMB,
-			MaxAge:    cfg.FineMaxAgeInDays,
+			MaxAge:    cfg.FileMaxAgeInDays,
 		})
 
 		L = slog.New(
