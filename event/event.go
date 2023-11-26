@@ -43,8 +43,7 @@ type CoreEvent struct {
 	Options *Options
 }
 
-type MetaData struct {
-}
+type MetaData struct{}
 
 type Options struct {
 	Integrations *Integrations

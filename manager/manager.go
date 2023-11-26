@@ -1,9 +1,8 @@
 package manager
 
-type Repository interface {
-}
+type Repository interface{}
 
-// Manager is a service to config pipelines/connections
+// Manager is a service to config pipelines/connections.
 type Manager struct {
 	repo Repository
 }

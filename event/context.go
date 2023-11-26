@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-// This is an implementation of Context class similar to the `CoreExtraContext` in segment js SDK
+// This is an implementation of Context class similar to the `CoreExtraContext` in segment js SDK.
 type Context struct {
 	Active        bool
 	IP            net.IP    // Current user's IP address.
@@ -24,12 +24,12 @@ type Context struct {
 type Referrer struct {
 	ReferrerType string
 	Name         string
-	Url          url.URL
+	URL          url.URL
 	Link         string
 
-	//id           string these three properties were undocumented in segment so is commented them
-	//btid         string
-	//urid         string
+	// id           string these three properties were undocumented in segment so is commented them
+	// btid         string
+	// urid         string
 }
 
 type Campaign struct {
@@ -62,23 +62,23 @@ type UserAgentData struct {
 	//{
 	//	"brand": "Chromium",
 	//	"version": "119"
-	//},
+	// },
 	//{
 	//	"brand": "Not?A_Brand",
 	//	"version": "24"
 	//}
 	// This is an example which I've collected from js SDK of segment my browser's name is ARC which is not identified by segment so the brand field is Not?A_brand by also the engine of my browser which is chromioum based is stored
 
-	fullVersionList []AgentBrandVersion // TODO: i don't know why this exists??
+	FullVersionList []AgentBrandVersion // TODO: i don't know why this exists??
 	// uaFullVersion   string // also this field is logged as deprecated in segment so i left it as a comment
 }
 
 type Page struct {
-	Path     string  //academy/
+	Path     string  // academy/
 	Referrer url.URL // https://www.foo.com/
 	Search   string  // projectId=123
 	Title    string  // Analytics Academy
-	Url      url.URL // https://segment.com/academy/
+	URL      url.URL // https://segment.com/academy/
 }
 
 type Location struct {
