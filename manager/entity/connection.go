@@ -5,16 +5,14 @@ type Pipeline struct {
 	Integrations []Integration
 }
 
-// Connection is an object for configure pipeline
+// Connection is an object for configure pipeline.
 type Connection struct {
 	Pipes        []Pipeline
 	Integrations []Integration
 }
 
-// TODO: I'm not sure integration is right name for destination object
-type Integration struct {
-}
+// TODO: I'm not sure integration is right name for destination object.
+type Integration struct{}
 
 // TODO: Do we need source object?
-type Source struct {
-}
+type Source struct{}
