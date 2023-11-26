@@ -25,6 +25,10 @@ var Logger *slog.Logger
 
 var once = sync.Once{}
 
+func New(cfg Config) {
+	InitLogger(cfg)
+}
+
 func InitLogger(cfg Config) {
 	once.Do(func() {
 		var logLevel slog.Level
