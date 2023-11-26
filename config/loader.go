@@ -1,13 +1,14 @@
 package config
 
 import (
+	"log"
+	"strings"
+
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
-	"log"
-	"strings"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 	defaultYamlFilePath = "config.yml"
 )
 
-var c *Config
+var c Config
 
 type Option struct {
 	Prefix       string
@@ -58,11 +59,11 @@ func init() {
 	}
 }
 
-func C() *Config {
+func C() Config {
 	return c
 }
 
-func New(opt Option) *Config {
+func New(opt Option) Config {
 	k := koanf.New(opt.Separator)
 
 	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
