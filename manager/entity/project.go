@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-// Project is the main object for managing different connections
+// Project is the main object for managing different connections.
 type Project struct {
 	ID          string
 	CreatedAt   time.Time

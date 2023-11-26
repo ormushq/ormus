@@ -25,7 +25,6 @@ type LogTest struct {
 }
 
 func TestInitLogger(t *testing.T) {
-
 	tmpDir, err := os.MkdirTemp("", "logger-test")
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +112,6 @@ func TestInitLogger(t *testing.T) {
 		t.Error("Log directory does not have the expected number of files")
 	}
 	for _, file := range files {
-
 		if file.Name() != "test.json" && !strings.HasSuffix(file.Name(), ".gz") {
 			t.Error("Log file is not compressed")
 		}

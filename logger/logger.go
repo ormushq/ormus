@@ -26,9 +26,7 @@ var Logger *slog.Logger
 var once = sync.Once{}
 
 func InitLogger(cfg Config) {
-
 	once.Do(func() {
-
 		var logLevel slog.Level
 
 		switch cfg.LogLevel {
@@ -43,7 +41,9 @@ func InitLogger(cfg Config) {
 			logLevel = slog.LevelError
 
 		default:
+
 			// INFO level
+
 			logLevel = slog.LevelInfo
 		}
 
@@ -71,6 +71,5 @@ func InitLogger(cfg Config) {
 		}
 
 		slog.SetDefault(Logger)
-
 	})
 }
