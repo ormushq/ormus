@@ -13,10 +13,10 @@ import (
 
 func TestLogger(t *testing.T) {
 	cfg := logger.Config{
-		FinePath:         "./logs.json",
+		FilePath:         "./logs.json",
 		UseLocalTime:     false,
 		FileMaxSizeInMB:  10,
-		FineMaxAgeInDays: 1,
+		FileMaxAgeInDays: 1,
 	}
 	opt := slog.HandlerOptions{
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
@@ -72,9 +72,9 @@ func TestLogger(t *testing.T) {
 		test.f()
 	}
 
-	f, err := os.Open(cfg.FinePath)
+	f, err := os.Open(cfg.FilePath)
 	defer f.Close()
-	defer os.Remove(cfg.FinePath)
+	defer os.Remove(cfg.FilePath)
 	if err != nil {
 		t.Fatalf("can't open file: %s", err)
 	}
