@@ -28,33 +28,33 @@ func TestLogger(t *testing.T) {
 			return a
 		},
 	}
-	logger.New(cfg, &opt)
 
+	l := logger.New(cfg, &opt)
 	tests := []struct {
 		f    func()
 		want string
 	}{
 		{
 			f: func() {
-				logger.L.Info("INFO", "key", "value")
+				l.Info("INFO", "key", "value")
 			},
 			want: `{"level":"INFO","msg":"INFO","key":"value"}`,
 		},
 		{
 			f: func() {
-				logger.L.Warn("WARN", "key", "value")
+				l.Warn("WARN", "key", "value")
 			},
 			want: `{"level":"WARN","msg":"WARN","key":"value"}`,
 		},
 		{
 			f: func() {
-				logger.L.Error("ERROR", "key", "value")
+				l.Error("ERROR", "key", "value")
 			},
 			want: `{"level":"ERROR","msg":"ERROR","key":"value"}`,
 		},
 		{
 			f: func() {
-				logger.L.With(
+				l.With(
 					slog.Group("user",
 						slog.String("id", "user-123"),
 					),
