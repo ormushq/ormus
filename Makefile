@@ -2,10 +2,11 @@
 // TODO: add commands for build protobuf files
 
 ROOT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+LINT_BIN = $(GOPATH)/bin/golangci-lint
 
 lint:
 	which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
-	golangci-lint run --config=$(ROOT)/.golangci.yml $(ROOT)/...
+	$(LINT_BIN) run --config=$(ROOT)/.golangci.yml $(ROOT)/...
 
 test:
 	go test -v ./...
@@ -15,5 +16,5 @@ format:
 	@gofumpt -l -w $(ROOT)
 	@which gci || (go install github.com/daixiang0/gci@latest)
 	@gci write $(ROOT)
-	@which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
-	@golangci-lint run --fix
+	@which $(LINT_BIN) || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
+	@$(LINT_BIN) run --fix
