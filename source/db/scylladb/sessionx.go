@@ -1,3 +1,7 @@
+/*
+Package scylladb provides an interface and implementation for a ScyllaDB session
+wrapper to simplify database interactions using gocql and gocqlx libraries.
+*/
 package scylladb
 
 import (

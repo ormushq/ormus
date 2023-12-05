@@ -1,3 +1,7 @@
+/*
+Package scylladb provides an interface and implementation for a ScyllaDB table
+abstraction to simplify database interactions using the gocqlx and gocql libraries.
+*/
 package scylladb
 
 import (

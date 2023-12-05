@@ -1,3 +1,9 @@
+/*
+Package initializedb provides functionality for initializing a connection to ScyllaDB database using to gocql library.
+
+Note: Make sure to handle errors appropriately when using this package.
+*/
+
 package initializedb
 
 import (
@@ -8,13 +14,18 @@ import (
 	"time"
 )
 
-type scyllaDBConnection struct {
+type ScyllaDBConnection struct {
 	consistency gocql.Consistency
 	keyspace    string
 	hosts       []string
 }
 
-func (conn *scyllaDBConnection) createCluster() *gocql.ClusterConfig {
+/*
+The 'createCluster' method creates and returns a gocql.ClusterConfig
+based on the provided connection parameters. It also sets additional configurations,
+such as timeout and retry policies.
+*/
+func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	cluster := gocql.NewCluster(conn.hosts...)
 	cluster.Consistency = conn.consistency
 	cluster.Keyspace = conn.keyspace
@@ -29,7 +40,12 @@ func (conn *scyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	return cluster
 }
 
-func (conn *scyllaDBConnection) createSession(cluster *gocql.ClusterConfig) (scylladb.SessionxInterface, error) {
+/*
+The 'createSession' method creates a ScyllaDB session using the given gocql.ClusterConfig.
+It returns a session wrapped by the 'scylladb' package, which provides additional functionalities.
+If an error occurs during the session creation, an error is returned.
+*/
+func (conn *ScyllaDBConnection) createSession(cluster *gocql.ClusterConfig) (scylladb.SessionxInterface, error) {
 	session, err := scylladb.WrapSession(cluster.CreateSession())
 	if err != nil {
 		fmt.Println("an error occureed while creating DB Session", err.Error())
