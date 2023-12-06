@@ -49,3 +49,18 @@ func NewScyllaDBConnection(consistency gocql.Consistency, keyspace string, hosts
 func GetConnection(conn *ScyllaDBConnection) (scylladb.SessionxInterface, error) {
 	return conn.createSession(conn.createCluster())
 }
+
+func CreateKeySpace(consistency gocql.Consistency, keyspace string, hosts ...string) error {
+	scyllaDBConnection := &ScyllaDBConnection{
+		consistency: consistency,
+		keyspace:    "system",
+		hosts:       hosts,
+	}
+
+	session, err := scyllaDBConnection.createSession(scyllaDBConnection.createCluster())
+	if err != nil {
+		return err
+	}
+
+	return scyllaDBConnection.createKeyspace(session, keyspace)
+}

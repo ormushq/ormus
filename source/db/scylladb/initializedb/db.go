@@ -40,6 +40,11 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	return cluster
 }
 
+func (conn *ScyllaDBConnection) createKeyspace(session scylladb.SessionxInterface, keyspace string) error {
+	stmt := fmt.Sprintf("CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}", keyspace)
+	return session.ExecStmt(stmt)
+}
+
 /*
 The 'createSession' method creates a ScyllaDB session using the given gocql.ClusterConfig.
 It returns a session wrapped by the 'scylladb' package, which provides additional functionalities.
