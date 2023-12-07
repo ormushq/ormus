@@ -10,7 +10,7 @@ import (
 	"github.com/knadh/koanf/providers/file"
 )
 
-func Load() Config {
+func Load(configPath string) Config {
 	// Global koanf instance. Use "." as the key path delimiter. This can be "/" or any character.
 	var k = koanf.New(".")
 
@@ -26,7 +26,7 @@ func Load() Config {
 	// replace `_` with `.` and strip the MYVAR_ prefix so that
 	// only "parent1.child1.name" remains.
 
-	k.Load(file.Provider("config.yml"), yaml.Parser())
+	k.Load(file.Provider(configPath), yaml.Parser())
 
 	k.Load(env.Provider("ORMUS_SOURCE_", ".", func(s string) string {
 		fmt.Println(s)

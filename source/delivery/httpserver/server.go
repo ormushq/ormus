@@ -15,7 +15,12 @@ type Server struct {
 }
 
 func New() Server {
+	c := config.Load("source/config.yml")
+
 	return Server{
+		config: config.Config{
+			HTTPServer: c.HTTPServer,
+		},
 		Router: echo.New(),
 	}
 }
@@ -23,8 +28,6 @@ func New() Server {
 func (s Server) Serve() {
 	s.userhandler.SetRoutes(s.Router)
 
-	c := config.Load()
-
-	port := fmt.Sprintf(":%d", c.HTTPServer.Port)
+	port := fmt.Sprintf(":%d", s.config.HTTPServer.Port)
 	s.Router.Logger.Fatal(s.Router.Start(port))
 }
