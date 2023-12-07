@@ -26,13 +26,17 @@ func Load(configPath string) Config {
 	// replace `_` with `.` and strip the MYVAR_ prefix so that
 	// only "parent1.child1.name" remains.
 
-	k.Load(file.Provider(configPath), yaml.Parser())
+	err := k.Load(file.Provider(configPath), yaml.Parser()); if err != nil {
+		panic(err)
+	}
 
-	k.Load(env.Provider("ORMUS_SOURCE_", ".", func(s string) string {
+	err = k.Load(env.Provider("ORMUS_SOURCE_", ".", func(s string) string {
 		fmt.Println(s)
 		return strings.ReplaceAll(strings.ToLower(
 			strings.TrimPrefix(s, "ORMUS_SOURCE_")), "_", ".")
-	}), nil)
+	}), nil); if err != nil {
+		panic(err)
+	}
 
 	var cfg Config
 	if err := k.Unmarshal("", &cfg); err != nil {
