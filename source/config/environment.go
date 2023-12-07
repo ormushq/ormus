@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/knadh/koanf"
@@ -31,7 +30,7 @@ func Load(configPath string) Config {
 	}
 
 	err = k.Load(env.Provider("ORMUS_SOURCE_", ".", func(s string) string {
-		fmt.Println(s)
+		
 		return strings.ReplaceAll(strings.ToLower(
 			strings.TrimPrefix(s, "ORMUS_SOURCE_")), "_", ".")
 	}), nil); if err != nil {
