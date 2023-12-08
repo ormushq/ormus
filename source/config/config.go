@@ -2,6 +2,7 @@ package config
 
 type HTTPServer struct {
 	Port int `koanf:"port"`
+	Network string `koanf:"network"`
 }
 
 type Config struct {

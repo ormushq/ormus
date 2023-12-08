@@ -2,3 +2,4 @@ type: yml
 
 http_server:
   port: 8088
+  network: "tcp"
