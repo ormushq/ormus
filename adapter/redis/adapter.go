@@ -46,8 +46,3 @@ func New(config Config) (Adapter, error) {
 func (a Adapter) Client() *redis.Client {
 	return a.client
 }
-
-// Close is a method that close the redis.Client.
-func (a Adapter) Close() {
-	a.Close()
-}
