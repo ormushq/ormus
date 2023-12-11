@@ -4,7 +4,10 @@ go 1.21.0
 
 require gopkg.in/natefinch/lumberjack.v2 v2.2.1
 
-require github.com/knadh/koanf v1.5.0
+require (
+	github.com/knadh/koanf v1.5.0
+	github.com/oklog/ulid/v2 v2.1.0
+)
 
 require (
 	github.com/fatih/structs v1.1.0 // indirect
