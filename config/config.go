@@ -1,3 +1,7 @@
 package config
 
-type Config struct{}
+import "github.com/ormushq/ormus/adapter/redis"
+
+type Config struct {
+	Redis redis.Config `koanf:"redis"`
+}
