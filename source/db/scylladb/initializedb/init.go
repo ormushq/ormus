@@ -36,6 +36,7 @@ package initializedb
 import (
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/source/db/scylladb"
+	scyllaMigrate "github.com/ormushq/ormus/source/db/scylladb/migrate"
 )
 
 func NewScyllaDBConnection(consistency gocql.Consistency, keyspace string, hosts ...string) *ScyllaDBConnection {
@@ -63,4 +64,16 @@ func CreateKeySpace(consistency gocql.Consistency, keyspace string, hosts ...str
 	}
 
 	return scyllaDBConnection.createKeyspace(session, keyspace)
+}
+
+func RunMigrations(dbConn *ScyllaDBConnection, dir string) error {
+	for _, host := range dbConn.hosts {
+		manager := scyllaMigrate.New(dir, host, dbConn.keyspace)
+		err := manager.Run()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
