@@ -15,7 +15,7 @@ const (
 	defaultPrefix       = "ORMUS_"
 	defaultDelimiter    = "."
 	defaultSeparator    = "__"
-	defaultYamlFilePath = "config.yml"
+	defaultYamlFilePath = "srcconfig.yml"
 )
 
 var c Config
@@ -41,12 +41,12 @@ func init() {
 
 	// load default configuration from Default function
 	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
-		log.Fatalf("error loading default config: %s", err)
+		log.Fatalf("error loading default srcconfig: %s", err)
 	}
 
 	// load configuration from yaml file
 	if err := k.Load(file.Provider(defaultYamlFilePath), yaml.Parser()); err != nil {
-		log.Printf("error loading config from `config.yml` file: %s", err)
+		log.Printf("error loading srcconfig from `srcconfig.yml` file: %s", err)
 	}
 
 	// load from environment variable
@@ -55,7 +55,7 @@ func init() {
 	}
 
 	if err := k.Unmarshal("", &c); err != nil {
-		log.Fatalf("error unmarshaling config: %s", err)
+		log.Fatalf("error unmarshaling srcconfig: %s", err)
 	}
 }
 
@@ -67,11 +67,11 @@ func New(opt Option) Config {
 	k := koanf.New(opt.Separator)
 
 	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
-		log.Fatalf("error loading default config: %s", err)
+		log.Fatalf("error loading default srcconfig: %s", err)
 	}
 
 	if err := k.Load(file.Provider(opt.YamlFilePath), yaml.Parser()); err != nil {
-		log.Printf("error loading config from `config.yml` file: %s", err)
+		log.Printf("error loading srcconfig from `srcconfig.yml` file: %s", err)
 	}
 
 	if err := k.Load(env.Provider(opt.Prefix, opt.Delimiter, opt.CallbackEnv), nil); err != nil {
@@ -79,7 +79,7 @@ func New(opt Option) Config {
 	}
 
 	if err := k.Unmarshal("", &c); err != nil {
-		log.Fatalf("error unmarshaling config: %s", err)
+		log.Fatalf("error unmarshaling srcconfig: %s", err)
 	}
 
 	return c

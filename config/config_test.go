@@ -58,12 +58,12 @@ func TestLoadingDefaultConfigFromStruct(t *testing.T) {
 	}
 
 	if err := k.Load(structs.Provider(testStruct, "koanf"), nil); err != nil {
-		t.Fatalf("error loading default config: %s", err)
+		t.Fatalf("error loading default srcconfig: %s", err)
 	}
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("error unmarshaling srcconfig: %s", err)
 	}
 
 	if !reflect.DeepEqual(instance, testStruct) {
@@ -75,7 +75,7 @@ func TestLoadingConfigFromYamlFile(t *testing.T) {
 	k := koanf.New(".")
 
 	ymlConfigTest := []byte(`debug: false
-multi_word_var: "I'm complex in config.yml"
+multi_word_var: "I'm complex in srcconfig.yml"
 db:
   host: "localhost"
   username: "ali"
@@ -88,12 +88,12 @@ db:
 	ymlFile.Write(ymlConfigTest)
 	// load configuration from yaml file
 	if err := k.Load(file.Provider("test.yml"), yaml.Parser()); err != nil {
-		t.Logf("error loading config from `config.yml` file: %s", err)
+		t.Logf("error loading srcconfig from `srcconfig.yml` file: %s", err)
 	}
 
 	want := structConfig{
 		Debug:        false,
-		MultiWordVar: "I'm complex in config.yml",
+		MultiWordVar: "I'm complex in srcconfig.yml",
 		DB: db{
 			Host:               "localhost",
 			Username:           "ali",
@@ -104,7 +104,7 @@ db:
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("error unmarshaling srcconfig: %s", err)
 	}
 
 	if !reflect.DeepEqual(want, instance) {
@@ -129,7 +129,7 @@ func TestLoadConfigFromEnvironmentVariable(t *testing.T) {
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("error unmarshaling srcconfig: %s", err)
 	}
 
 	want := structConfig{
