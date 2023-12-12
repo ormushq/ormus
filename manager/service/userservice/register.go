@@ -7,7 +7,6 @@ import (
 func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
 
 	// TODO : creat user in repository
-
 	//return create new user
 	return param.RegisterResponse{
 		ID:    "0",
