@@ -1,18 +1,21 @@
-package authservice
+package auth
 
 import (
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/ormushq/ormus/manager/entity"
 	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/ormushq/ormus/manager/entity"
 )
 
+var auth *Service
+
 const (
-	defultSignKey               = "Ormus_jwt"
-	defultAccessExpirationTime  = time.Hour * 24 * 7
-	defultRefreshExpirationTime = time.Hour * 24 * 7 * 4
-	defultAccessSubject         = "ac"
-	defultRefreshSubject        = "rt"
+	defaultSecretKey             = "Ormus_jwt"
+	defaultAccessExpirationTime  = time.Hour * 24 * 7
+	defaultRefreshExpirationTime = time.Hour * 24 * 7 * 4
+	defaultAccessSubject         = "ac"
+	defaultRefreshSubject        = "rt"
 )
 
 type Config struct {
@@ -27,18 +30,17 @@ type Service struct {
 	configs Config
 }
 
-var auth *Service
-
 func init() {
 	auth = &Service{
 		configs: Config{
-			signKey:               defultSignKey,
-			accessExpirationTime:  defultAccessExpirationTime,
-			refreshExpirationTime: defultRefreshExpirationTime,
-			accessSubject:         defultAccessSubject,
-			refreshSubject:        defultRefreshSubject,
+			signKey:               defaultSecretKey,
+			accessExpirationTime:  defaultAccessExpirationTime,
+			refreshExpirationTime: defaultRefreshExpirationTime,
+			accessSubject:         defaultAccessSubject,
+			refreshSubject:        defaultRefreshSubject,
 		}}
 }
+
 func New(signKey, accessSubject, refreshSubject string,
 	accessExpirationTime, refreshExpirationTime time.Duration) Service {
 	return Service{
@@ -50,12 +52,15 @@ func New(signKey, accessSubject, refreshSubject string,
 			refreshSubject:        refreshSubject,
 		}}
 }
+
 func (s Service) CreateAccessToken(user entity.User) (string, error) {
 	return s.createToken(user.Email, s.configs.accessSubject, s.configs.accessExpirationTime)
 }
+
 func (s Service) CreateRefreshToken(user entity.User) (string, error) {
 	return s.createToken(user.Email, s.configs.refreshSubject, s.configs.refreshExpirationTime)
 }
+
 func (s Service) ParseToken(bearerToken string) (*Claims, error) {
 	//https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
 
