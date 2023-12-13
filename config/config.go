@@ -1,3 +1,7 @@
 package config
 
-type Config struct{}
+import "github.com/ormushq/ormus/manager"
+
+type Config struct {
+	Manager manager.Config `koanf:"manager"`
+}
