@@ -28,6 +28,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, welcome to the user registration app!")
 	})
 	e.POST("/register", userhand.RegisterUser)
+	e.POST("/login", userhand.UserLogin)
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

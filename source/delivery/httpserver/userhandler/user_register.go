@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) RegisterUser(ctx echo.Context) error {
+func (h Handler) RegisterUser(ctx echo.Context) error {
 	var Req param.RegisterRequest
 	if err := ctx.Bind(&Req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Bad request")
