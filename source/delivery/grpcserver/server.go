@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Server is the main object for managing grpc configurations and handlers
 type Server struct {
 	Config config.Config
 }
@@ -17,6 +18,7 @@ func New() Server {
 	return Server{}
 }
 
+// Start server connection
 func (s Server) Start() {
 	// config the grpc port and network type
 	address := fmt.Sprintf(":%d", s.Config.HTTPServer.Port)

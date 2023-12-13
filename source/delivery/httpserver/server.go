@@ -8,12 +8,14 @@ import (
 	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
 )
 
+// Server is the main object for managing http configurations and handlers
 type Server struct {
 	config      config.Config
 	Router      *echo.Echo
 	userhandler userhandler.Handler
 }
 
+// Setup a new server object
 func New(c config.Config) Server {
 	return Server{
 		config: config.Config{
@@ -23,6 +25,7 @@ func New(c config.Config) Server {
 	}
 }
 
+// Start server connection
 func (s Server) Serve() {
 	s.userhandler.SetRoutes(s.Router)
 
