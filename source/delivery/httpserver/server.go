@@ -14,9 +14,7 @@ type Server struct {
 	userhandler userhandler.Handler
 }
 
-func New() Server {
-	c := config.Load("source/config.yml")
-
+func New(c config.Config) Server {
 	return Server{
 		config: config.Config{
 			HTTPServer: c.HTTPServer,

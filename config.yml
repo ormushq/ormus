@@ -1,0 +1,6 @@
+type: yml
+
+source:
+  http_server:
+    port: 8090
+    network: "tcp"
