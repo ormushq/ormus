@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ormuserror "github.com/ormushq/ormus/manager/error"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/password"
 )
 
 func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
@@ -13,9 +14,11 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	if err != nil {
 		return param.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
 	}
-
-	// TODO: add hashing function for login and registers
-	if user.Password != req.Password {
+	hashedPassword, err := password.HashPassword(req.Password)
+	if err != nil {
+		return param.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
+	}
+	if user.Password != hashedPassword {
 		return param.LoginResponse{}, ormuserror.ErrWrongCredentials
 	}
 	// jwt token
