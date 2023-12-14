@@ -14,6 +14,7 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
+
 	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
@@ -21,6 +22,7 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	if user.Password != hashedPassword {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrorMsgWrongCredentials)
 	}
+
 	// jwt token
 	AccessToken, err := s.auth.CreateAccessToken(user)
 	if err != nil {
@@ -30,6 +32,7 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
+
 	//return ok
 	return param.LoginResponse{
 		User: param.UserInfo{
