@@ -3,24 +3,67 @@ package auth_test
 import (
 	"fmt"
 	"github.com/ormushq/ormus/config"
-	"testing"
-
 	"github.com/ormushq/ormus/manager/entity"
 	errors "github.com/ormushq/ormus/manager/error"
 	"github.com/ormushq/ormus/manager/service/auth"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_NewJWT(t *testing.T) {
-	c := config.C()
-	fmt.Println(c)
+func Test_ParseToken(t *testing.T) {
+	testCases := []struct {
+		name         string
+		bearerToken  string
+		expectedErr  error
+		expectedUser string // Add more fields if necessary for validation
+	}{
+		// TODO: these tests may fail due to expiration of the jwt tokens
+		{
+			name:         "valid token",
+			bearerToken:  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE1ODkzNSwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiJ9.uGyl2lTwhH8CB5UwzYu_2cDrH5zo9_2cCYqivHTY0Cc",
+			expectedUser: "testemail@example.com",
+		},
+		{
+			// TODO: this test cases passes but is this correct?
+			name:         "valid token without bearer keyword",
+			bearerToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE1Nzk2MSwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSJ9.TSvkTtpw69PCjBhqeUQ5t72HHw5GXsyPZrZdETcZYgA",
+			expectedUser: "testemail@example.com",
+		},
+		{
+			// the data here is tampered and the jwt module should raise error on this
+			name:        "malformed signature",
+			bearerToken: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE2MDIxNCwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiJ9.714GxZ2iXAD87R5Zk27XXgwp7heWYx2190_GAZagFCg",
+			expectedErr: fmt.Errorf("token signature is invalid: signature is invalid"), // Define the expected error
+		},
+	}
+
+	cfg := config.C()
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// 1. setup
+			jwt := auth.NewJWT(cfg.Manager.JWTConfig)
+
+			// 2. execution
+			claims, err := jwt.ParseToken(tc.bearerToken)
+
+			// 3. assertion
+			if tc.expectedErr != nil {
+				assert.Equal(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, claims)
+				assert.Equal(t, tc.expectedUser, claims.UserEmail)
+				// Add more assertions if needed for other claim data
+			}
+		})
+	}
 }
 
 func Test_CreateAccessToken(t *testing.T) {
 	testCases := []struct {
 		name string
-		cfg  *auth.JwtConfig
 		user entity.User
 		err  error
 	}{
@@ -31,26 +74,32 @@ func Test_CreateAccessToken(t *testing.T) {
 		{
 			name: "empty user",
 			user: entity.User{},
-			err:  errors.JwtEmptyUserErr,
+			err:  errors.ErrJwtEmptyUser,
 		},
 		{
 			name: "nil user",
-			err:  errors.JwtEmptyUserErr,
+			err:  errors.ErrJwtEmptyUser,
 		},
 	}
+
+	cfg := config.C()
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := auth.NewJWT(tc.cfg)
+			jwt := auth.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
-			_, err := jwt.CreateAccessToken(tc.user)
+			token, err := jwt.CreateAccessToken(tc.user)
+			fmt.Println(token)
 
 			// 3. assertion
 			if err != nil {
 				assert.Error(t, tc.err, err)
+				return
 			}
+			assert.NotEmpty(t, token)
+			assert.NoError(t, err)
 		})
 	}
 }
