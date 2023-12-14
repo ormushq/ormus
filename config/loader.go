@@ -11,6 +11,7 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 )
 
+// TODO: defaultYamlFilePath has some problems in testing environment but have normal behavior in build environment
 const (
 	defaultPrefix       = "ORMUS_"
 	defaultDelimiter    = "."

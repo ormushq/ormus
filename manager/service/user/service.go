@@ -6,15 +6,15 @@ type Repository interface {
 	Register(u entity.User) (entity.User, error)
 	GetUserByEmail(email string) (entity.User, error)
 }
-type AuthGenerator interface {
+type JWTEngine interface {
 	CreateAccessToken(user entity.User) (string, error)
 	CreateRefreshToken(user entity.User) (string, error)
 }
 type Service struct {
 	repo Repository
-	auth AuthGenerator
+	auth JWTEngine
 }
 
-func New(authGenerator AuthGenerator) Service {
+func New(authGenerator JWTEngine) Service {
 	return Service{auth: authGenerator}
 }
