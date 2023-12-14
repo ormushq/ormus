@@ -51,7 +51,7 @@ func Test_ParseToken(t *testing.T) {
 
 			// 3. assertion
 			if tc.expectedErr != nil {
-				assert.Equal(t, err.Error(), tc.expectedErr.Error())
+				assert.Equal(t, tc.expectedErr.Error(), err.(richerror.RichError).Message())
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, claims)
