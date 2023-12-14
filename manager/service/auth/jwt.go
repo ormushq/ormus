@@ -9,53 +9,30 @@ import (
 	errors "github.com/ormushq/ormus/manager/error"
 )
 
-var jwtModule *JWT
-
-const (
-	defaultSecretKey             = "Ormus_jwt"
-	defaultAccessExpirationTime  = time.Hour * 24 * 7
-	defaultRefreshExpirationTime = time.Hour * 24 * 7 * 4
-	defaultAccessSubject         = "ac"
-	defaultRefreshSubject        = "rt"
-)
-
 type JwtConfig struct {
-	secretKey             string        `koanf:"secret_key"`
-	accessExpirationTime  time.Duration `koanf:"access_expiration_time"`
-	refreshExpirationTime time.Duration `koanf:"refresh_expiration_time"`
-	accessSubject         string        `koanf:"access_subject"`
-	refreshSubject        string        `koanf:"refresh_subject"`
+	SecretKey                  string        `koanf:"secret_key"`
+	AccessExpirationTimeInDay  time.Duration `koanf:"access_expiration_time_in_day"`
+	RefreshExpirationTimeInDay time.Duration `koanf:"refresh_expiration_time_in_day"`
+	AccessSubject              string        `koanf:"access_subject"`
+	RefreshSubject             string        `koanf:"refresh_subject"`
 }
 
 type JWT struct {
 	configs JwtConfig
 }
 
-func init() {
-	jwtModule = &JWT{
-		configs: JwtConfig{
-			secretKey:             defaultSecretKey,
-			accessExpirationTime:  defaultAccessExpirationTime,
-			refreshExpirationTime: defaultRefreshExpirationTime,
-			accessSubject:         defaultAccessSubject,
-			refreshSubject:        defaultRefreshSubject,
-		}}
-}
-
-func NewJWT(config *JwtConfig) *JWT {
-	// if the config was not loaded return the jwt module with default config
-	if config == nil {
-		return jwtModule
-	}
+func NewJWT(cfg JwtConfig) *JWT {
+	day := time.Hour * 24
 
 	return &JWT{
 		configs: JwtConfig{
-			secretKey:             config.secretKey,
-			accessExpirationTime:  config.accessExpirationTime,
-			refreshExpirationTime: config.refreshExpirationTime,
-			accessSubject:         config.accessSubject,
-			refreshSubject:        config.refreshSubject,
-		}}
+			SecretKey:                  cfg.SecretKey,
+			AccessExpirationTimeInDay:  cfg.AccessExpirationTimeInDay * day,
+			RefreshExpirationTimeInDay: cfg.RefreshExpirationTimeInDay * day,
+			AccessSubject:              cfg.AccessSubject,
+			RefreshSubject:             cfg.RefreshSubject,
+		},
+	}
 }
 
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
@@ -63,11 +40,11 @@ func (s JWT) CreateAccessToken(user entity.User) (string, error) {
 		// it is wierd to build a jwt token for no one, right?
 		return "", errors.JwtEmptyUserErr
 	}
-	return s.createToken(user.Email, s.configs.accessSubject, s.configs.accessExpirationTime)
+	return s.createToken(user.Email, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
 }
 
 func (s JWT) CreateRefreshToken(user entity.User) (string, error) {
-	return s.createToken(user.Email, s.configs.refreshSubject, s.configs.refreshExpirationTime)
+	return s.createToken(user.Email, s.configs.RefreshSubject, s.configs.RefreshExpirationTimeInDay)
 }
 
 func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
@@ -76,7 +53,7 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 	tokenStr := strings.Replace(bearerToken, "Bearer ", "", 1)
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(s.configs.secretKey), nil
+		return []byte(s.configs.SecretKey), nil
 	})
 	if err != nil {
 		return nil, err
@@ -104,7 +81,7 @@ func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := accessToken.SignedString([]byte(s.configs.secretKey))
+	tokenString, err := accessToken.SignedString([]byte(s.configs.SecretKey))
 	if err != nil {
 		return "", err
 	}
