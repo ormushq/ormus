@@ -44,7 +44,7 @@ func callbackEnv(source string) string {
 }
 
 func TestLoadingDefaultConfigFromStruct(t *testing.T) {
-	k := koanf.New(".")
+	k := koanf.New(delimiter)
 
 	testStruct := structConfig{
 		Debug:        false,
@@ -72,7 +72,7 @@ func TestLoadingDefaultConfigFromStruct(t *testing.T) {
 }
 
 func TestLoadingConfigFromYamlFile(t *testing.T) {
-	k := koanf.New(".")
+	k := koanf.New(delimiter)
 
 	ymlConfigTest := []byte(`debug: false
 multi_word_var: "I'm complex in config.yml"
@@ -88,7 +88,7 @@ db:
 	ymlFile.Write(ymlConfigTest)
 	// load configuration from yaml file
 	if err := k.Load(file.Provider("test.yml"), yaml.Parser()); err != nil {
-		t.Logf("error loading config from `config.yml` file: %s", err)
+		t.Logf("error loading config from `test.yml` file: %s", err)
 	}
 
 	want := structConfig{
