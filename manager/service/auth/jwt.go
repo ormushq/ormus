@@ -38,7 +38,7 @@ func NewJWT(cfg JwtConfig) *JWT {
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
 	if len(user.Email) == 0 {
 		// it is wierd to build a jwt token for no one, right?
-		return "", errors.JwtEmptyUserErr
+		return "", errors.ErrJwtEmptyUser
 	}
 	return s.createToken(user.Email, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
 }
@@ -55,6 +55,7 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.configs.SecretKey), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
