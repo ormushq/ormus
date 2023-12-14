@@ -7,10 +7,15 @@ require gopkg.in/natefinch/lumberjack.v2 v2.2.1
 require (
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.3
+	github.com/redis/go-redis/v9 v9.3.0
+	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.59.0
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -20,6 +25,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
