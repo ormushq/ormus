@@ -1,13 +1,14 @@
 package auth
 
 import (
-	"github.com/ormushq/ormus/pkg/errmsg"
-	"github.com/ormushq/ormus/pkg/richerror"
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/richerror"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtConfig struct {

@@ -15,6 +15,8 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
 
+	// user not existing
+	// TODO: should we let users know that an email is not registered? or we should proceed with more secure way of not telling them.
 	if user == nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitMessage(errmsg.ErrWrongCredentials)
 	}
@@ -28,11 +30,11 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	}
 
 	// jwt token
-	AccessToken, err := s.jwt.CreateAccessToken(user)
+	AccessToken, err := s.jwt.CreateAccessToken(*user)
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
-	RefreshToken, err := s.jwt.CreateRefreshToken(user)
+	RefreshToken, err := s.jwt.CreateRefreshToken(*user)
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
