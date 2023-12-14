@@ -2,12 +2,13 @@ package auth_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/service/auth"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -75,11 +76,11 @@ func Test_CreateAccessToken(t *testing.T) {
 		{
 			name: "empty user",
 			user: entity.User{},
-			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser),
+			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrJwtEmptyUser),
 		},
 		{
 			name: "nil user",
-			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser),
+			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrJwtEmptyUser),
 		},
 	}
 

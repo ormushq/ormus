@@ -13,7 +13,7 @@ func Error(err error) (message string, code int) {
 		msg := re.Message()
 		code := mapKindToHTTPStatusCode(re.Kind())
 		if code >= 500 {
-			msg = errmsg.ErrorMsgSomeThingWentWrong
+			msg = errmsg.ErrSomeThingWentWrong
 		}
 		return msg, code
 	default:

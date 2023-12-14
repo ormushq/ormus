@@ -37,7 +37,6 @@ func NewJWT(cfg JwtConfig) *JWT {
 }
 
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
-
 	return s.createToken(user.Email, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
 }
 
@@ -68,7 +67,7 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration) (string, error) {
 	if len(userEmail) == 0 {
 		// it is wierd to build a jwt token for no one, right?
-		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser)
+		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrJwtEmptyUser)
 	}
 	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
