@@ -1,4 +1,4 @@
-package auth_test
+package service_test
 
 import (
 	"fmt"
@@ -45,7 +45,7 @@ func Test_ParseToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := auth.NewJWT(cfg.Manager.JWTConfig)
+			jwt := service.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			claims, err := jwt.ParseToken(tc.bearerToken)
@@ -89,7 +89,7 @@ func Test_CreateAccessToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := auth.NewJWT(cfg.Manager.JWTConfig)
+			jwt := service.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)

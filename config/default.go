@@ -8,7 +8,7 @@ import (
 func Default() Config {
 	return Config{
 		Manager: manager.Config{
-			JWTConfig: auth.JwtConfig{
+			JWTConfig: service.JwtConfig{
 				SecretKey:                  "Ormus_jwt",
 				AccessExpirationTimeInDay:  7,
 				RefreshExpirationTimeInDay: 28,

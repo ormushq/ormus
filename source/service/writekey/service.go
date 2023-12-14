@@ -10,12 +10,12 @@ type Repository interface {
 	IsValidWriteKey(ctx context.Context, writeKey string) (bool, error)
 }
 
-// Service show dependencies writeKey service.
+// Service show dependencies writeKey auth.
 type Service struct {
 	repo Repository
 }
 
-// Constructor writeKey service.
+// Constructor writeKey auth.
 func New(repo Repository) Service {
 	return Service{
 		repo: repo,

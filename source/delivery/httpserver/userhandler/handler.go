@@ -6,10 +6,10 @@ import (
 
 type Handler struct {
 	// TODO - add configurations
-	userSvc auth.Service
+	userSvc service.Service
 }
 
-func New(userSvc auth.Service) *Handler {
+func New(userSvc service.Service) *Handler {
 
 	return &Handler{userSvc: userSvc}
 

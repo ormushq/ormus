@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/manager/service/auth"
+
+	authrepository "github.com/ormushq/ormus/manager/repository/auth"
+	authservice "github.com/ormushq/ormus/manager/service/auth"
+
 	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
-	"net/http"
 )
 
 func main() {
@@ -15,9 +19,10 @@ func main() {
 
 	e := echo.New()
 
-	jwt := auth.NewJWT(cfg.Manager.JWTConfig)
+	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
-	usersvc := auth.New(jwt)
+	userrepo := authrepository.StorageAdapter{}
+	usersvc := authservice.NewService(jwt, userrepo)
 	userhand := userhandler.New(usersvc)
 
 	e.GET("/", func(c echo.Context) error {

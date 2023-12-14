@@ -1,4 +1,4 @@
-package auth_test
+package service_test
 
 import (
 	"fmt"
@@ -53,7 +53,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := auth.NewService(jwt, repo)
+			svc := service.NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -117,7 +117,7 @@ func TestService_Login(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := auth.NewService(jwt, repo)
+			svc := service.NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)
