@@ -5,7 +5,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/service/auth"
-	"github.com/ormushq/ormus/manager/service/user"
 	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
 	"net/http"
 )
@@ -18,7 +17,7 @@ func main() {
 
 	jwt := auth.NewJWT(cfg.Manager.JWTConfig)
 
-	usersvc := user.New(jwt)
+	usersvc := auth.New(jwt)
 	userhand := userhandler.New(usersvc)
 
 	e.GET("/", func(c echo.Context) error {
