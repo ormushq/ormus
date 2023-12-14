@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
-	errors "github.com/ormushq/ormus/manager/error"
 	"github.com/ormushq/ormus/manager/service/auth"
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/richerror"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,10 +32,10 @@ func Test_ParseToken(t *testing.T) {
 			expectedUser: "testemail@example.com",
 		},
 		{
-			// the data here is tampered and the jwt module should raise error on this
+			// the data here is tampered and the jwt module should raise errmsg on this
 			name:        "malformed signature",
 			bearerToken: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE2MDIxNCwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiJ9.714GxZ2iXAD87R5Zk27XXgwp7heWYx2190_GAZagFCg",
-			expectedErr: fmt.Errorf("token signature is invalid: signature is invalid"), // Define the expected error
+			expectedErr: fmt.Errorf("token signature is invalid: signature is invalid"), // Define the expected errmsg
 		},
 	}
 
@@ -74,11 +75,11 @@ func Test_CreateAccessToken(t *testing.T) {
 		{
 			name: "empty user",
 			user: entity.User{},
-			err:  errors.ErrJwtEmptyUser,
+			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser),
 		},
 		{
 			name: "nil user",
-			err:  errors.ErrJwtEmptyUser,
+			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser),
 		},
 	}
 

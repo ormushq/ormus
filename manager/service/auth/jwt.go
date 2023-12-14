@@ -1,12 +1,13 @@
 package auth
 
 import (
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/richerror"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ormushq/ormus/manager/entity"
-	errors "github.com/ormushq/ormus/manager/error"
 )
 
 type JwtConfig struct {
@@ -36,10 +37,7 @@ func NewJWT(cfg JwtConfig) *JWT {
 }
 
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
-	if len(user.Email) == 0 {
-		// it is wierd to build a jwt token for no one, right?
-		return "", errors.ErrJwtEmptyUser
-	}
+
 	return s.createToken(user.Email, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
 }
 
@@ -57,18 +55,21 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, richerror.New("parse token failed").WhitWarpError(err)
 	}
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return claims, nil
 	} else {
-		return nil, err
+		return nil, richerror.New("parse token failed").WhitWarpError(err)
 	}
 }
 
 func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration) (string, error) {
-
+	if len(userEmail) == 0 {
+		// it is wierd to build a jwt token for no one, right?
+		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrorMsgJwtEmptyUser)
+	}
 	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
 
@@ -84,7 +85,7 @@ func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := accessToken.SignedString([]byte(s.configs.SecretKey))
 	if err != nil {
-		return "", err
+		return "", richerror.New("jwt.createToken").WhitWarpError(err)
 	}
 
 	return tokenString, nil

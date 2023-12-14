@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/richerror"
 	"time"
 )
 
@@ -19,7 +19,7 @@ func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, er
 	}
 	createdUser, err := s.repo.Register(user)
 	if err != nil {
-		return param.RegisterResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return param.RegisterResponse{}, richerror.New("register").WhitWarpError(err)
 	}
 	//return create new user
 	return param.RegisterResponse{

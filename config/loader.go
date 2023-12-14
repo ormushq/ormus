@@ -42,21 +42,21 @@ func init() {
 
 	// load default configuration from Default function
 	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
-		log.Fatalf("error loading default config: %s", err)
+		log.Fatalf("errmsg loading default config: %s", err)
 	}
 
 	// load configuration from yaml file
 	if err := k.Load(file.Provider(defaultYamlFilePath), yaml.Parser()); err != nil {
-		log.Printf("error loading srcconfig from `config.yml` file: %s", err)
+		log.Printf("errmsg loading srcconfig from `config.yml` file: %s", err)
 	}
 
 	// load from environment variable
 	if err := k.Load(env.Provider(defaultPrefix, defaultDelimiter, defaultCallbackEnv), nil); err != nil {
-		log.Printf("error loading environment variables: %s", err)
+		log.Printf("errmsg loading environment variables: %s", err)
 	}
 
 	if err := k.Unmarshal("", &c); err != nil {
-		log.Fatalf("error unmarshaling config: %s", err)
+		log.Fatalf("errmsg unmarshaling config: %s", err)
 	}
 }
 
@@ -68,19 +68,19 @@ func New(opt Option) Config {
 	k := koanf.New(opt.Separator)
 
 	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
-		log.Fatalf("error loading default config: %s", err)
+		log.Fatalf("errmsg loading default config: %s", err)
 	}
 
 	if err := k.Load(file.Provider(opt.YamlFilePath), yaml.Parser()); err != nil {
-		log.Printf("error loading config from `config.yml` file: %s", err)
+		log.Printf("errmsg loading config from `config.yml` file: %s", err)
 	}
 
 	if err := k.Load(env.Provider(opt.Prefix, opt.Delimiter, opt.CallbackEnv), nil); err != nil {
-		log.Printf("error loading environment variables: %s", err)
+		log.Printf("errmsg loading environment variables: %s", err)
 	}
 
 	if err := k.Unmarshal("", &c); err != nil {
-		log.Fatalf("error unmarshaling config: %s", err)
+		log.Fatalf("errmsg unmarshaling config: %s", err)
 	}
 
 	return c

@@ -24,7 +24,7 @@ func New(repo Repository) Service {
 
 // IsValid checks whether the writeKey is valid or not.
 func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
-	// TODO - How error handling ? Rich-error or ...?
+	// TODO - How errmsg handling ? Rich-errmsg or ...?
 	isValid, err := s.repo.IsValidWriteKey(ctx, writeKey)
 	if err != nil {
 		// TODO - logger

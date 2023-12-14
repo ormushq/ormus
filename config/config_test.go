@@ -58,12 +58,12 @@ func TestLoadingDefaultConfigFromStruct(t *testing.T) {
 	}
 
 	if err := k.Load(structs.Provider(testStruct, "koanf"), nil); err != nil {
-		t.Fatalf("error loading default config: %s", err)
+		t.Fatalf("errmsg loading default config: %s", err)
 	}
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("errmsg unmarshaling config: %s", err)
 	}
 
 	if !reflect.DeepEqual(instance, testStruct) {
@@ -88,7 +88,7 @@ db:
 	ymlFile.Write(ymlConfigTest)
 	// load configuration from yaml file
 	if err := k.Load(file.Provider("test.yml"), yaml.Parser()); err != nil {
-		t.Logf("error loading config from `test.yml` file: %s", err)
+		t.Logf("errmsg loading config from `test.yml` file: %s", err)
 	}
 
 	want := structConfig{
@@ -104,7 +104,7 @@ db:
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("errmsg unmarshaling config: %s", err)
 	}
 
 	if !reflect.DeepEqual(want, instance) {
@@ -124,12 +124,12 @@ func TestLoadConfigFromEnvironmentVariable(t *testing.T) {
 	os.Setenv("ORMUS_DB__NESTED_MULTI_WORD_CONFIG__DOWN_HERE", "im here")
 
 	if err := k.Load(env.Provider(prefix, delimiter, callbackEnv), nil); err != nil {
-		t.Logf("error loading environment variables: %s", err)
+		t.Logf("errmsg loading environment variables: %s", err)
 	}
 
 	var instance structConfig
 	if err := k.Unmarshal("", &instance); err != nil {
-		t.Fatalf("error unmarshaling config: %s", err)
+		t.Fatalf("errmsg unmarshaling config: %s", err)
 	}
 
 	want := structConfig{
