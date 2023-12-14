@@ -1,4 +1,4 @@
-package user
+package auth
 
 import "github.com/ormushq/ormus/manager/entity"
 

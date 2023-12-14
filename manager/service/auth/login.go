@@ -1,7 +1,8 @@
-package user
+package auth
 
 import (
 	"fmt"
+	ormuserror "github.com/ormushq/ormus/manager/error"
 	"github.com/ormushq/ormus/param"
 )
 
@@ -12,8 +13,10 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	if err != nil {
 		return param.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
 	}
+
+	// TODO: add hashing function for login and registers
 	if user.Password != req.Password {
-		return param.LoginResponse{}, fmt.Errorf("username or password isn't correct")
+		return param.LoginResponse{}, ormuserror.ErrWrongCredentials
 	}
 	// jwt token
 	AccessToken, err := s.auth.CreateAccessToken(user)
