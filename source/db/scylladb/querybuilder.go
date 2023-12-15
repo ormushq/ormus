@@ -48,6 +48,7 @@ package scylladb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 )
@@ -56,6 +57,8 @@ type QueryBuilder[T any] struct {
 	model   TableInterface
 	session SessionxInterface
 }
+
+var ErrNoData = errors.New("no data found")
 
 func (queryBuilder *QueryBuilder[T]) Insert(_ context.Context, insertData *T) error {
 	insertStatement, insertNames := queryBuilder.model.Insert()
@@ -101,7 +104,7 @@ func (queryBuilder *QueryBuilder[T]) Get(ctx context.Context, dataToGet *T) (*T,
 		return &result[0], nil
 	}
 
-	return nil, nil
+	return nil, ErrNoData
 }
 
 func (queryBuilder *QueryBuilder[T]) Delete(ctx context.Context, dataToBeDeleted *T) error {

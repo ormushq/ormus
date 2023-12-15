@@ -44,6 +44,7 @@ func (s *Session) Close() {
 
 func NewSession(session *gocql.Session) SessionxInterface {
 	gocqlxSession := gocqlx.NewSession(session)
+
 	return &Session{S: &gocqlxSession}
 }
 

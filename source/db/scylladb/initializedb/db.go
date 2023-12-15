@@ -19,6 +19,17 @@ type ScyllaDBConnection struct {
 	hosts       []string
 }
 
+const (
+	// numRetries represents the number of retries in the ExponentialBackoffRetryPolicy.
+	numRetries = 5
+
+	// minRetryDelay represents the minimum delay duration in the ExponentialBackoffRetryPolicy.
+	minRetryDelay = time.Second
+
+	// maxRetryDelay represents the maximum delay duration in the ExponentialBackoffRetryPolicy.
+	maxRetryDelay = 10 * time.Second
+)
+
 /*
 The 'createCluster' method creates and returns a gocql.ClusterConfig
 based on the provided connection parameters. It also sets additional configurations,
@@ -30,9 +41,9 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	cluster.Keyspace = conn.keyspace
 	cluster.Timeout = 5 * time.Second
 	cluster.RetryPolicy = &gocql.ExponentialBackoffRetryPolicy{
-		NumRetries: 5,
-		Min:        time.Second,
-		Max:        10 * time.Second,
+		NumRetries: numRetries,
+		Min:        minRetryDelay,
+		Max:        maxRetryDelay,
 	}
 	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
 	log.Println("cluster was created.")
