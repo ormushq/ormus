@@ -1,5 +1,3 @@
-
-
 package event
 
 import (

@@ -4,11 +4,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtConfig struct {
@@ -24,17 +23,26 @@ type JWT struct {
 }
 
 func NewJWT(cfg JwtConfig) *JWT {
-	day := time.Hour * 24
+	hoursInDay := 24
+
+	// 7 * 24 * 60 * 60 * 1000 = 604,800,000
+	// 28 * 24 * 60 * 60 * 1000 = 2,419,200,000
+	accessExpDuration := cfg.AccessExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
+	refreshExpDuration := cfg.RefreshExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
 
 	return &JWT{
 		configs: JwtConfig{
 			SecretKey:                  cfg.SecretKey,
-			AccessExpirationTimeInDay:  cfg.AccessExpirationTimeInDay * day,
-			RefreshExpirationTimeInDay: cfg.RefreshExpirationTimeInDay * day,
+			AccessExpirationTimeInDay:  accessExpDuration,
+			RefreshExpirationTimeInDay: refreshExpDuration,
 			AccessSubject:              cfg.AccessSubject,
 			RefreshSubject:             cfg.RefreshSubject,
 		},
 	}
+}
+
+func (s JWT) GetConfig() *JwtConfig {
+	return &s.configs
 }
 
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
@@ -46,28 +54,27 @@ func (s JWT) CreateRefreshToken(user entity.User) (string, error) {
 }
 
 func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
-	//https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
+	// https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
 
 	tokenStr := strings.Replace(bearerToken, "Bearer ", "", 1)
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.configs.SecretKey), nil
 	})
-
 	if err != nil {
 		return nil, richerror.New("parse token failed").WhitWarpError(err)
 	}
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return claims, nil
-	} else {
-		return nil, richerror.New("parse token failed").WhitWarpError(err)
 	}
+
+	return nil, richerror.New("parse token failed").WhitWarpError(err)
 }
 
 func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration) (string, error) {
-	if len(userEmail) == 0 {
-		// it is wierd to build a jwt token for no one, right?
+	if userEmail == "" {
+		// it is weird to build a jwt token for no one, right?
 		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrJwtEmptyUser)
 	}
 	// create a signer for rsa 256

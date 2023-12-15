@@ -1,16 +1,21 @@
 package repository
 
-import "github.com/ormushq/ormus/manager/entity"
+import (
+	"fmt"
 
-type StorageAdapter struct {
-}
+	"github.com/ormushq/ormus/manager/entity"
+)
+
+// TODO: implement repository for auth
+
+type StorageAdapter struct{}
 
 func (a StorageAdapter) Register(u entity.User) (*entity.User, error) {
-	//TODO implement me
+	fmt.Println(u)
 	panic("implement me")
 }
 
 func (a StorageAdapter) GetUserByEmail(email string) (*entity.User, error) {
-	//TODO implement me
+	fmt.Println(email)
 	panic("implement me")
 }

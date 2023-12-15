@@ -12,7 +12,10 @@ import (
 
 func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
 	// fetch user to check if exists before user creation
-	existing, _ := s.repo.GetUserByEmail(req.Email)
+	existing, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		return param.RegisterResponse{}, richerror.New("register.repo").WhitWarpError(err)
+	}
 	if existing != nil {
 		return param.RegisterResponse{}, richerror.New("register").WhitMessage(errmsg.ErrAuthUserExisting)
 	}
@@ -36,7 +39,7 @@ func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, er
 		return param.RegisterResponse{}, richerror.New("register.repo").WhitWarpError(err)
 	}
 
-	//return create new user
+	// return create new user
 	return param.RegisterResponse{
 		Email: createdUser.Email,
 	}, nil

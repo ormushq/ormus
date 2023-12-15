@@ -1,9 +1,10 @@
 package password_test
 
 import (
+	"testing"
+
 	"github.com/ormushq/ormus/pkg/password"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestHashPassword(t *testing.T) {

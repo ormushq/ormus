@@ -1,7 +1,7 @@
 package userhandler
 
 import (
-	"github.com/ormushq/ormus/manager/service/auth"
+	service "github.com/ormushq/ormus/manager/service/auth"
 )
 
 type Handler struct {
@@ -10,7 +10,5 @@ type Handler struct {
 }
 
 func New(userSvc service.Service) *Handler {
-
 	return &Handler{userSvc: userSvc}
-
 }

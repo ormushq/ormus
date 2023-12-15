@@ -8,8 +8,8 @@ import (
 )
 
 func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
-	//check the existing of email address  from repository
-	//get user by email address
+	// check the existing of email address  from repository
+	// get user by email address
 	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
@@ -39,7 +39,7 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
 
-	//return ok
+	// return ok
 	return param.LoginResponse{
 		User: param.UserInfo{
 			ID:        user.ID,
@@ -53,5 +53,4 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 			RefreshToken: RefreshToken,
 		},
 	}, nil
-
 }

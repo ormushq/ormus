@@ -9,7 +9,6 @@ import (
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -139,8 +138,7 @@ func TestService_Login(t *testing.T) {
 	}
 }
 
-type MockJwtEngine struct {
-}
+type MockJwtEngine struct{}
 
 func (m MockJwtEngine) CreateAccessToken(user entity.User) (string, error) {
 	return "very_secure_token", nil

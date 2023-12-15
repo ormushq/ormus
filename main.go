@@ -6,10 +6,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
-
 	authrepository "github.com/ormushq/ormus/manager/repository/auth"
 	authservice "github.com/ormushq/ormus/manager/service/auth"
-
 	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
 )
 
@@ -31,5 +29,4 @@ func main() {
 	e.POST("/register", userhand.RegisterUser)
 	e.POST("/login", userhand.UserLogin)
 	e.Logger.Fatal(e.Start(":8080"))
-
 }

@@ -1,26 +1,33 @@
 package httpmsg
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"net/http"
 )
 
 func Error(err error) (message string, code int) {
-	switch err.(type) {
-	case richerror.RichError:
-		re := err.(richerror.RichError)
+	serverErrCode := 500
+
+	var richError richerror.RichError
+	switch {
+	case errors.As(err, &richError):
+		var re richerror.RichError
+		errors.As(err, &re)
+
 		msg := re.Message()
 		code := mapKindToHTTPStatusCode(re.Kind())
-		if code >= 500 {
+
+		if code >= serverErrCode {
 			msg = errmsg.ErrSomeThingWentWrong
 		}
+
 		return msg, code
 	default:
 		return err.Error(), http.StatusBadRequest
-
 	}
-
 }
 
 func mapKindToHTTPStatusCode(kind richerror.Kind) int {

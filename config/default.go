@@ -1,17 +1,22 @@
 package config
 
 import (
+	"time"
+
 	"github.com/ormushq/ormus/manager"
-	"github.com/ormushq/ormus/manager/service/auth"
+	service "github.com/ormushq/ormus/manager/service/auth"
 )
 
 func Default() Config {
+	var accessExpirationTimeInDay time.Duration = 7
+	var refreshExpirationTimeInDay time.Duration = 28
+
 	return Config{
 		Manager: manager.Config{
 			JWTConfig: service.JwtConfig{
 				SecretKey:                  "Ormus_jwt",
-				AccessExpirationTimeInDay:  7,
-				RefreshExpirationTimeInDay: 28,
+				AccessExpirationTimeInDay:  accessExpirationTimeInDay,
+				RefreshExpirationTimeInDay: refreshExpirationTimeInDay,
 				AccessSubject:              "ac",
 				RefreshSubject:             "rt",
 			},

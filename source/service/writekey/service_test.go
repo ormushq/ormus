@@ -3,12 +3,12 @@ package writekey_test
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/source/service/writekey"
 	"testing"
+
+	"github.com/ormushq/ormus/source/service/writekey"
 )
 
-type mockRepo struct {
-}
+type mockRepo struct{}
 
 // TODO - use https://github.com/golang/mock
 func (m mockRepo) IsValidWriteKey(ctx context.Context, writeKey string) (bool, error) {
