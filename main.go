@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	authrepository "github.com/ormushq/ormus/manager/repository/auth"
 	authservice "github.com/ormushq/ormus/manager/service/auth"
-	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
 )
 
 func main() {
