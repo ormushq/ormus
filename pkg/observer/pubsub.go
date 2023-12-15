@@ -8,13 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
+const subscriberChannelBufferSize = 1000
+
 type Config struct {
-	SubscriberChannelBufferSize int64
+	SubscriberChannelBufferSize int64 `koanf:"subscriber_channel_buffer_size"`
 }
 
 var Pubsub *GoChannelPubsub
 
-func init() {}
+func init() {
+	Pubsub = NewPubsub(Config{
+		SubscriberChannelBufferSize: subscriberChannelBufferSize,
+	})
+}
 
 type GoChannelPubsub struct {
 	config Config
