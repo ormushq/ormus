@@ -3,15 +3,34 @@ package service_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/service/auth"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-
 	"github.com/stretchr/testify/assert"
 )
+
+func TestNewJWT(t *testing.T) {
+	t.Run("test durations", func(t *testing.T) {
+		// 1. setup
+		cfg := service.JwtConfig{
+			AccessExpirationTimeInDay:  7,  // 7 * 24 * 60 * 60 * 1000 * 1000 = 604,800,000,000,000
+			RefreshExpirationTimeInDay: 28, // 28 * 24 * 60 * 60 * 1000 * 1000 = 2,419,200,000,000,000
+		}
+
+		jwt := service.NewJWT(cfg)
+
+		// 2. execution
+		jwtCfg := jwt.GetConfig()
+
+		// 3. assertion
+		assert.Equal(t, time.Duration(604_800_000_000_000), jwtCfg.AccessExpirationTimeInDay)
+		assert.Equal(t, time.Duration(2_419_200_000_000_000), jwtCfg.RefreshExpirationTimeInDay)
+	})
+}
 
 func Test_ParseToken(t *testing.T) {
 	testCases := []struct {
