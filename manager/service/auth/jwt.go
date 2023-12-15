@@ -25,8 +25,6 @@ type JWT struct {
 func NewJWT(cfg JwtConfig) *JWT {
 	hoursInDay := 24
 
-	// 7 * 24 * 60 * 60 * 1000 = 604,800,000
-	// 28 * 24 * 60 * 60 * 1000 = 2,419,200,000
 	accessExpDuration := cfg.AccessExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
 	refreshExpDuration := cfg.RefreshExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
 

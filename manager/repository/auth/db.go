@@ -10,6 +10,11 @@ import (
 
 type StorageAdapter struct{}
 
+func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
+	fmt.Println(email)
+	panic("implement me")
+}
+
 func (a StorageAdapter) Register(u entity.User) (*entity.User, error) {
 	fmt.Println(u)
 	panic("implement me")

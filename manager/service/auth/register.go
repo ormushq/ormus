@@ -12,11 +12,11 @@ import (
 
 func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
 	// fetch user to check if exists before user creation
-	existing, err := s.repo.GetUserByEmail(req.Email)
+	existing, err := s.repo.DoesUserExistsByEmail(req.Email)
 	if err != nil {
 		return param.RegisterResponse{}, richerror.New("register.repo").WhitWarpError(err)
 	}
-	if existing != nil {
+	if existing {
 		return param.RegisterResponse{}, richerror.New("register").WhitMessage(errmsg.ErrAuthUserExisting)
 	}
 

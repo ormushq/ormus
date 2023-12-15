@@ -5,6 +5,7 @@ import "github.com/ormushq/ormus/manager/entity"
 type Repository interface {
 	Register(u entity.User) (*entity.User, error)
 	GetUserByEmail(email string) (*entity.User, error)
+	DoesUserExistsByEmail(email string) (bool, error)
 }
 
 type JWTEngine interface {

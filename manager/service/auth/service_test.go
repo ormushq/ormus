@@ -189,3 +189,13 @@ func (m MockRepository) GetUserByEmail(email string) (*entity.User, error) {
 
 	return nil, richerror.New("MockRepo.GetUserByEmail").WhitMessage(errmsg.ErrAuthUserNotFound)
 }
+
+func (m MockRepository) DoesUserExistsByEmail(email string) (bool, error) {
+	for _, user := range m.users {
+		if user.Email == email {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
