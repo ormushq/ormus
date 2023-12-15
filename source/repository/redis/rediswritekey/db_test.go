@@ -1,12 +1,13 @@
 package rediswritekey_test
 
 import (
+	"os"
+	"testing"
+
 	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/source/repository/redis/rediswritekey"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 func TestMain(m *testing.M) {

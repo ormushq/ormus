@@ -1,9 +1,11 @@
 package config
 
-import "github.com/ormushq/ormus/manager"
-import "github.com/ormushq/ormus/adapter/redis"
+import (
+	"github.com/ormushq/ormus/adapter/redis"
+	"github.com/ormushq/ormus/manager"
+)
 
 type Config struct {
-  Manager manager.Config `koanf:"manager"`
-	Redis redis.Config `koanf:"redis"`
+	Manager manager.Config `koanf:"manager"`
+	Redis   redis.Config   `koanf:"redis"`
 }
