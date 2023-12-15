@@ -20,6 +20,8 @@ type ScyllaDBConnection struct {
 }
 
 const (
+	timeoutCluster = 5 * time.Second
+
 	// numRetries represents the number of retries in the ExponentialBackoffRetryPolicy.
 	numRetries = 5
 
@@ -39,7 +41,7 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	cluster := gocql.NewCluster(conn.hosts...)
 	cluster.Consistency = conn.consistency
 	cluster.Keyspace = conn.keyspace
-	cluster.Timeout = 5 * time.Second
+	cluster.Timeout = timeoutCluster
 	cluster.RetryPolicy = &gocql.ExponentialBackoffRetryPolicy{
 		NumRetries: numRetries,
 		Min:        minRetryDelay,
