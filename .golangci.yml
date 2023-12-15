@@ -6,7 +6,7 @@ run:
 
   timeout: 30m
 
-  # Fail if the errmsg was met.
+  # Fail if the error was met.
   issues-exit-code: 1
 
   # Check for bugs in tests.
@@ -57,13 +57,13 @@ linters:
     # Check for two durations multiplied together.
     - durationcheck
 
-    # Forces to not skip errmsg check.
+    # Forces to not skip error check.
     - errcheck
 
-    # Checks `Err-` prefix for var and `-Error` suffix for errmsg type.
+    # Checks `Err-` prefix for var and `-Error` suffix for error type.
     - errname
 
-    # Suggests to use `%w` for errmsg-wrapping.
+    # Suggests to use `%w` for error-wrapping.
     - errorlint
 
     # Checks for pointers to enclosing loop variables.
@@ -222,7 +222,7 @@ linters:
     # Find duplicate words, rare.
     - dupword
 
-    # I'm fine to check the errmsg from json.Marshal
+    # I'm fine to check the error from json.Marshal
     - errchkjson
 
     # All SQL queries MUST BE covered with tests.
@@ -251,7 +251,7 @@ linters:
     # TODO and friends are ok.
     - godox
 
-    # Check the errmsg handling expressions. Too noisy.
+    # Check the error handling expressions. Too noisy.
     - goerr113
 
     # I don't use file headers.
