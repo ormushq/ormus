@@ -114,7 +114,7 @@ func TestPubsub_Publish_Subscribe(t *testing.T) {
 		}
 
 		for _, receivedMessage := range receivedMessages {
-			assert.Equal(t, message.Id, receivedMessage.Id)
+			assert.Equal(t, message.ID, receivedMessage.ID)
 			assert.Equal(t, message.Payload, receivedMessage.Payload)
 		}
 	})
@@ -175,7 +175,7 @@ func TestPubsub_Subscribe_RaceCondition(t *testing.T) {
 			// Receive and verify the message
 			select {
 			case receivedMessage := <-subscriber:
-				if receivedMessage.Id != message.Id || receivedMessage.Payload != message.Payload {
+				if receivedMessage.ID != message.ID || receivedMessage.Payload != message.Payload {
 					t.Errorf("Received unexpected message. Expected: %+v, Received: %+v", message, receivedMessage)
 				}
 			case <-time.After(time.Millisecond * 500):

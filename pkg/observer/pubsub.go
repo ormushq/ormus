@@ -30,7 +30,6 @@ type GoChannelPubsub struct {
 }
 
 func NewPubsub(config Config) *GoChannelPubsub {
-
 	return &GoChannelPubsub{
 		config:                 config,
 		subscribers:            make(map[string][]*Subscriber),
@@ -40,9 +39,7 @@ func NewPubsub(config Config) *GoChannelPubsub {
 }
 
 func (g *GoChannelPubsub) Publish(topic string, messages ...*Message) error {
-
 	if g.isClosed() {
-
 		return fmt.Errorf("pubsub closed")
 	}
 
@@ -50,8 +47,12 @@ func (g *GoChannelPubsub) Publish(topic string, messages ...*Message) error {
 	defer g.subscribersLock.RUnlock()
 
 	topicLock, _ := g.subscribersByTopicLock.LoadOrStore(topic, &sync.Mutex{})
-	topicLock.(*sync.Mutex).Lock()
-	defer topicLock.(*sync.Mutex).Unlock()
+	tl, ok := topicLock.(*sync.Mutex)
+	if !ok {
+		panic("Type assertion failed in pubsub.publish")
+	}
+	tl.Lock()
+	defer tl.Unlock()
 
 	for i := range messages {
 
@@ -59,7 +60,6 @@ func (g *GoChannelPubsub) Publish(topic string, messages ...*Message) error {
 
 		err := g.sendMessage(topic, msg)
 		if err != nil {
-
 			return err
 		}
 	}
@@ -68,11 +68,9 @@ func (g *GoChannelPubsub) Publish(topic string, messages ...*Message) error {
 }
 
 func (g *GoChannelPubsub) sendMessage(topic string, message *Message) error {
-
 	subscribers := g.topicSubscribers(topic)
 
 	if len(subscribers) == 0 {
-
 		return fmt.Errorf("no subscribers have")
 	}
 
@@ -90,17 +88,14 @@ func (g *GoChannelPubsub) sendMessage(topic string, message *Message) error {
 		}
 
 		wg.Wait()
-
 	}(subscribers)
 
 	return nil
 }
 
 func (g *GoChannelPubsub) topicSubscribers(topic string) []*Subscriber {
-
 	subscribers, ok := g.subscribers[topic]
 	if !ok {
-
 		return nil
 	}
 
@@ -112,7 +107,6 @@ func (g *GoChannelPubsub) topicSubscribers(topic string) []*Subscriber {
 }
 
 func (g *GoChannelPubsub) Subscribe(topic string) (chan *Message, error) {
-
 	g.closedLock.Lock()
 
 	if g.closed {
@@ -127,7 +121,11 @@ func (g *GoChannelPubsub) Subscribe(topic string) (chan *Message, error) {
 	g.subscribersLock.Lock()
 
 	topicLock, _ := g.subscribersByTopicLock.LoadOrStore(topic, &sync.Mutex{})
-	topicLock.(*sync.Mutex).Lock()
+	tl, ok := topicLock.(*sync.Mutex)
+	if !ok {
+		panic("Type assertion failed in pubsub.publish")
+	}
+	tl.Lock()
 
 	s := &Subscriber{
 		id:             uuid.New(),
@@ -136,7 +134,7 @@ func (g *GoChannelPubsub) Subscribe(topic string) (chan *Message, error) {
 	}
 
 	defer g.subscribersLock.Unlock()
-	defer topicLock.(*sync.Mutex).Unlock()
+	defer tl.Unlock()
 
 	g.addSubscriber(topic, s)
 
@@ -144,9 +142,7 @@ func (g *GoChannelPubsub) Subscribe(topic string) (chan *Message, error) {
 }
 
 func (g *GoChannelPubsub) addSubscriber(topic string, s *Subscriber) {
-
 	if _, ok := g.subscribers[topic]; !ok {
-
 		g.subscribers[topic] = make([]*Subscriber, 0)
 	}
 
@@ -154,7 +150,6 @@ func (g *GoChannelPubsub) addSubscriber(topic string, s *Subscriber) {
 }
 
 func (g *GoChannelPubsub) isClosed() bool {
-
 	g.closedLock.Lock()
 	defer g.closedLock.Unlock()
 
@@ -163,7 +158,6 @@ func (g *GoChannelPubsub) isClosed() bool {
 
 // Close closes the GoChannel Pub/Sub.
 func (g *GoChannelPubsub) Close() error {
-
 	g.closedLock.Lock()
 	defer g.closedLock.Unlock()
 
@@ -191,9 +185,7 @@ type Subscriber struct {
 }
 
 func (s *Subscriber) Close() {
-
 	if s.closed {
-
 		return
 	}
 
@@ -209,7 +201,6 @@ func (s *Subscriber) Close() {
 }
 
 func (s *Subscriber) sendMessageToSubscriber(msg *Message) {
-
 	s.sending.Lock()
 	defer s.sending.Unlock()
 
