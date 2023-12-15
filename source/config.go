@@ -1,4 +1,4 @@
-package config
+package source
 
 // HTTPServer is the main object for http configurations
 type HTTPServer struct {

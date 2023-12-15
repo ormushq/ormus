@@ -5,13 +5,13 @@ import (
 	"log"
 	"net"
 
-	"github.com/ormushq/ormus/source/config"
+	"github.com/ormushq/ormus/source"
 	"google.golang.org/grpc"
 )
 
 // Server is the main object for managing grpc configurations and handlers
 type Server struct {
-	Config config.Config
+	Config source.Config
 }
 
 func New() Server {

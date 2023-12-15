@@ -4,21 +4,21 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ormushq/ormus/source/config"
+	"github.com/ormushq/ormus/source"
 	"github.com/ormushq/ormus/source/delivery/httpserver/userhandler"
 )
 
 // Server is the main object for managing http configurations and handlers
 type Server struct {
-	config      config.Config
+	config      source.Config
 	Router      *echo.Echo
 	userhandler userhandler.Handler
 }
 
 // Setup a new server object
-func New(c config.Config) Server {
+func New(c source.Config) Server {
 	return Server{
-		config: config.Config{
+		config: source.Config{
 			HTTPServer: c.HTTPServer,
 		},
 		Router: echo.New(),
