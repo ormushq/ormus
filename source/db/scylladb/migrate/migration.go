@@ -4,6 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
+	// Using a blank import for the Cassandra database package ensures that
+	// its side effects, such as registering the database driver, take place
+	// during program initialization. This is done without directly
+	// referencing any of its identifiers in the code.
 	_ "github.com/golang-migrate/migrate/v4/database/cassandra"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"os"
@@ -17,7 +21,7 @@ type Manager struct {
 
 const MigrationDBURL = "cassandra://%s/%s"
 
-func New(dir string, host string, keyspace string) *Manager {
+func New(dir, host, keyspace string) *Manager {
 	return &Manager{
 		dir:      dir,
 		host:     host,

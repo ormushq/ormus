@@ -57,19 +57,20 @@ type QueryBuilder[T any] struct {
 	session SessionxInterface
 }
 
-func (queryBuilder *QueryBuilder[T]) Insert(ctx context.Context, insertData *T) error {
+func (queryBuilder *QueryBuilder[T]) Insert(_ context.Context, insertData *T) error {
 	insertStatement, insertNames := queryBuilder.model.Insert()
 	insertQuery := queryBuilder.session.Query(insertStatement, insertNames)
 	err := insertQuery.BindStruct(insertData).ExecRelease()
 	if err != nil {
 		log.Println("Insert error:", err.Error())
+
 		return err
 	}
 
 	return nil
 }
 
-func (queryBuilder *QueryBuilder[T]) Select(ctx context.Context, dataToGet *T) ([]T, error) {
+func (queryBuilder *QueryBuilder[T]) Select(_ context.Context, dataToGet *T) ([]T, error) {
 	selectStatement, selectNames := queryBuilder.model.Select()
 	selectQuery := queryBuilder.session.Query(selectStatement, selectNames)
 
@@ -77,6 +78,7 @@ func (queryBuilder *QueryBuilder[T]) Select(ctx context.Context, dataToGet *T) (
 	err := selectQuery.BindStruct(dataToGet).SelectRelease(&results)
 	if err != nil {
 		log.Println("Select error:", err.Error())
+
 		return nil, err
 	}
 
@@ -91,6 +93,7 @@ func (queryBuilder *QueryBuilder[T]) Get(ctx context.Context, dataToGet *T) (*T,
 	err := selectQuery.BindStruct(dataToGet).WithContext(ctx).SelectRelease(&result)
 	if err != nil {
 		log.Println("Get error", err.Error())
+
 		return nil, err
 	}
 
@@ -108,8 +111,8 @@ func (queryBuilder *QueryBuilder[T]) Delete(ctx context.Context, dataToBeDeleted
 
 	if err := deleteQuery.BindStruct(dataToBeDeleted).WithContext(ctx).ExecRelease(); err != nil {
 		log.Println("Delete error", err.Error())
-		return err
 
+		return err
 	}
 
 	return nil

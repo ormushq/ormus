@@ -3,7 +3,6 @@ Package initializedb provides functionality for initializing a connection to Scy
 
 Note: Make sure to handle errors appropriately when using this package.
 */
-
 package initializedb
 
 import (
@@ -37,11 +36,13 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 	}
 	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
 	log.Println("cluster was created.")
+
 	return cluster
 }
 
 func (conn *ScyllaDBConnection) createKeyspace(session scylladb.SessionxInterface, keyspace string) error {
 	stmt := fmt.Sprintf("CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}", keyspace)
+
 	return session.ExecStmt(stmt)
 }
 
@@ -54,8 +55,11 @@ func (conn *ScyllaDBConnection) createSession(cluster *gocql.ClusterConfig) (scy
 	session, err := scylladb.WrapSession(cluster.CreateSession())
 	if err != nil {
 		fmt.Println("an error occureed while creating DB Session", err.Error())
+
 		return nil, err
 	}
+
 	log.Println("session was created")
+
 	return session, nil
 }
