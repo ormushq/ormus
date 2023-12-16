@@ -3,10 +3,11 @@ package redis
 import (
 	"context"
 	"fmt"
+
 	"github.com/redis/go-redis/v9"
 )
 
-// Config is config adpater redis.
+// Config is config adapter redis.
 type Config struct {
 	Host     string `koanf:"host"`
 	Port     int    `koanf:"port"`
@@ -20,7 +21,6 @@ type Adapter struct {
 
 // New is Constructor redis Adapter.
 func New(config Config) (Adapter, error) {
-
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Password: config.Password,
@@ -39,7 +39,6 @@ func New(config Config) (Adapter, error) {
 	}
 
 	return Adapter{client: redisClient}, nil
-
 }
 
 // Client is a method that returns the redis.Client.

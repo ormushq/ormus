@@ -35,5 +35,4 @@ func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
 	}
 
 	return true, nil
-
 }
