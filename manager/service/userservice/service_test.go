@@ -1,11 +1,10 @@
-package service_test
+package userservice_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/service/auth"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -52,7 +51,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := service.NewService(jwt, repo)
+			svc := NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -116,7 +115,7 @@ func TestService_Login(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := service.NewService(jwt, repo)
+			svc := NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)

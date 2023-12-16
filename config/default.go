@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/manager"
-	service "github.com/ormushq/ormus/manager/service/auth"
+	"github.com/ormushq/ormus/manager/service/authservice"
 )
 
 func Default() Config {

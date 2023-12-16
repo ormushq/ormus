@@ -5,5 +5,9 @@ const (
 	ErrWrongCredentials   = "username or password isn't correct"
 	ErrSomeThingWentWrong = "some thing went wrong"
 	ErrAuthUserNotFound   = "user not found"
+	ErrEmailIsNotValid    = "email is not valid"
 	ErrAuthUserExisting   = "a user with this email is already registered"
+	ErrPasswordIsTooShort = "password is too short"
+	ErrPasswordIsNotValid = "password is not valid"
+	ErrorMsgInvalidInput  = "invalid input"
 )

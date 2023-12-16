@@ -1,4 +1,4 @@
-package service
+package userservice
 
 import "github.com/ormushq/ormus/manager/entity"
 

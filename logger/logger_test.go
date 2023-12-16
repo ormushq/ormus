@@ -60,10 +60,10 @@ func TestLogger(t *testing.T) {
 					),
 				).
 					With("environment", "dev").
-					With("errmsg", fmt.Errorf("an errmsg")).
+					With("error", fmt.Errorf("an error")).
 					Error("A message")
 			},
-			want: `{"level":"ERROR","msg":"A message","user":{"id":"user-123"},"environment":"dev","errmsg":"an errmsg"}`,
+			want: `{"level":"ERROR","msg":"A message","user":{"id":"user-123"},"environment":"dev","error":"an error"}`,
 		},
 	}
 

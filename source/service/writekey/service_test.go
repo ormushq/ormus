@@ -25,7 +25,7 @@ func TestIsValid(t *testing.T) {
 		ctx := context.Background()
 		_, err := service.IsValid(ctx, "")
 		if err == nil {
-			t.Fatal("errmsg is nil")
+			t.Fatal("error is nil")
 		}
 	})
 
@@ -35,7 +35,7 @@ func TestIsValid(t *testing.T) {
 		ctx := context.Background()
 		isValid, err := service.IsValid(ctx, "asdfffg4g5g56d5s4s6s5sd8")
 		if err != nil {
-			t.Fatal("errmsg is not nil")
+			t.Fatal("error is not nil")
 		}
 		if !isValid {
 			t.Fatal("writekey is not valid")

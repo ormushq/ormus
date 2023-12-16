@@ -7,7 +7,7 @@ import (
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/service/auth"
+	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/stretchr/testify/assert"

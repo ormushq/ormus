@@ -3,6 +3,7 @@ module github.com/ormushq/ormus
 go 1.21.0
 
 require (
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.3

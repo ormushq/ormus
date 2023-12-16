@@ -1,14 +1,19 @@
 package userhandler
 
 import (
-	service "github.com/ormushq/ormus/manager/service/auth"
+	"github.com/ormushq/ormus/manager/service/userservice"
+	"github.com/ormushq/ormus/manager/validator/uservalidator"
 )
 
 type Handler struct {
 	// TODO - add configurations
-	userSvc service.Service
+	userSvc       userservice.Service
+	userValidator uservalidator.Validator
 }
 
-func New(userSvc service.Service) *Handler {
-	return &Handler{userSvc: userSvc}
+func New(userSvc userservice.Service, userValidator uservalidator.Validator) *Handler {
+	return &Handler{
+		userSvc:       userSvc,
+		userValidator: userValidator,
+	}
 }
