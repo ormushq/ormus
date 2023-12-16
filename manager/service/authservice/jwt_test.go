@@ -52,10 +52,10 @@ func Test_ParseToken(t *testing.T) {
 			expectedUser: "testemail@example.com",
 		},
 		{
-			// the data here is tampered and the jwt module should raise errmsg on this
+			// the data here is tampered and the jwt module should raise error on this
 			name:        "malformed signature",
 			bearerToken: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE2MDIxNCwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiJ9.714GxZ2iXAD87R5Zk27XXgwp7heWYx2190_GAZagFCg",
-			expectedErr: fmt.Errorf("token signature is invalid: signature is invalid"), // Define the expected errmsg
+			expectedErr: fmt.Errorf("token signature is invalid: signature is invalid"), // Define the expected error
 		},
 	}
 

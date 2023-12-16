@@ -2,6 +2,7 @@ package userservice_test
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/service/userservice"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
@@ -51,7 +52,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := NewService(jwt, repo)
+			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -115,7 +116,7 @@ func TestService_Login(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := NewMockRepository(tc.repoErr)
-			svc := NewService(jwt, repo)
+			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)
