@@ -46,7 +46,7 @@ func NewPubsub(config Config) *GoChannelPubsub {
 
 func (g *GoChannelPubsub) Publish(topic string, messages ...*Message) error {
 	if g.isClosed() {
-		return fmt.Errorf("pubsub closed")
+		panic("pubsub closed")
 	}
 
 	g.subscribersLock.RLock()

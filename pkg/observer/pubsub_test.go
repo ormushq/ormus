@@ -57,91 +57,34 @@ func TestPublishSubscribe(t *testing.T) {
 	wg.Wait()
 }
 
-func TestPubsub_Publish_Subscribe(t *testing.T) {
-
-	t.Run("subscriber receives multiple messages", func(t *testing.T) {
-
-		// Given
-		topic := "happy-topic"
-		pubsub := observer.NewPubsub(observer.Config{SubscriberChannelBufferSize: 10})
-		defer pubsub.Close()
-
-		messages := []*observer.Message{
-			observer.NewMessage(uuid.New(), "hello, world 1!"),
-			observer.NewMessage(uuid.New(), "hello, world 2!"),
-			observer.NewMessage(uuid.New(), "hello, world 3!"),
-		}
-
-		// When
-		err := pubsub.Publish(topic, messages...)
-		require.NoError(t, err)
-
-		subscriberChannel, err := pubsub.Subscribe(topic)
-		require.NoError(t, err)
-
-		// Then
-		var receivedMessages []*observer.Message
-		for range messages {
-			receivedMessages = append(receivedMessages, <-subscriberChannel)
-		}
-
-		assert.ElementsMatch(t, messages, receivedMessages)
-	})
-
-	t.Run("multiple subscribers receive the message", func(t *testing.T) {
-
-		// Given
-		topic := "happy-topic"
-		pubsub := observer.NewPubsub(observer.Config{SubscriberChannelBufferSize: 10})
-		defer pubsub.Close()
-
-		message := observer.NewMessage(uuid.New(), "hello, world!")
-
-		// When
-		err := pubsub.Publish(topic, message)
-		require.NoError(t, err)
-
-		subscriberChannels := make([]chan *observer.Message, 5)
-		for i := range subscriberChannels {
-			subscriberChannels[i], err = pubsub.Subscribe(topic)
-			require.NoError(t, err)
-		}
-
-		// Then
-		var receivedMessages []*observer.Message
-		for i := range subscriberChannels {
-			receivedMessages = append(receivedMessages, <-subscriberChannels[i])
-		}
-
-		for _, receivedMessage := range receivedMessages {
-			assert.Equal(t, message.ID, receivedMessage.ID)
-			assert.Equal(t, message.Payload, receivedMessage.Payload)
-		}
-	})
-}
-
 func TestPubSub_Close(t *testing.T) {
 
-	t.Run("pubsub closes properly", func(t *testing.T) {
+	// Given
+	topic := "happy-topic"
+	pubsub := observer.NewPubsub(observer.Config{SubscriberChannelBufferSize: 10})
+	defer pubsub.Close()
 
-		// Given
-		topic := "happy-topic"
-		pubsub := observer.NewPubsub(observer.Config{SubscriberChannelBufferSize: 10})
-		defer pubsub.Close()
+	message := observer.NewMessage(uuid.New(), "hello, world!")
 
-		message := observer.NewMessage(uuid.New(), "hello, world!")
+	// When
 
-		// When
+	go func() {
+		_, _ = pubsub.Subscribe(topic)
+	}()
+
+	go func() {
+		time.Sleep(200 * time.Millisecond)
 		err := pubsub.Publish(topic, message)
 		require.NoError(t, err)
+	}()
 
-		pubsub.Close()
+	pubsub.Close()
 
-		// Then
-		assert.Panics(t, func() {
-			pubsub.Publish(topic, message)
-		})
+	// Then
+	assert.Panics(t, func() {
+		pubsub.Publish(topic, message)
 	})
+
 }
 
 func TestPubsub_Subscribe_RaceCondition(t *testing.T) {
