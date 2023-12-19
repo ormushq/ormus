@@ -7,10 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	userrepo "github.com/ormushq/ormus/manager/repository/user"
-	service "github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/repository/userrepo"
+	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
-	uservalidator "github.com/ormushq/ormus/manager/validator/user"
+	"github.com/ormushq/ormus/manager/validator/uservalidator"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	fmt.Println(cfg)
 
 	e := echo.New()
-	jwt := service.NewJWT(cfg.Manager.JWTConfig)
+	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
 	unknownRepo := userrepo.StorageAdapter{}
 	userSvc := userservice.NewService(jwt, unknownRepo)

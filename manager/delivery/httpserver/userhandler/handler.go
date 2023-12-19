@@ -2,7 +2,7 @@ package userhandler
 
 import (
 	"github.com/ormushq/ormus/manager/service/userservice"
-	uservalidator "github.com/ormushq/ormus/manager/validator/user"
+	"github.com/ormushq/ormus/manager/validator/uservalidator"
 )
 
 type Handler struct {

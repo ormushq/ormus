@@ -1,4 +1,4 @@
-package service
+package authservice
 
 import (
 	"strings"

@@ -1,4 +1,4 @@
-package service_test
+package authservice_test
 
 import (
 	"fmt"
@@ -16,12 +16,12 @@ import (
 func TestNewJWT(t *testing.T) {
 	t.Run("test durations", func(t *testing.T) {
 		// 1. setup
-		cfg := service.JwtConfig{
+		cfg := authservice.JwtConfig{
 			AccessExpirationTimeInDay:  7,  // 7 * 24 * 60 * 60 * 1000 * 1000 = 604,800,000,000,000
 			RefreshExpirationTimeInDay: 28, // 28 * 24 * 60 * 60 * 1000 * 1000 = 2,419,200,000,000,000
 		}
 
-		jwt := service.NewJWT(cfg)
+		jwt := authservice.NewJWT(cfg)
 
 		// 2. execution
 		jwtCfg := jwt.GetConfig()
@@ -64,7 +64,7 @@ func Test_ParseToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := service.NewJWT(cfg.Manager.JWTConfig)
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			claims, err := jwt.ParseToken(tc.bearerToken)
@@ -108,7 +108,7 @@ func Test_CreateAccessToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := service.NewJWT(cfg.Manager.JWTConfig)
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)
