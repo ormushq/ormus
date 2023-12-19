@@ -11,10 +11,11 @@ func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
 	// check the existing of email address  from repository
 	// get user by email address
 	user, err := s.repo.GetUserByEmail(req.Email)
-	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
 	}
+
+	hashedPassword, err := password.HashPassword(req.Password)
 	if user.Password != hashedPassword {
 		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrWrongCredentials)
 	}

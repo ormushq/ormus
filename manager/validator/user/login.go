@@ -1,29 +1,31 @@
 package uservalidator
 
 import (
+	"errors"
+	"regexp"
+	"unicode"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"regexp"
-	"unicode"
 )
 
-// ValidateLoginRequest is used to validate login request
+// ValidateLoginRequest is used to validate login request.
 func (v Validator) ValidateLoginRequest(req param.LoginRequest) (map[string]string, error) {
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Email, validation.Required,
-			validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid),
-			validation.By(v.doesUserExist)),
-		validation.Field(&req.Password, validation.Required, validation.By(v.doesPasswordIsValid))); err != nil {
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.doesUserExist)),
+		validation.Field(&req.Password, validation.Required, validation.By(v.isPasswordValid))); err != nil {
 		fieldErr := make(map[string]string)
-		errV, ok := err.(validation.Errors)
+
+		var errV validation.Errors
+		ok := errors.As(err, &errV)
+
 		if ok {
 			for key, value := range errV {
 				if value != nil {
 					fieldErr[key] = value.Error()
 				}
-
 			}
 		}
 
@@ -31,14 +33,17 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) (map[string]stri
 			WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err)
 
 	}
+
 	return nil, nil
 }
 
-// doesUserExist is a helper function to check user exists
+// doesUserExist is a helper function to check user exists.
 func (v Validator) doesUserExist(value interface{}) error {
-	email := value.(string)
+	email, ok := value.(string)
+	if !ok {
+		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
+	}
 	user, err := v.repo.GetUserByEmail(email)
-
 	if err != nil {
 		return richerror.New("validator.doesUserExist").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
@@ -51,12 +56,16 @@ func (v Validator) doesUserExist(value interface{}) error {
 }
 
 // TODO: implement this function with regex
-// doesPasswordIsValid is a helper function to validate  password
-func (v Validator) doesPasswordIsValid(value interface{}) error {
-	password := value.(string)
+// isPasswordValid is a helper function to validate  password.
+func (v Validator) isPasswordValid(value interface{}) error {
+	password, ok := value.(string)
+	if !ok {
+		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
+	}
+
 	var lower, upper, numeric, special, space bool
 	if len(password) < 8 || len(password) > 32 {
-		return richerror.New("validator.doesPasswordIsValid").WhitMessage(errmsg.ErrPasswordIsTooShort)
+		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsTooShort)
 	}
 	for _, val := range password {
 		switch {
@@ -74,8 +83,8 @@ func (v Validator) doesPasswordIsValid(value interface{}) error {
 		}
 	}
 	if numeric && lower && upper && special || space {
-		return richerror.New("validator.doesPasswordIsValid").WhitMessage(errmsg.ErrPasswordIsNotValid)
+		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsNotValid)
 	}
-	return nil
 
+	return nil
 }

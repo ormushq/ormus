@@ -1,7 +1,8 @@
-package unknownrepo
+package userrepo
 
 import (
 	"fmt"
+
 	"github.com/ormushq/ormus/manager/entity"
 )
 
@@ -22,4 +23,3 @@ func (a StorageAdapter) GetUserByEmail(email string) (*entity.User, error) {
 
 	panic("implement me")
 }
-

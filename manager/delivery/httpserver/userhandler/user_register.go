@@ -1,11 +1,11 @@
 package userhandler
 
 import (
-	"github.com/ormushq/ormus/pkg/httpmsg"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/httpmsg"
 )
 
 func (h Handler) RegisterUser(ctx echo.Context) error {
@@ -16,6 +16,7 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 
 	if fieldErr, err := h.userValidator.ValidateRegisterRequest(Req); err != nil {
 		msg, code := httpmsg.Error(err)
+
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
 			"error":   fieldErr,

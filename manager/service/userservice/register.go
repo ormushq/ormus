@@ -10,7 +10,6 @@ import (
 )
 
 func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
-
 	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
 		return param.RegisterResponse{}, richerror.New("register.hash").WhitWarpError(err)
