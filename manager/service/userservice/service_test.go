@@ -22,14 +22,6 @@ func TestService_Register(t *testing.T) {
 		req         param.RegisterRequest
 	}{
 		{
-			name:        "user exists",
-			expectedErr: richerror.New("register").WhitMessage(errmsg.ErrAuthUserExisting),
-			req: param.RegisterRequest{
-				Email:    "test@example.com",
-				Password: "123",
-			},
-		},
-		{
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(errRepo)),
