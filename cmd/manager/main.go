@@ -5,15 +5,12 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-
 	"github.com/ormushq/ormus/config"
-
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	"github.com/ormushq/ormus/manager/repository/user"
+	userrepo "github.com/ormushq/ormus/manager/repository/user"
+	service "github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
-	"github.com/ormushq/ormus/manager/validator/user"
-
-	"github.com/ormushq/ormus/manager/service/authservice"
+	uservalidator "github.com/ormushq/ormus/manager/validator/user"
 )
 
 func main() {

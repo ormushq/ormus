@@ -14,12 +14,13 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
-	if fieldErr, err := h.userValidator.ValidateLoginRequest(req); err != nil {
-		msg, code := httpmsg.Error(err)
+	result := h.userValidator.ValidateLoginRequest(req)
+	if result != nil {
+		msg, code := httpmsg.Error(result.Error)
 
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
-			"error":   fieldErr,
+			"error":   result.Fields,
 		})
 	}
 

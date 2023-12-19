@@ -10,7 +10,7 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) (map[string]string, error) {
+func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *ValidatorError {
 	maxLength := 50
 	minLength := 3
 
@@ -33,14 +33,17 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) (map[strin
 			}
 		}
 
-		return fieldErr, richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-			WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err)
+		return &ValidatorError{
+			Fields: fieldErr,
+			Error: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+		}
 	}
 
-	return nil, nil
+	return nil
 }
 
-// doesUserExistsByEmail it's a helper function checks the user is exists
+// doesUserExistsByEmail it's a helper function checks the user is existing
 // this function used for registration users.
 func (v Validator) doesUserExistsByEmail(value interface{}) error {
 	// fetch user to check if exists before user creation

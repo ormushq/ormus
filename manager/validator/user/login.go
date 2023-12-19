@@ -12,10 +12,11 @@ import (
 )
 
 // ValidateLoginRequest is used to validate login request.
-func (v Validator) ValidateLoginRequest(req param.LoginRequest) (map[string]string, error) {
+func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError {
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.doesUserExist)),
 		validation.Field(&req.Password, validation.Required, validation.By(v.isPasswordValid))); err != nil {
+
 		fieldErr := make(map[string]string)
 
 		var errV validation.Errors
@@ -29,12 +30,14 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) (map[string]stri
 			}
 		}
 
-		return fieldErr, richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-			WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err)
-
+		return &ValidatorError{
+			Fields: fieldErr,
+			Error: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+		}
 	}
 
-	return nil, nil
+	return nil
 }
 
 // doesUserExist is a helper function to check user exists.
