@@ -46,12 +46,12 @@ func (v Validator) doesUserExist(value interface{}) error {
 	if !ok {
 		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
 	}
-	user, err := v.repo.GetUserByEmail(email)
+	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
 		return richerror.New("validator.doesUserExist").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
-	if user == nil {
+	if !exists {
 		return richerror.New("validator.doesUserExist").WhitMessage(errmsg.ErrAuthUserNotFound)
 	}
 
@@ -63,13 +63,17 @@ func (v Validator) doesUserExist(value interface{}) error {
 func (v Validator) isPasswordValid(value interface{}) error {
 	password, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
+		return richerror.New("validator.isPasswordValid").WhitMessage("wrong type")
 	}
 
-	var lower, upper, numeric, special, space bool
-	if len(password) < 8 || len(password) > 32 {
+	var lower, upper, numeric, special bool
+	if len(password) < 8 {
 		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsTooShort)
 	}
+	if len(password) > 32 {
+		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsTooLong)
+	}
+
 	for _, val := range password {
 		switch {
 		case unicode.IsNumber(val):
@@ -78,16 +82,15 @@ func (v Validator) isPasswordValid(value interface{}) error {
 			lower = true
 		case unicode.IsUpper(val):
 			upper = true
-		case unicode.IsSpace(val):
-			space = true
 		case unicode.IsSymbol(val) || unicode.IsPunct(val):
 			special = true
 
 		}
 	}
-	if numeric && lower && upper && special || space {
-		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsNotValid)
+
+	if numeric && lower && upper && special {
+		return nil
 	}
 
-	return nil
+	return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsNotValid)
 }
