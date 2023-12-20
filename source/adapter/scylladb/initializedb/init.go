@@ -35,8 +35,8 @@ package initializedb
 
 import (
 	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/db/scylladb"
-	scyllaMigrate "github.com/ormushq/ormus/source/db/scylladb/migrate"
+	"github.com/ormushq/ormus/source/repository/scylladb"
+	scyllaMigrate "github.com/ormushq/ormus/source/repository/scylladb/migrate"
 )
 
 func NewScyllaDBConnection(consistency gocql.Consistency, keyspace string, hosts ...string) *ScyllaDBConnection {
