@@ -35,7 +35,7 @@ package initializedb
 
 import (
 	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/repository/scylladb"
+	"github.com/ormushq/ormus/source/adapter/scylladb"
 	scyllaMigrate "github.com/ormushq/ormus/source/repository/scylladb/migrate"
 )
 

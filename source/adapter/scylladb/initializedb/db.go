@@ -8,7 +8,7 @@ package initializedb
 import (
 	"fmt"
 	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/repository/scylladb"
+	"github.com/ormushq/ormus/source/adapter/scylladb"
 	"log"
 	"time"
 )
