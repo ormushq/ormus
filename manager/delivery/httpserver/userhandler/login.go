@@ -16,7 +16,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 
 	result := h.userValidator.ValidateLoginRequest(req)
 	if result != nil {
-		msg, code := httpmsg.Error(result.Error)
+		msg, code := httpmsg.Error(result.Err)
 
 		return ctx.JSON(code, echo.Map{
 			"message": msg,

@@ -16,7 +16,7 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 
 	result := h.userValidator.ValidateRegisterRequest(Req)
 	if result != nil {
-		msg, code := httpmsg.Error(result.Error)
+		msg, code := httpmsg.Error(result.Err)
 
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
