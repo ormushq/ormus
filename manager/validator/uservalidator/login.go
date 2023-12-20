@@ -32,7 +32,7 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError 
 
 		return &ValidatorError{
 			Fields: fieldErr,
-			Error: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
 		}
 	}

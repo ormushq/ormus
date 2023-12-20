@@ -1,6 +1,7 @@
 package uservalidator
 
 import (
+	"fmt"
 	"github.com/ormushq/ormus/manager/service/userservice"
 )
 
@@ -10,7 +11,17 @@ const (
 
 type ValidatorError struct {
 	Fields map[string]string
-	Error  error
+	Err    error
+}
+
+func (v ValidatorError) Error() string {
+	var err string
+
+	for key, value := range v.Fields {
+		err += fmt.Sprintf("%s: %s\n", key, value)
+	}
+
+	return err
 }
 
 type Validator struct {
