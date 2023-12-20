@@ -2,9 +2,11 @@ package userservice_test
 
 import (
 	"fmt"
+
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/mock"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -24,7 +26,7 @@ func TestService_Register(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(errRepo)),
+			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(userrepomock_test.Err)),
 			req: param.RegisterRequest{
 				Email:    "new@example.com",
 				Password: "very_safe_password",
@@ -43,7 +45,7 @@ func TestService_Register(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
-			repo := NewMockRepository(tc.repoErr)
+			repo := userrepomock_test.NewMockRepository(tc.repoErr)
 			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution
@@ -88,7 +90,7 @@ func TestService_Login(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(errRepo)),
+			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(userrepomock_test.Err)),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "wrongpassword",
@@ -107,7 +109,7 @@ func TestService_Login(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
-			repo := NewMockRepository(tc.repoErr)
+			repo := userrepomock_test.NewMockRepository(tc.repoErr)
 			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution
@@ -138,56 +140,4 @@ func (m MockJwtEngine) CreateAccessToken(user entity.User) (string, error) {
 
 func (m MockJwtEngine) CreateRefreshToken(user entity.User) (string, error) {
 	return "very_secure_token", nil
-}
-
-const errRepo = "repository error"
-
-type MockRepository struct {
-	users  []entity.User
-	hasErr bool
-}
-
-func NewMockRepository(hasErr bool) *MockRepository {
-	users := []entity.User{
-		{
-			Email:    "test@example.com",
-			Password: "$2a$10$pMV1Q1b9jgUQdgWnq4GVOuenS2X.HPns0oMRYmoLdLR1nJL/oONzS", // very_strong_password
-		},
-	}
-
-	return &MockRepository{
-		users:  users,
-		hasErr: hasErr,
-	}
-}
-
-func (m MockRepository) Register(u entity.User) (*entity.User, error) {
-	if m.hasErr {
-		return nil, fmt.Errorf(errRepo)
-	}
-
-	u.ID = "new_id"
-	m.users = append(m.users, u)
-
-	return &u, nil
-}
-
-func (m MockRepository) GetUserByEmail(email string) (*entity.User, error) {
-	for _, user := range m.users {
-		if user.Email == email {
-			return &user, nil
-		}
-	}
-
-	return nil, richerror.New("MockRepo.GetUserByEmail").WhitMessage(errmsg.ErrAuthUserNotFound)
-}
-
-func (m MockRepository) DoesUserExistsByEmail(email string) (bool, error) {
-	for _, user := range m.users {
-		if user.Email == email {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
