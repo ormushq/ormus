@@ -8,6 +8,8 @@ import (
 	"github.com/ormushq/ormus/pkg/httpmsg"
 )
 
+// TODO: the naming convention is wierd UserLogin, and RegisterUser should we change them?
+
 func (h Handler) UserLogin(ctx echo.Context) error {
 	var req param.LoginRequest
 	if err := ctx.Bind(&req); err != nil {
