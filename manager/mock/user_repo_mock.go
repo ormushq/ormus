@@ -1,4 +1,4 @@
-package userrepomock_test
+package usermock
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-const Err = "repository error"
+const RepoErr = "repository error"
 
 type MockRepository struct {
 	users  []entity.User
@@ -31,7 +31,7 @@ func NewMockRepository(hasErr bool) *MockRepository {
 
 func (m *MockRepository) Register(u entity.User) (*entity.User, error) {
 	if m.hasErr {
-		return nil, fmt.Errorf(Err)
+		return nil, fmt.Errorf(RepoErr)
 	}
 
 	u.ID = "new_id"
@@ -41,6 +41,10 @@ func (m *MockRepository) Register(u entity.User) (*entity.User, error) {
 }
 
 func (m *MockRepository) GetUserByEmail(email string) (*entity.User, error) {
+	if m.hasErr {
+		return nil, fmt.Errorf(RepoErr)
+	}
+
 	for _, user := range m.users {
 		if user.Email == email {
 			return &user, nil
@@ -51,6 +55,10 @@ func (m *MockRepository) GetUserByEmail(email string) (*entity.User, error) {
 }
 
 func (m *MockRepository) DoesUserExistsByEmail(email string) (bool, error) {
+	if m.hasErr {
+		return false, fmt.Errorf(RepoErr)
+	}
+
 	for _, user := range m.users {
 		if user.Email == email {
 			return true, nil

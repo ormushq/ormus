@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/mock"
+	usermock "github.com/ormushq/ormus/manager/mock"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -25,7 +25,7 @@ func TestService_Register(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(userrepomock_test.Err)),
+			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
 			req: param.RegisterRequest{
 				Email:    "new@example.com",
 				Password: "very_safe_password",
@@ -44,7 +44,7 @@ func TestService_Register(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
-			repo := userrepomock_test.NewMockRepository(tc.repoErr)
+			repo := usermock.NewMockRepository(tc.repoErr)
 			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution
@@ -89,7 +89,7 @@ func TestService_Login(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(userrepomock_test.Err)),
+			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "wrongpassword",
@@ -108,7 +108,7 @@ func TestService_Login(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
-			repo := userrepomock_test.NewMockRepository(tc.repoErr)
+			repo := usermock.NewMockRepository(tc.repoErr)
 			svc := userservice.NewService(jwt, repo)
 
 			// 2. execution

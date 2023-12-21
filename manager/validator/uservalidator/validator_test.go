@@ -27,6 +27,16 @@ func TestValidator_ValidateRegisterRequest(t *testing.T) {
 			},
 		},
 		{
+			name:    "repo error",
+			repoErr: true,
+			error:   fmt.Errorf("email: some thing went wrong\n"),
+			params: param.RegisterRequest{
+				Name:     "the_best_user",
+				Email:    "test1@example.com",
+				Password: "HeavY!234",
+			},
+		},
+		{
 			name:  "email regex fail",
 			error: fmt.Errorf(fmt.Sprintf("email: %s\n", errmsg.ErrEmailIsNotValid)),
 			params: param.RegisterRequest{
@@ -158,7 +168,7 @@ func TestValidator_ValidateRegisterRequest(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			repo := userrepomock_test.NewMockRepository(tc.repoErr)
+			repo := usermock.NewMockRepository(tc.repoErr)
 			vld := uservalidator.New(repo)
 
 			// 2. execution
@@ -183,6 +193,15 @@ func TestValidator_ValidateLoginRequest(t *testing.T) {
 	}{
 		{
 			name: "ordinary login",
+			params: param.LoginRequest{
+				Email:    "test@example.com",
+				Password: "HeavY!234",
+			},
+		},
+		{
+			name:    "repo error",
+			repoErr: true,
+			error:   fmt.Errorf("email: some thing went wrong\n"),
 			params: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "HeavY!234",
@@ -281,7 +300,7 @@ func TestValidator_ValidateLoginRequest(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			repo := userrepomock_test.NewMockRepository(tc.repoErr)
+			repo := usermock.NewMockRepository(tc.repoErr)
 			vld := uservalidator.New(repo)
 
 			// 2. execution
