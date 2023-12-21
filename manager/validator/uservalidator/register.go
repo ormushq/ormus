@@ -11,13 +11,16 @@ import (
 )
 
 func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *ValidatorError {
-	maxLength := 50
-	minLength := 3
+	minNameLength := 3
+	maxNameLength := 50
+
+	minPasswordLength := 8
+	maxPasswordLength := 32
 
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Name, validation.Required, validation.Length(minLength, maxLength)),
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)), validation.By(v.doesUserExistsByEmail)),
-		validation.Field(&req.Password, validation.Required, validation.By(v.isPasswordValid)),
+		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isEmailAlreadyRegistered)),
+		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -35,7 +38,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *Validator
 
 		return &ValidatorError{
 			Fields: fieldErr,
-			Error: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
 		}
 	}
@@ -43,21 +46,31 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *Validator
 	return nil
 }
 
-// doesUserExistsByEmail it's a helper function checks the user is existing
-// this function used for registration users.
-func (v Validator) doesUserExistsByEmail(value interface{}) error {
-	// fetch user to check if exists before user creation
+// isEmailAlreadyRegistered is a function which will check if user is already registered in the register process and will return error if user was existing and registered and nil if was not registered
+// TODO: isEmailAlreadyRegistered and isUserRegistered are similar in most parts but at the end of function we have different logics, so I decided to repeat the code and sacrifice redundancy for readability.
+//
+//	func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
+//		err := v.isUserRegistered(value)
+//		if err == nil {
+//			return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage(errmsg.ErrAuthUserExisting)
+//		}
+//
+//		return nil
+//	}
+//
+// you can implement it like upper code if you think it is better.
+func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
 	email, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
+		return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage("wrong type")
+	}
+	exists, err := v.repo.DoesUserExistsByEmail(email)
+	if err != nil {
+		return richerror.New("validator.isEmailAlreadyRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
-	existing, err := v.repo.DoesUserExistsByEmail(email)
-	if err != nil {
-		return richerror.New("validation.doesUserExistsByEmail").WhitWarpError(err)
-	}
-	if existing {
-		return richerror.New("validation.doesUserExistsByEmail").WhitMessage(errmsg.ErrAuthUserExisting)
+	if exists {
+		return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage(errmsg.ErrAuthUserExisting)
 	}
 
 	return nil

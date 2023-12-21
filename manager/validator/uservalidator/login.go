@@ -13,9 +13,12 @@ import (
 
 // ValidateLoginRequest is used to validate login request.
 func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError {
+	minPasswordLength := 8
+	maxPasswordLength := 32
+
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.doesUserExist)),
-		validation.Field(&req.Password, validation.Required, validation.By(v.isPasswordValid))); err != nil {
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserRegistered)),
+		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid))); err != nil {
 
 		fieldErr := make(map[string]string)
 
@@ -40,19 +43,19 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError 
 	return nil
 }
 
-// doesUserExist is a helper function to check user exists.
-func (v Validator) doesUserExist(value interface{}) error {
+// isUserRegistered is a helper function in LoginRequest validation process which will return nil if email exists in db and return error otherwise.
+func (v Validator) isUserRegistered(value interface{}) error {
 	email, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.doesUserExist").WhitMessage("wrong type")
+		return richerror.New("validator.isUserRegistered").WhitMessage("wrong type")
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.doesUserExist").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isUserRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if !exists {
-		return richerror.New("validator.doesUserExist").WhitMessage(errmsg.ErrAuthUserNotFound)
+		return richerror.New("validator.isUserRegistered").WhitMessage(errmsg.ErrAuthUserNotFound)
 	}
 
 	return nil
@@ -67,12 +70,6 @@ func (v Validator) isPasswordValid(value interface{}) error {
 	}
 
 	var lower, upper, numeric, special bool
-	if len(password) < 8 {
-		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsTooShort)
-	}
-	if len(password) > 32 {
-		return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsTooLong)
-	}
 
 	for _, val := range password {
 		switch {
