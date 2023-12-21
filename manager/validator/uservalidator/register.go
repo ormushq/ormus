@@ -10,6 +10,8 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
+// TODO: should we change the name to just `Register`?
+
 func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *ValidatorError {
 	minNameLength := 3
 	maxNameLength := 50
