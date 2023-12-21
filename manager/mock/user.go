@@ -2,6 +2,7 @@ package userrepomock_test
 
 import (
 	"fmt"
+
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -28,7 +29,7 @@ func NewMockRepository(hasErr bool) *MockRepository {
 	}
 }
 
-func (m MockRepository) Register(u entity.User) (*entity.User, error) {
+func (m *MockRepository) Register(u entity.User) (*entity.User, error) {
 	if m.hasErr {
 		return nil, fmt.Errorf(Err)
 	}
@@ -39,7 +40,7 @@ func (m MockRepository) Register(u entity.User) (*entity.User, error) {
 	return &u, nil
 }
 
-func (m MockRepository) GetUserByEmail(email string) (*entity.User, error) {
+func (m *MockRepository) GetUserByEmail(email string) (*entity.User, error) {
 	for _, user := range m.users {
 		if user.Email == email {
 			return &user, nil
@@ -49,7 +50,7 @@ func (m MockRepository) GetUserByEmail(email string) (*entity.User, error) {
 	return nil, richerror.New("MockRepo.GetUserByEmail").WhitMessage(errmsg.ErrAuthUserNotFound)
 }
 
-func (m MockRepository) DoesUserExistsByEmail(email string) (bool, error) {
+func (m *MockRepository) DoesUserExistsByEmail(email string) (bool, error) {
 	for _, user := range m.users {
 		if user.Email == email {
 			return true, nil

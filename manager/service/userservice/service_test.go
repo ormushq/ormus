@@ -2,7 +2,6 @@ package userservice_test
 
 import (
 	"fmt"
-
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"

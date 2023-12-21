@@ -2,12 +2,13 @@ package uservalidator_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/ormushq/ormus/manager/mock"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestValidator_ValidateRegisterRequest(t *testing.T) {
@@ -171,7 +172,6 @@ func TestValidator_ValidateRegisterRequest(t *testing.T) {
 			assert.Equal(t, tc.error.Error(), res.Error())
 		})
 	}
-
 }
 
 func TestValidator_ValidateLoginRequest(t *testing.T) {
@@ -293,8 +293,6 @@ func TestValidator_ValidateLoginRequest(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tc.error.Error(), res.Error())
-
 		})
 	}
-
 }

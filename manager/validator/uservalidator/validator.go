@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"fmt"
+
 	"github.com/ormushq/ormus/manager/service/userservice"
 )
 
