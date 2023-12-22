@@ -64,6 +64,8 @@ func TestService_Register(t *testing.T) {
 }
 
 func TestService_Login(t *testing.T) {
+	defaultUser := usermock.DefaultUser()
+
 	testCases := []struct {
 		name        string
 		repoErr     bool
@@ -71,8 +73,15 @@ func TestService_Login(t *testing.T) {
 		req         param.LoginRequest
 	}{
 		{
+			name: "ordinary",
+			req: param.LoginRequest{
+				Email:    defaultUser.Email,
+				Password: defaultUser.Password,
+			},
+		},
+		{
 			name:        "user not available",
-			expectedErr: richerror.New("Login").WhitMessage(errmsg.ErrWrongCredentials),
+			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
 			req: param.LoginRequest{
 				Email:    "not@existing.com",
 				Password: "123",
@@ -95,13 +104,6 @@ func TestService_Login(t *testing.T) {
 				Password: "wrongpassword",
 			},
 		},
-		{
-			name: "ordinary",
-			req: param.LoginRequest{
-				Email:    "test@example.com",
-				Password: "very_strong_password",
-			},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -113,13 +115,10 @@ func TestService_Login(t *testing.T) {
 
 			// 2. execution
 			user, err := svc.Login(tc.req)
-			if err != nil {
-				return
-			}
 
 			// 3. assertion
 			if tc.expectedErr != nil {
-				assert.Equal(t, tc.expectedErr, err)
+				assert.Equal(t, tc.expectedErr.Error(), err.Error())
 				assert.Empty(t, user)
 				return
 			}
