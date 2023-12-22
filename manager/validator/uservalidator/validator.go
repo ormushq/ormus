@@ -11,8 +11,8 @@ const (
 )
 
 type ValidatorError struct {
-	Fields map[string]string
-	Err    error
+	Fields map[string]string `json:"error"`
+	Err    error             `json:"message"`
 }
 
 func (v ValidatorError) Error() string {

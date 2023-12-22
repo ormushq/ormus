@@ -10,18 +10,29 @@ import (
 
 const RepoErr = "repository error"
 
+type DefaultUserTest struct {
+	Email    string
+	Hash     string
+	Password string
+}
+
+func DefaultUser() DefaultUserTest {
+	return DefaultUserTest{
+		Email:    "test@example.com",
+		Hash:     "$2a$10$GkuJxcHmx.wsVAVl3V/c3uuj75jWVE5awuxJVfoXzIQBA5zQvl572",
+		Password: "HeavYPasS123!",
+	}
+}
+
 type MockRepository struct {
 	users  []entity.User
 	hasErr bool
 }
 
 func NewMockRepository(hasErr bool) *MockRepository {
-	users := []entity.User{
-		{
-			Email:    "test@example.com",
-			Password: "$2a$10$pMV1Q1b9jgUQdgWnq4GVOuenS2X.HPns0oMRYmoLdLR1nJL/oONzS", // very_strong_password
-		},
-	}
+	var users []entity.User
+	defaultUser := DefaultUser()
+	users = append(users, entity.User{Email: defaultUser.Email, Password: defaultUser.Hash})
 
 	return &MockRepository{
 		users:  users,

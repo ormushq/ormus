@@ -12,6 +12,8 @@ import (
 )
 
 func TestValidator_ValidateRegisterRequest(t *testing.T) {
+	defaultUser := usermock.DefaultUser()
+
 	testCases := []struct {
 		name    string
 		params  param.RegisterRequest
@@ -59,8 +61,8 @@ func TestValidator_ValidateRegisterRequest(t *testing.T) {
 			error: fmt.Errorf(fmt.Sprintf("email: %s\n", errmsg.ErrAuthUserExisting)),
 			params: param.RegisterRequest{
 				Name:     "common_name",
-				Email:    "test@example.com",
-				Password: "HeavY!234",
+				Email:    defaultUser.Email,
+				Password: defaultUser.Password,
 			},
 		},
 		{
