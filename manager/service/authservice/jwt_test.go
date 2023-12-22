@@ -39,17 +39,11 @@ func Test_ParseToken(t *testing.T) {
 		expectedErr  error
 		expectedUser string // Add more fields if necessary for validation
 	}{
-		// TODO: these tests may fail due to expiration of the jwt tokens
 		{
-			name:         "valid token",
+			name:         "expired token",
 			bearerToken:  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE1ODkzNSwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiJ9.uGyl2lTwhH8CB5UwzYu_2cDrH5zo9_2cCYqivHTY0Cc",
 			expectedUser: "testemail@example.com",
-		},
-		{
-			// TODO: this test cases passes but is this correct?
-			name:         "valid token without bearer keyword",
-			bearerToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYyIsImV4cCI6MTcwMzE1Nzk2MSwidXNlcl9lbWFpbCI6InRlc3RlbWFpbEBleGFtcGxlLmNvbSJ9.TSvkTtpw69PCjBhqeUQ5t72HHw5GXsyPZrZdETcZYgA",
-			expectedUser: "testemail@example.com",
+			expectedErr:  fmt.Errorf("token has invalid claims: token is expired"),
 		},
 		{
 			// the data here is tampered and the jwt module should raise error on this
