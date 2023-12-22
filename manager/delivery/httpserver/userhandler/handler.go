@@ -6,8 +6,8 @@ import (
 )
 
 type UserService interface {
-	Login(req param.LoginRequest) (param.LoginResponse, error)
-	Register(req param.RegisterRequest) (param.RegisterResponse, error)
+	Login(req param.LoginRequest) (*param.LoginResponse, error)
+	Register(req param.RegisterRequest) (*param.RegisterResponse, error)
 }
 
 type UserValidator interface {

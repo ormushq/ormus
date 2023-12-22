@@ -9,10 +9,10 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
+func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, error) {
 	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
-		return param.RegisterResponse{}, richerror.New("register.hash").WhitWarpError(err)
+		return nil, richerror.New("register.hash").WhitWarpError(err)
 	}
 
 	user := entity.User{
@@ -26,11 +26,11 @@ func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, er
 
 	createdUser, err := s.repo.Register(user)
 	if err != nil {
-		return param.RegisterResponse{}, richerror.New("register.repo").WhitWarpError(err)
+		return nil, richerror.New("register.repo").WhitWarpError(err)
 	}
 
 	// return create new user
-	return param.RegisterResponse{
+	return &param.RegisterResponse{
 		Email: createdUser.Email,
 	}, nil
 }
