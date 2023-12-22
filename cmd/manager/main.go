@@ -20,7 +20,7 @@ func main() {
 	// TODO: implement the repository for user
 	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 	unknownRepo := usermock.NewMockRepository(false)
-	userSvc := userservice.NewService(jwt, unknownRepo)
+	userSvc := userservice.New(jwt, unknownRepo)
 	validateUserSvc := uservalidator.New(unknownRepo)
 
 	userHand := userhandler.New(userSvc, validateUserSvc)

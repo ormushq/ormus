@@ -45,7 +45,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.NewService(jwt, repo)
+			svc := userservice.New(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -109,7 +109,7 @@ func TestService_Login(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.NewService(jwt, repo)
+			svc := userservice.New(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)
