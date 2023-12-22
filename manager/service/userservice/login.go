@@ -15,8 +15,7 @@ func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
 		return nil, richerror.New("Login").WhitWarpError(err)
 	}
 
-	hashedPassword, err := password.HashPassword(req.Password)
-	if user.Password != hashedPassword {
+	if !password.CheckPasswordHash(req.Password, user.Password) {
 		return nil, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrWrongCredentials)
 	}
 
