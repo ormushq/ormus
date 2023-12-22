@@ -4,15 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/pkg/errmsg"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"github.com/ormushq/ormus/manager/mock"
@@ -20,6 +17,8 @@ import (
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationHandler_Register(t *testing.T) {

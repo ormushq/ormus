@@ -36,6 +36,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 		if err.Error() == errmsg.ErrWrongCredentials {
 			return ctx.JSON(http.StatusUnauthorized, EchoErrorMessage(errmsg.ErrWrongCredentials))
 		}
+
 		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
