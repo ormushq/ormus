@@ -20,6 +20,9 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 	result := h.userValidator.ValidateLoginRequest(req)
 	if result != nil {
 		msg, code := httpmsg.Error(result.Err)
+		if result.Fields["email"] == "user not found" {
+			return ctx.JSON(http.StatusUnauthorized, EchoErrorMessage(errmsg.ErrWrongCredentials))
+		}
 
 		// TODO: in validator we have a ValidatorError struct and this binding is ambiguous, we should change it properly
 		return ctx.JSON(code, echo.Map{
@@ -30,6 +33,9 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 
 	response, err := h.userSvc.Login(req)
 	if err != nil {
+		if err.Error() == errmsg.ErrWrongCredentials {
+			return ctx.JSON(http.StatusUnauthorized, EchoErrorMessage(errmsg.ErrWrongCredentials))
+		}
 		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
