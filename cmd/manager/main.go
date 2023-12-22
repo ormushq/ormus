@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	usermock "github.com/ormushq/ormus/manager/mock"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	"github.com/ormushq/ormus/manager/repository/userrepo"
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
@@ -20,7 +20,8 @@ func main() {
 	e := echo.New()
 	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
-	unknownRepo := userrepo.StorageAdapter{}
+	// TODO: implement the repository for user
+	unknownRepo := usermock.NewMockRepository(false)
 	userSvc := userservice.NewService(jwt, unknownRepo)
 	validateUserSvc := uservalidator.New(unknownRepo)
 	userHand := userhandler.New(userSvc, validateUserSvc)

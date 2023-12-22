@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
-	usermock "github.com/ormushq/ormus/manager/mock"
+	"github.com/ormushq/ormus/manager/mock"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
