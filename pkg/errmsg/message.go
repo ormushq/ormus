@@ -7,8 +7,7 @@ const (
 	ErrAuthUserNotFound   = "user not found"
 	ErrEmailIsNotValid    = "email is not valid"
 	ErrAuthUserExisting   = "a user with this email is already registered"
-	ErrPasswordIsTooShort = "password is too short"
-	ErrPasswordIsTooLong  = "password is too long"
 	ErrPasswordIsNotValid = "password is not valid"
 	ErrorMsgInvalidInput  = "invalid input"
+	ErrBadRequest         = "Bad request"
 )

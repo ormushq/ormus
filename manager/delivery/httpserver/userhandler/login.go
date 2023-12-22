@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/httpmsg"
 )
 
@@ -13,7 +14,7 @@ import (
 func (h Handler) UserLogin(ctx echo.Context) error {
 	var req param.LoginRequest
 	if err := ctx.Bind(&req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest)
+		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
 	result := h.userValidator.ValidateLoginRequest(req)
@@ -28,7 +29,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 
 	response, err := h.userSvc.Login(req)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest)
+		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
 	return ctx.JSON(http.StatusOK, response)
