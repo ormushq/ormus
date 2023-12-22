@@ -9,5 +9,5 @@ redis:
   host: localhost
   db: 0
   password: ""
-
-
+destination:
+  consumer_topic: ""
