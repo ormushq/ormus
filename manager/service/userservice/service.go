@@ -18,6 +18,6 @@ type Service struct {
 	jwt  JWTEngine
 }
 
-func NewService(authGenerator JWTEngine, repository Repository) Service {
+func New(authGenerator JWTEngine, repository Repository) Service {
 	return Service{jwt: authGenerator, repo: repository}
 }

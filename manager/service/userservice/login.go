@@ -7,30 +7,30 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (s Service) Login(req param.LoginRequest) (param.LoginResponse, error) {
+func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
 	// check the existing of email address  from repository
 	// get user by email address
 	user, err := s.repo.GetUserByEmail(req.Email)
-	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
-		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WhitWarpError(err)
 	}
-	if user.Password != hashedPassword {
-		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrWrongCredentials)
+
+	if !password.CheckPasswordHash(req.Password, user.Password) {
+		return nil, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrWrongCredentials)
 	}
 
 	// jwt token
 	AccessToken, err := s.jwt.CreateAccessToken(*user)
 	if err != nil {
-		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WhitWarpError(err)
 	}
 	RefreshToken, err := s.jwt.CreateRefreshToken(*user)
 	if err != nil {
-		return param.LoginResponse{}, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WhitWarpError(err)
 	}
 
 	// return ok
-	return param.LoginResponse{
+	return &param.LoginResponse{
 		User: param.UserInfo{
 			ID:        user.ID,
 			CreatedAt: user.CreatedAt,
