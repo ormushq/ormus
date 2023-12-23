@@ -111,8 +111,8 @@ func TestService_Login(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 
-			repo := NewMockRepository(tc.repoErr)
-			svc := userservice.NewService(jwt, repo)
+			repo := usermock.NewMockRepository(tc.repoErr)
+			svc := userservice.New(jwt, repo)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)

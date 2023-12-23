@@ -38,7 +38,7 @@ func TestIntegrationHandler_Register(t *testing.T) {
 				Password: "HeavYPasS123!",
 			},
 			expectedStatus: http.StatusCreated,
-			expectedBody:   `{"email":"test@gmail.com"}`,
+			expectedBody:   `{"email":"test@gmail.com", "id":"new_id"}`,
 		},
 		{
 			name: "Validation Failed",
@@ -48,7 +48,7 @@ func TestIntegrationHandler_Register(t *testing.T) {
 			},
 			expectedStatus: http.StatusUnprocessableEntity,
 			expectedBody: `{
-				"error":{
+				"errors":{
 					"email":"email is not valid",
 					"name":"cannot be blank",
 					"password":"the length must be between 8 and 32"
@@ -135,7 +135,7 @@ func TestIntegrationHandler_Login(t *testing.T) {
 			err:            true,
 			expectedStatus: http.StatusUnprocessableEntity,
 			expectedErrBody: `{
-				"error":{
+				"errors":{
 					"email":"email is not valid",
 					"password":"the length must be between 8 and 32"
 				},
