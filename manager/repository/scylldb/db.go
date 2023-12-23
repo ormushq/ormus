@@ -1,4 +1,4 @@
-package userrepo
+package scylldb
 
 // TODO: implement repository for authservice
 

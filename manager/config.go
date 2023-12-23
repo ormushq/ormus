@@ -1,7 +1,7 @@
 package manager
 
-import service "github.com/ormushq/ormus/manager/service/authservice"
+import "github.com/ormushq/ormus/manager/service/authservice"
 
 type Config struct {
-	JWTConfig service.JwtConfig `koanf:"jwt_config"`
+	JWTConfig authservice.JwtConfig `koanf:"jwt_config"`
 }

@@ -8,4 +8,5 @@ type RegisterRequest struct {
 
 type RegisterResponse struct {
 	Email string `json:"email"`
+	ID    string `json:"id"`
 }

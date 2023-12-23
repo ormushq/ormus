@@ -2,27 +2,17 @@ package userhandler
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
-	"github.com/ormushq/ormus/param"
 )
-
-type UserService interface {
-	Login(req param.LoginRequest) (*param.LoginResponse, error)
-	Register(req param.RegisterRequest) (*param.RegisterResponse, error)
-}
-
-type UserValidator interface {
-	ValidateLoginRequest(req param.LoginRequest) *uservalidator.ValidatorError
-	ValidateRegisterRequest(req param.RegisterRequest) *uservalidator.ValidatorError
-}
 
 type Handler struct {
 	// TODO - add configurations
-	userSvc       UserService
-	userValidator UserValidator
+	userSvc       userservice.Service
+	userValidator uservalidator.Validator
 }
 
-func New(userSvc UserService, userValidator UserValidator) *Handler {
+func New(userSvc userservice.Service, userValidator uservalidator.Validator) *Handler {
 	return &Handler{
 		userSvc:       userSvc,
 		userValidator: userValidator,

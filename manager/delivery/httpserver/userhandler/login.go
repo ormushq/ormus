@@ -27,7 +27,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 		// TODO: in validator we have a ValidatorError struct and this binding is ambiguous, we should change it properly
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
-			"error":   result.Fields,
+			"errors":  result.Fields,
 		})
 	}
 

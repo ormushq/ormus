@@ -1,8 +1,6 @@
 package userservice
 
 import (
-	"time"
-
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/password"
@@ -16,8 +14,6 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 	}
 
 	user := entity.User{
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
 		DeletedAt: nil,
 		Email:     req.Email,
 		Password:  hashedPassword,
@@ -31,6 +27,7 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 
 	// return create new user
 	return &param.RegisterResponse{
+		ID:    createdUser.ID,
 		Email: createdUser.Email,
 	}, nil
 }

@@ -21,7 +21,7 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
-			"error":   result.Fields,
+			"errors":  result.Fields,
 		})
 	}
 
