@@ -82,5 +82,6 @@ func New(config Config) (SessionxInterface, error) {
 
 		return nil, err
 	}
+
 	return session, nil
 }
