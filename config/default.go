@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/manager"
-	service "github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/service/authservice"
 )
 
 func Default() Config {
@@ -13,7 +13,7 @@ func Default() Config {
 
 	return Config{
 		Manager: manager.Config{
-			JWTConfig: service.JwtConfig{
+			JWTConfig: authservice.JwtConfig{
 				SecretKey:                  "Ormus_jwt",
 				AccessExpirationTimeInDay:  accessExpirationTimeInDay,
 				RefreshExpirationTimeInDay: refreshExpirationTimeInDay,
