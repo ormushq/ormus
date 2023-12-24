@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
@@ -14,9 +18,6 @@ import (
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestIntegrationHandler_Login(t *testing.T) {
@@ -103,7 +104,6 @@ func TestIntegrationHandler_Login(t *testing.T) {
 			assert.Equal(t, tc.expectedStatus, rec.Code)
 
 			if tc.err {
-				fmt.Println(rec.Body.String())
 				assert.JSONEq(t, tc.expectedErrBody, rec.Body.String())
 				return
 			}

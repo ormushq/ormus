@@ -18,7 +18,6 @@ func main() {
 	server := httpserver.New(cfg, setupSvc)
 
 	server.Server()
-
 }
 
 func setupServices(cfg config.Config) httpserver.SetupServicesResponse {
@@ -28,6 +27,7 @@ func setupServices(cfg config.Config) httpserver.SetupServicesResponse {
 	validateUserSvc := uservalidator.New(unknownRepo)
 
 	userHand := userhandler.New(userSvc, validateUserSvc)
+
 	return httpserver.SetupServicesResponse{
 		UserHandler: userHand,
 	}

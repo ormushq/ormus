@@ -17,13 +17,13 @@ type Server struct {
 }
 
 func New(cfg config.Config, setupSvc SetupServicesResponse) *Server {
-
 	return &Server{
 		config:      cfg,
 		userHandler: *setupSvc.UserHandler,
 		Router:      echo.New(),
 	}
 }
+
 func (s *Server) Server() {
 	e := echo.New()
 
@@ -32,5 +32,4 @@ func (s *Server) Server() {
 	e.GET("/health-check", s.healthCheck)
 
 	e.Logger.Fatal(e.Start(":8080"))
-
 }
