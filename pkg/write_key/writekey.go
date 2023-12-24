@@ -1,8 +1,8 @@
 package writekey
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -12,8 +12,7 @@ import (
 
 var entropyPool = sync.Pool{
 	New: func() any {
-		seed := rand.New(rand.NewSource(time.Now().UnixNano()))
-		entropy := ulid.Monotonic(seed, 0)
+		entropy := ulid.Monotonic(rand.Reader, 0)
 
 		return entropy
 	},
@@ -42,7 +41,6 @@ func GenerateNewWriteKey() (string, error) {
 func ValidateWriteKey(writeKey string) error {
 	_, err := ulid.Parse(writeKey)
 	if err != nil {
-
 		return err
 	}
 
