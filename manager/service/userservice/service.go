@@ -20,13 +20,13 @@ type Service struct {
 
 // This benchmark is the result of using a pointer, or a struct in return of New() function of this package
 //
-//goos: darwin
-//goarch: arm64
-//pkg: github.com/ormushq/ormus/manager/service
-//BenchmarkServiceStructReturn-10         14631142                78.64 ns/op          240 B/op          3 allocs/op
-//BenchmarkServicePointerReturn-10        15361818                78.75 ns/op          240 B/op          3 allocs/op
-//PASS
-//ok      github.com/ormushq/ormus/manager/service        2.590s
+// goos: darwin
+// goarch: arm64
+// pkg: github.com/ormushq/ormus/manager/service
+// BenchmarkServiceStructReturn-10         14631142                78.64 ns/op          240 B/op          3 allocs/op
+// BenchmarkServicePointerReturn-10        15361818                78.75 ns/op          240 B/op          3 allocs/op
+// PASS
+// ok      github.com/ormushq/ormus/manager/service        2.590s
 
 func New(authGenerator JWTEngine, repository Repository) *Service {
 	return &Service{jwt: authGenerator, repo: repository}

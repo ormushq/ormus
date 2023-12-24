@@ -25,6 +25,7 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 		return nil, richerror.New("register.repo").WhitWarpError(err)
 	}
 
+	// TODO: we have to trigger an event of registration in this phase of function
 	// return create new user
 	return &param.RegisterResponse{
 		ID:    createdUser.ID,
