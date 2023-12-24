@@ -23,6 +23,7 @@ require (
 	github.com/gocql/gocql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/uuid v1.5.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/labstack/gommon v0.4.0 // indirect
