@@ -1,6 +1,7 @@
 package pubsub
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -29,7 +30,8 @@ type PubSub struct {
 	closed     bool
 	closedLock sync.Mutex
 
-	messageRepo InMemoryMessageStore
+	messageRepo     map[string][]InMemoryMessageStore
+	messageRepoLock sync.Mutex
 }
 
 func NewPubSub(cfg Config) *PubSub {
@@ -37,7 +39,7 @@ func NewPubSub(cfg Config) *PubSub {
 		cfg:                    cfg,
 		subscribers:            make(map[string][]*subscriber),
 		subscribersByTopicLock: sync.Map{},
-		messageRepo:            InMemoryMessageStore{Data: make(map[string][]publisherMessage)},
+		messageRepo:            make(map[string][]InMemoryMessageStore, 0),
 	}
 }
 
@@ -64,30 +66,43 @@ func (g *PubSub) Publish(publisher *Publisher, topic string, messages ...*Messag
 	tl.Lock()
 	defer tl.Unlock()
 
-	unsendedMessages, ok := g.messageRepo.Data[topic]
+	g.messageRepoLock.Lock()
+	// add unsended message to messages
+	unsendedMessages, ok := g.messageRepo[topic]
 	// if there are messages ok == true
 	if ok {
 		for _, msg := range unsendedMessages {
 			// then we need check did this publisher send this message or not?
-			if msg.p == publisher {
+			if msg.pubslisher == publisher {
 				// append to new messages list to send again
-				messages = append(messages, msg.m)
+				messages = append(messages, msg.message)
 			}
 		}
+	}
+
+	g.messageRepoLock.Unlock()
+
+	subscriber := g.topicSubscribers(topic)
+
+	// add new message to repo
+	for _, msg := range messages {
+
+		g.messageRepoLock.Lock()
+		unsendedMessages := g.messageRepo[topic]
+
+		for _, unmsg := range unsendedMessages {
+			// check if not duplicate add to repo
+			if unmsg.message != msg {
+				unsendedMessages = append(unsendedMessages, InMemoryMessageStore{message: msg, pubslisher: publisher, subscriberCount: len(subscriber)})
+			}
+		}
+
+		g.messageRepoLock.Unlock()
 	}
 
 	for i := range messages {
 		// access to each message
 		msg := messages[i]
-
-		// lock in memory repo to write message
-		g.messageRepo.Mu.Lock()
-
-		// write in memory repo key = topic , value = message and publisher
-		g.messageRepo.Data[topic] = append(g.messageRepo.Data[topic], publisherMessage{m: msg, p: publisher})
-
-		// unlock after write
-		g.messageRepo.Mu.Unlock()
 
 		// send all message
 		err := g.sendMessage(publisher.name, topic, msg)
@@ -217,17 +232,54 @@ func (g *PubSub) Close() error {
 	return nil
 }
 
-func (g *PubSub) RemoveReceivedMessageFromMemoryRepo(topic string) {
+func (g *PubSub) RemoveReceivedMessageFromMemoryRepo(publisher *Publisher, topic string, message *Message) error {
 	// lock message repo
-	g.messageRepo.Mu.Lock()
+	g.messageRepoLock.Lock()
 	// check existens message in topic
-	_, ok := g.messageRepo.Data[topic]
-	if ok {
-		// if there are/is remove from repo
-		delete(g.messageRepo.Data, topic)
-		logger.L().Info("message received to one subscriber and delete message from memory repo")
+	pms, ok := g.messageRepo[topic]
+	if !ok {
+		logger.L().Info("there is no message on this topic")
 
 		// unlouk message repo
-		g.messageRepo.Mu.Unlock()
+		g.messageRepoLock.Unlock()
+
+		return errors.New("there is no message on this topic")
 	}
+
+	for _, pm := range pms {
+
+		if pm.pubslisher == publisher {
+			if pm.message == message {
+				pm.subscriberCount--
+			}
+		}
+
+		if pm.subscriberCount == 0 {
+			pms = removeFromMemoryStorge(pms, publisher, message)
+		}
+	}
+
+	g.messageRepo[topic] = pms
+
+	g.messageRepoLock.Unlock()
+
+	return nil
+}
+
+func removeFromMemoryStorge(datas []InMemoryMessageStore, publisher *Publisher, message *Message) []InMemoryMessageStore {
+	indexToRemove := -1
+	for i, pm := range datas {
+		if pm.pubslisher == publisher {
+			if pm.message == message {
+				indexToRemove = i
+			}
+		}
+	}
+
+	// If the element is found, remove it
+	if indexToRemove != -1 {
+		datas = append(datas[:indexToRemove], datas[indexToRemove+1:]...)
+	}
+
+	return datas
 }
