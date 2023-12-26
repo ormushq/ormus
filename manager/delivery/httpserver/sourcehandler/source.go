@@ -7,9 +7,8 @@ import (
 	"github.com/ormushq/ormus/manager/param"
 )
 
-// ? Handler or *Handler
+// ? Handler or *Handler.
 func (h Handler) CreateSource(ctx echo.Context) error {
-
 	// TODO  get owner(user) id
 
 	// TODO  get project id ?
@@ -20,7 +19,7 @@ func (h Handler) CreateSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
-	// validate form aslo check existen
+	// validate form also check existen
 	if err := h.ValidateSvc.ValidateCreateSourceForm(AddSourceReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
@@ -35,18 +34,16 @@ func (h Handler) CreateSource(ctx echo.Context) error {
 }
 
 func (h Handler) UpdateSource(ctx echo.Context) error {
-
 	// TODO  get owner(user) id
 
 	// TODO  get project id ?
 
 	// get source id
-	sourceId := ctx.Param("sourceId")
+	sourceID := ctx.Param("sourceId")
 
 	// binding addsource request form
 	updateSourceReq := new(param.UpdateSourceRequest)
 	if err := ctx.Bind(updateSourceReq); err != nil {
-
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
@@ -55,7 +52,7 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 	}
 
 	// call save method in service
-	sourceResp, err := h.sourceSvc.UpdateSource(sourceId, updateSourceReq)
+	sourceResp, err := h.sourceSvc.UpdateSource(sourceID, updateSourceReq)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
@@ -64,14 +61,13 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 }
 
 func (h Handler) DeleteSource(ctx echo.Context) error {
-
 	// get id from param
-	sourceId := ctx.Param("sourceId")
+	sourceID := ctx.Param("sourceId")
 
-	// TODO validate id and check existen soruce ?
+	// TODO validate id and check existen source ?
 
 	// call delete service method
-	if err := h.sourceSvc.DeleteSource(sourceId); err != nil {
+	if err := h.sourceSvc.DeleteSource(sourceID); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
