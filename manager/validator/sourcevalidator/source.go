@@ -18,8 +18,8 @@ func (v Validator) ValidateCreateSourceForm(req *param.AddSourceRequest) *Valida
 	if err := validation.ValidateStruct(req,
 		validation.Field(req.Name, validation.Required, validation.Length(minNameLength, maxNameLength), validation.By(v.isSourceAlreadyCreated)),
 		validation.Field(req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(req.ProjectId, validation.Required, validation.By(v.validateULID)),
-		validation.Field(req.OwnerId, validation.Required, validation.By(v.validateULID)),
+		validation.Field(req.ProjectID, validation.Required, validation.By(v.validateULID)),
+		validation.Field(req.OwnerID, validation.Required, validation.By(v.validateULID)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -45,7 +45,6 @@ func (v Validator) ValidateCreateSourceForm(req *param.AddSourceRequest) *Valida
 }
 
 func (v Validator) ValidateUpdateSourceForm(req *param.UpdateSourceRequest) *ValidatorError {
-
 	minNameLength := 5
 	maxNameLength := 30
 
@@ -55,7 +54,7 @@ func (v Validator) ValidateUpdateSourceForm(req *param.UpdateSourceRequest) *Val
 	if err := validation.ValidateStruct(req,
 		validation.Field(req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(req.ProjectId, validation.Required, validation.By(v.validateULID)),
+		validation.Field(req.ProjectID, validation.Required, validation.By(v.validateULID)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)

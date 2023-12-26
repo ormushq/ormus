@@ -9,16 +9,16 @@ import (
 type AddSourceRequest struct {
 	Name        string
 	Description string
-	ProjectId   string
-	OwnerId     string
+	ProjectID   string
+	OwnerID     string
 }
 
 type AddSourceResponse struct {
 	WriteKey    ulid.ULID
 	Name        string
 	Description string
-	ProjectId   string
-	OwnerId     string
+	ProjectID   string
+	OwnerID     string
 	Status      bool
 	CreateAt    time.Time
 	UpdateAt    time.Time
@@ -28,8 +28,8 @@ type AddSourceResponse struct {
 type UpdateSourceRequest struct {
 	Name        string
 	Description string
-	ProjectId   string
-	OwnerId     string
+	ProjectID   string
+	OwnerID     string
 	Status      bool
 }
 
@@ -37,8 +37,8 @@ type UpdateSourceResponse struct {
 	WriteKey    ulid.ULID
 	Name        string
 	Description string
-	ProjectId   string
-	OwnerId     string
+	ProjectID   string
+	OwnerID     string
 	Status      bool
 	CreateAt    time.Time
 	UpdateAt    time.Time
