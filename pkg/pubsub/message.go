@@ -8,9 +8,10 @@ type Message struct {
 	Publisher Publisher
 }
 
-func NewMessage(id uuid.UUID, payload any) *Message {
+func NewMessage(id uuid.UUID, payload any, publisher Publisher) *Message {
 	return &Message{
-		ID:      id,
-		Payload: payload,
+		ID:        id,
+		Payload:   payload,
+		Publisher: publisher,
 	}
 }

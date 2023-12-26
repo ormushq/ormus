@@ -20,7 +20,7 @@ func TestPublishSubscribe(t *testing.T) {
 	},
 	)
 
-	message := pubsub.NewMessage(uuid.New(), "hello")
+	message := pubsub.NewMessage(uuid.New(), "hello", *pubsub.NewPublisher("publisher"))
 
 	wg.Add(1)
 	go func(PubSub *pubsub.PubSub) {
@@ -60,7 +60,7 @@ func TestPubSub_Close(t *testing.T) {
 	Gopubsub := pubsub.NewPubSub(pubsub.Config{SubscriberChannelBufferSize: 10})
 	defer Gopubsub.Close()
 
-	message := pubsub.NewMessage(uuid.New(), "hello, world!")
+	message := pubsub.NewMessage(uuid.New(), "hello, world!", *pubsub.NewPublisher("publisher"))
 
 	// When
 
@@ -94,7 +94,7 @@ func TestPubsub_Subscribe_RaceCondition(t *testing.T) {
 	// Number of goroutines to create
 	numGoroutines := 100
 
-	message := pubsub.NewMessage(uuid.New(), "Race condition test message")
+	message := pubsub.NewMessage(uuid.New(), "Race condition test message", *pubsub.NewPublisher("publisher"))
 
 	// Create multiple goroutines trying to subscribe simultaneously
 	for i := 0; i < numGoroutines; i++ {
