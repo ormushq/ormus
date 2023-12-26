@@ -40,7 +40,7 @@ func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceRes
 
 func (s *Service) UpdateSource(id string, req *param.UpdateSourceRequest) (*param.UpdateSourceResponse, error) {
 
-	source, err := s.repo.GetUserSources(req.OwnerId, id)
+	source, err := s.repo.GetUserSourceById(req.OwnerId, id)
 	if err != nil {
 		return nil, err
 	}
