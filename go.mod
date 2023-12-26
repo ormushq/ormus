@@ -72,6 +72,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gocql/gocql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -81,6 +82,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/scylladb/gocqlx/v2 v2.8.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
