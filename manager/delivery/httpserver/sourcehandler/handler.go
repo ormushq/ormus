@@ -8,12 +8,13 @@ import (
 
 type Handler struct {
 	sourceSvc   sourceservice.Service
-	ValidateSvc sourcevalidator.Validator
-	// TODO all serveices
+	validateSvc sourcevalidator.Validator
 }
 
-func New() *Handler { // TODO give parameters
-	return &Handler{}
+func New(sourceSvc sourceservice.Service,
+	validateSvc sourcevalidator.Validator,
+) *Handler {
+	return &Handler{sourceSvc: sourceSvc, validateSvc: validateSvc}
 }
 
 func EchoErrorMessage(message string) echo.Map {

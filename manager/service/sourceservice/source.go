@@ -3,14 +3,13 @@ package sourceservice
 import (
 	"time"
 
-	"github.com/oklog/ulid/v2"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/param"
 )
 
 func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceResponse, error) {
 	source := new(entity.Source)
-	source.WriteKey = ulid.Make() // TODO wait for our write key generator
+	source.WriteKey = "" // TODO wait for our write key generator
 	source.Name = req.Name
 	source.Description = req.Description
 	source.OwnerID = req.OwnerID
