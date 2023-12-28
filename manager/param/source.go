@@ -2,8 +2,6 @@ package param
 
 import (
 	"time"
-
-	"github.com/oklog/ulid/v2"
 )
 
 type AddSourceRequest struct {
@@ -14,7 +12,7 @@ type AddSourceRequest struct {
 }
 
 type AddSourceResponse struct {
-	WriteKey    ulid.ULID
+	WriteKey    string
 	Name        string
 	Description string
 	ProjectID   string
@@ -34,7 +32,7 @@ type UpdateSourceRequest struct {
 }
 
 type UpdateSourceResponse struct {
-	WriteKey    ulid.ULID
+	WriteKey    string
 	Name        string
 	Description string
 	ProjectID   string

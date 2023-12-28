@@ -2,13 +2,11 @@ package entity
 
 import (
 	"time"
-
-	"github.com/oklog/ulid/v2"
 )
 
 // TODO: need change feilds.
 type Source struct {
-	WriteKey    ulid.ULID
+	WriteKey    string
 	Name        string
 	Description string
 	ProjectID   string
