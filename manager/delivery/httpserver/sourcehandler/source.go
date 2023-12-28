@@ -20,7 +20,7 @@ func (h Handler) CreateSource(ctx echo.Context) error {
 	}
 
 	// validate form also check existen
-	if err := h.ValidateSvc.ValidateCreateSourceForm(AddSourceReq); err != nil {
+	if err := h.validateSvc.ValidateCreateSourceForm(AddSourceReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
@@ -47,7 +47,7 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
-	if err := h.ValidateSvc.ValidateUpdateSourceForm(updateSourceReq); err != nil {
+	if err := h.validateSvc.ValidateUpdateSourceForm(updateSourceReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
