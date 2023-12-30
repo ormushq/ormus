@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
@@ -11,7 +12,7 @@ import (
 const RepoErr = "repository error"
 
 type DefaultSourceTest struct {
-	WriteKey    string
+	WriteKey    entity.WriteKey
 	Name        string
 	Description string
 	ProjectID   string
@@ -20,7 +21,7 @@ type DefaultSourceTest struct {
 
 func DefaultSource() DefaultSourceTest {
 	return DefaultSourceTest{
-		WriteKey:    "write_key",
+		WriteKey:    entity.WriteKey("writekey"),
 		Name:        "name name",
 		Description: "description",
 		ProjectID:   "project_id",
@@ -51,30 +52,50 @@ func NewMockRepository(hasErr bool) *MockRepo {
 	}
 }
 
-func (m *MockRepo) InsertSource(source *entity.Source) error {
+func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse, error) {
 	if m.hasErr {
-		return richerror.New("MockRepo.InsertSource").WhitWarpError(fmt.Errorf(RepoErr))
+		return nil, richerror.New("MockRepo.InsertSource").WhitWarpError(fmt.Errorf(RepoErr))
 	}
 
 	m.sources = append(m.sources, source)
 
-	return nil
+	return &param.AddSourceResponse{
+		WriteKey:    string(source.WriteKey),
+		Name:        source.Name,
+		Description: source.Description,
+		ProjectID:   source.ProjectID,
+		OwnerID:     source.OwnerID,
+		Status:      source.Status,
+		CreateAt:    source.CreateAt,
+		UpdateAt:    source.UpdateAt,
+		DeleteAt:    source.DeleteAt,
+	}, nil
 }
 
-func (m *MockRepo) UpdateSource(id string, source *entity.Source) error {
+func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.UpdateSourceResponse, error) {
 	if m.hasErr {
-		return richerror.New("MockRepo.UpdateSource").WhitWarpError(fmt.Errorf(RepoErr))
+		return nil, richerror.New("MockRepo.UpdateSource").WhitWarpError(fmt.Errorf(RepoErr))
 	}
 
 	for i, s := range m.sources {
-		if s.WriteKey == id {
+		if string(s.WriteKey) == id {
 			m.sources[i] = source
 
-			return nil
+			return &param.UpdateSourceResponse{
+				WriteKey:    string(source.WriteKey),
+				Name:        source.Name,
+				Description: source.Description,
+				ProjectID:   source.ProjectID,
+				OwnerID:     source.OwnerID,
+				Status:      source.Status,
+				CreateAt:    source.CreateAt,
+				UpdateAt:    source.UpdateAt,
+				DeleteAt:    source.DeleteAt,
+			}, nil
 		}
 	}
 
-	return richerror.New("MockRepo.UpdateSource").WhitMessage(errmsg.ErrUserNotFound)
+	return nil, richerror.New("MockRepo.UpdateSource").WhitMessage(errmsg.ErrUserNotFound)
 }
 
 func (m *MockRepo) DeleteSource(id string) error {
@@ -83,7 +104,7 @@ func (m *MockRepo) DeleteSource(id string) error {
 	}
 
 	for i, s := range m.sources {
-		if s.WriteKey == id {
+		if string(s.WriteKey) == id {
 			m.sources[i] = &entity.Source{}
 			return nil
 		}
@@ -98,7 +119,7 @@ func (m *MockRepo) GetUserSourceById(ownerID, id string) (*entity.Source, error)
 	}
 
 	for _, s := range m.sources {
-		if s.WriteKey == id && s.OwnerID == ownerID {
+		if string(s.WriteKey) == id && s.OwnerID == ownerID {
 			return s, nil
 		}
 	}
