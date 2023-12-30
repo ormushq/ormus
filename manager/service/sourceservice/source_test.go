@@ -13,14 +13,12 @@ import (
 )
 
 func TestDeleteSource(t *testing.T) {
-
 	testCases := []struct {
 		name        string
 		repoErr     bool
 		expectedErr error
 		req         string
 	}{
-
 		{
 			name:        "repo fails",
 			repoErr:     true,
@@ -52,11 +50,9 @@ func TestDeleteSource(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
-
 }
 
 func TestUpdateSource(t *testing.T) {
-
 	testCases := []struct {
 		name        string
 		repoErr     bool
@@ -64,7 +60,6 @@ func TestUpdateSource(t *testing.T) {
 		req         string
 		req1        param.UpdateSourceRequest
 	}{
-
 		{
 			name:        "repo fails",
 			repoErr:     true,
@@ -122,18 +117,15 @@ func TestUpdateSource(t *testing.T) {
 			assert.NotEmpty(t, response)
 		})
 	}
-
 }
 
 func TestCreateSource(t *testing.T) {
-
 	testCases := []struct {
 		name        string
 		repoErr     bool
 		expectedErr error
 		req         param.AddSourceRequest
 	}{
-
 		{
 			name:        "repo fails",
 			repoErr:     true,
@@ -177,5 +169,4 @@ func TestCreateSource(t *testing.T) {
 			assert.NotEmpty(t, response)
 		})
 	}
-
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func (s *Service) UpdateSource(id string, req *param.UpdateSourceRequest) (*param.UpdateSourceResponse, error) {
-	source, err := s.repo.GetUserSourceById(req.OwnerID, id)
+	source, err := s.repo.GetUserSourceByID(req.OwnerID, id)
 	if err != nil {
 		return nil, richerror.New("UpdateSource").WhitWarpError(err)
 	}
