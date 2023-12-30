@@ -11,14 +11,12 @@ import (
 )
 
 func TestValidateUpdateSourceForm(t *testing.T) {
-
 	testCases := []struct {
 		name    string
 		params  param.UpdateSourceRequest
 		repoErr bool
 		error   error
 	}{
-
 		{
 			name:  "less than min name len",
 			error: fmt.Errorf("Name: the length must be between 5 and 30\n"),
@@ -98,11 +96,9 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 			assert.Equal(t, tc.error.Error(), res.Error())
 		})
 	}
-
 }
 
 func TestValidateCreateSourceForm(t *testing.T) {
-
 	defaulte := sourcemock.DefaultSource()
 
 	testCases := []struct {
@@ -200,5 +196,4 @@ func TestValidateCreateSourceForm(t *testing.T) {
 			assert.Equal(t, tc.error.Error(), res.Error())
 		})
 	}
-
 }

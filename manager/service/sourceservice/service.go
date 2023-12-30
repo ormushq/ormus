@@ -9,7 +9,7 @@ type SourceRepo interface {
 	InsertSource(source *entity.Source) (*param.AddSourceResponse, error)
 	UpdateSource(id string, source *entity.Source) (*param.UpdateSourceResponse, error)
 	DeleteSource(id string) error
-	GetUserSourceById(ownerID, id string) (*entity.Source, error)
+	GetUserSourceByID(ownerID, id string) (*entity.Source, error)
 	IsSourceAlreadyCreatedByName(name string) (bool, error)
 }
 
