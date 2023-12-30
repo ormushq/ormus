@@ -5,6 +5,7 @@ import (
 
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/pkg/richerror"
 )
 
 func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceResponse, error) {
@@ -20,7 +21,7 @@ func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceRes
 	source.UpdateAt = now
 
 	if err := s.repo.InsertSource(source); err != nil {
-		return nil, err
+		return nil, richerror.New("CreateSource").WhitWarpError(err)
 	}
 
 	response := new(param.AddSourceResponse)
@@ -39,7 +40,7 @@ func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceRes
 func (s *Service) UpdateSource(id string, req *param.UpdateSourceRequest) (*param.UpdateSourceResponse, error) {
 	source, err := s.repo.GetUserSourceById(req.OwnerID, id)
 	if err != nil {
-		return nil, err
+		return nil, richerror.New("UpdateSource").WhitWarpError(err)
 	}
 
 	source.Name = req.Name
@@ -50,7 +51,7 @@ func (s *Service) UpdateSource(id string, req *param.UpdateSourceRequest) (*para
 	source.UpdateAt = now
 
 	if err := s.repo.UpdateSource(id, source); err != nil {
-		return nil, err
+		return nil, richerror.New("UpdateSource").WhitWarpError(err)
 	}
 
 	response := new(param.UpdateSourceResponse)
@@ -68,7 +69,7 @@ func (s *Service) UpdateSource(id string, req *param.UpdateSourceRequest) (*para
 
 func (s *Service) DeleteSource(id string) error {
 	if err := s.repo.DeleteSource(id); err != nil {
-		return err
+		return richerror.New("DeleteSource").WhitWarpError(err)
 	}
 
 	return nil
