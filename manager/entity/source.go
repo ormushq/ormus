@@ -4,9 +4,11 @@ import (
 	"time"
 )
 
+type WriteKey string // because we might change the format in future
+
 // TODO: need change feilds.
 type Source struct {
-	WriteKey    string
+	WriteKey    WriteKey
 	Name        string
 	Description string
 	ProjectID   string
