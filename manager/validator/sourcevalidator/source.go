@@ -6,20 +6,22 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/oklog/ulid/v2"
 	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateCreateSourceForm(req *param.AddSourceRequest) *ValidatorError {
+func (v Validator) ValidateCreateSourceForm(req param.AddSourceRequest) *ValidatorError {
 	minNameLength := 5
 	maxNameLength := 30
 
 	minDescriptionLength := 5
 	maxDescriptionLength := 100
 
-	if err := validation.ValidateStruct(req,
-		validation.Field(req.Name, validation.Required, validation.Length(minNameLength, maxNameLength), validation.By(v.isSourceAlreadyCreated)),
-		validation.Field(req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(req.ProjectID, validation.Required, validation.By(v.validateULID)),
-		validation.Field(req.OwnerID, validation.Required, validation.By(v.validateULID)),
+	if err := validation.ValidateStruct(&req,
+		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength), validation.By(v.isSourceAlreadyCreated)),
+		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
+		validation.Field(&req.ProjectID, validation.Required, validation.By(v.validateULID)),
+		validation.Field(&req.OwnerID, validation.Required, validation.By(v.validateULID)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -37,24 +39,25 @@ func (v Validator) ValidateCreateSourceForm(req *param.AddSourceRequest) *Valida
 
 		return &ValidatorError{
 			Fields: fieldErr,
-			Err:    errors.New("a"), // TODO wait for richerror
+			Err: richerror.New("sourcevalidator.ValidateCreateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
 		}
 	}
 
 	return nil
 }
 
-func (v Validator) ValidateUpdateSourceForm(req *param.UpdateSourceRequest) *ValidatorError {
+func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *ValidatorError {
 	minNameLength := 5
 	maxNameLength := 30
 
 	minDescriptionLength := 5
 	maxDescriptionLength := 100
 
-	if err := validation.ValidateStruct(req,
-		validation.Field(req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
-		validation.Field(req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(req.ProjectID, validation.Required, validation.By(v.validateULID)),
+	if err := validation.ValidateStruct(&req,
+		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
+		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
+		validation.Field(&req.ProjectID, validation.Required, validation.By(v.validateULID)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -72,7 +75,8 @@ func (v Validator) ValidateUpdateSourceForm(req *param.UpdateSourceRequest) *Val
 
 		return &ValidatorError{
 			Fields: fieldErr,
-			Err:    errors.New("a"), // TODO wait for richerror
+			Err: richerror.New("sourcevalidator.ValidateUpdateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
 		}
 	}
 
@@ -87,7 +91,7 @@ func (v Validator) validateULID(value interface{}) error {
 
 	_, err := ulid.Parse(s)
 	if err != nil {
-		return err
+		return errors.New("invalid id")
 	}
 
 	return nil
