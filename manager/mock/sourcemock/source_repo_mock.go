@@ -106,6 +106,7 @@ func (m *MockRepo) DeleteSource(id string) error {
 	for i, s := range m.sources {
 		if string(s.WriteKey) == id {
 			m.sources[i] = &entity.Source{}
+
 			return nil
 		}
 	}
@@ -113,7 +114,7 @@ func (m *MockRepo) DeleteSource(id string) error {
 	return richerror.New("MockRepo.DeleteSource").WhitMessage(errmsg.ErrUserNotFound)
 }
 
-func (m *MockRepo) GetUserSourceById(ownerID, id string) (*entity.Source, error) {
+func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error) {
 	if m.hasErr {
 		return nil, richerror.New("MockRepo.GetUserSourceById").WhitWarpError(fmt.Errorf(RepoErr))
 	}
