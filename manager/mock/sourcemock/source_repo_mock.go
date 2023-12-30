@@ -21,7 +21,7 @@ type DefaultSourceTest struct {
 func DefaultSource() DefaultSourceTest {
 	return DefaultSourceTest{
 		WriteKey:    "write_key",
-		Name:        "name",
+		Name:        "name name",
 		Description: "description",
 		ProjectID:   "project_id",
 		OwnerID:     "owner_id",
