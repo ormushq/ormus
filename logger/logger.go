@@ -8,6 +8,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+// TODO: should we transfer these constants to the default config struct also? or not?
 const (
 	defaultFilePath        = "logs/logs.json"
 	defaultUseLocalTime    = false
