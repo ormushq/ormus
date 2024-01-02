@@ -58,6 +58,7 @@ func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *Vali
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
 		validation.Field(&req.ProjectID, validation.Required, validation.By(v.validateULID)),
+		validation.Field(&req.Status, validation.Required, validation.By(v.validateStatus)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -113,4 +114,20 @@ func (v Validator) isSourceAlreadyCreated(value interface{}) error {
 	}
 
 	return nil
+}
+
+func (v Validator) validateStatus(value interface{}) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("error while reflection interface")
+	}
+
+	switch s {
+	case "active":
+		return nil
+	case "not active":
+		return nil
+	}
+
+	return errors.New("invalide status of source")
 }
