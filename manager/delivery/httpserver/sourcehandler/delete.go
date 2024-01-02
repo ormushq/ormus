@@ -17,5 +17,5 @@ func (h Handler) DeleteSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
 	}
 
-	return ctx.JSON(http.StatusAccepted, echo.Map{"result": "delete"}) // TODO maybe need change response structure
+	return ctx.JSON(http.StatusNoContent, echo.Map{"result": "delete"}) // TODO maybe need change response structure
 }
