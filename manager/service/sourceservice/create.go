@@ -8,7 +8,7 @@ import (
 
 func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceResponse, error) {
 	source := &entity.Source{
-		SourceID:    "",                  // TODO id is ulid ?
+		ID:          "",                  // TODO id is ulid ?
 		WriteKey:    entity.WriteKey(""), // TODO wait for our write key generator
 		Name:        req.Name,
 		Description: req.Description,

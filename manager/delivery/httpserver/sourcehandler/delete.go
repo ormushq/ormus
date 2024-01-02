@@ -8,7 +8,7 @@ import (
 
 func (h Handler) DeleteSource(ctx echo.Context) error {
 	// get id from param
-	sourceID := ctx.Param("sourceId")
+	sourceID := ctx.Param("sourceID")
 
 	// TODO validate id and check existen source ?
 

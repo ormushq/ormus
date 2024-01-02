@@ -13,7 +13,7 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 	// TODO  get project id ?
 
 	// get source id
-	sourceID := ctx.Param("sourceId")
+	sourceID := ctx.Param("sourceID")
 
 	// binding addsource request form
 	updateSourceReq := new(param.UpdateSourceRequest)

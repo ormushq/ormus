@@ -2,6 +2,8 @@ package param
 
 import (
 	"time"
+
+	"github.com/ormushq/ormus/manager/entity"
 )
 
 type UpdateSourceRequest struct {
@@ -9,7 +11,7 @@ type UpdateSourceRequest struct {
 	Description string
 	ProjectID   string
 	OwnerID     string
-	Status      bool
+	Status      entity.Status
 }
 
 type UpdateSourceResponse struct {
@@ -19,7 +21,7 @@ type UpdateSourceResponse struct {
 	Description string
 	ProjectID   string
 	OwnerID     string
-	Status      bool
+	Status      entity.Status
 	CreateAt    time.Time
 	UpdateAt    time.Time
 	DeleteAt    *time.Time
