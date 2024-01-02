@@ -15,7 +15,7 @@ type UpdateSourceRequest struct {
 }
 
 type UpdateSourceResponse struct {
-	SourceID    string
+	ID          string
 	WriteKey    string
 	Name        string
 	Description string
