@@ -14,7 +14,6 @@ type AddSourceRequest struct {
 }
 
 type AddSourceResponse struct {
-	SourceID    string
 	WriteKey    string
 	Name        string
 	Description string
