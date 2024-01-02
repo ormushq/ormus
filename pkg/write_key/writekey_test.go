@@ -2,11 +2,13 @@ package writekey_test
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"testing"
 
 	"github.com/oklog/ulid/v2"
 	writekey "github.com/ormushq/ormus/pkg/write_key"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWriteKeyUniqueness(t *testing.T) {
@@ -47,6 +49,7 @@ func TestWriteKeyValidation(t *testing.T) {
 
 	var wg sync.WaitGroup
 	ids := make([]string, 0)
+	fakeIDs := make([]string, 0)
 
 	for i := 0; i < 1000000; i++ {
 
@@ -75,4 +78,44 @@ func TestWriteKeyValidation(t *testing.T) {
 			}
 		}
 	}
+
+	for i := 0; i < 1000000; i++ {
+
+		wg.Add(1)
+		go func() {
+
+			fakeID, err := generateFakeULID()
+			if err != nil {
+				t.Errorf("error while generating writekey")
+				return
+			}
+
+			fakeIDs = append(fakeIDs, fakeID)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	for _, id := range fakeIDs {
+		if id != "" {
+			_, err := ulid.Parse(id)
+			assert.NotNil(t, err)
+			return
+		}
+	}
+}
+
+// Define a function that generates a fake ULID string
+func generateFakeULID() (string, error) {
+	chars := "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+	runes := []rune(chars)
+	result := make([]byte, 26)
+
+	for i := 0; i < 26; i++ {
+		r := runes[rand.Intn(len(runes))]
+		result[i] = byte(r)
+	}
+
+	return string(result), nil
 }
