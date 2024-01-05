@@ -14,7 +14,10 @@ type Handler struct {
 func New(sourceSvc sourceservice.Service,
 	validateSvc sourcevalidator.Validator,
 ) *Handler {
-	return &Handler{sourceSvc: sourceSvc, validateSvc: validateSvc}
+	return &Handler{
+		sourceSvc:   sourceSvc,
+		validateSvc: validateSvc,
+	}
 }
 
 func EchoErrorMessage(message string) echo.Map {

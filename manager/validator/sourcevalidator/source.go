@@ -84,6 +84,35 @@ func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *Vali
 	return nil
 }
 
+func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
+
+	if err := validation.Validate(id,
+		validation.By(v.isSourceAlreadyCreated),
+	); err != nil {
+
+		fieldErr := make(map[string]string)
+
+		var errV validation.Errors
+		ok := errors.As(err, &errV)
+
+		if ok {
+			for key, value := range errV {
+				if value != nil {
+					fieldErr[key] = value.Error()
+				}
+			}
+		}
+
+		return &ValidatorError{
+			Fields: fieldErr,
+			Err: richerror.New("sourcevalidator.ValidateUpdateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": id}).WhitWarpError(err),
+		}
+	}
+
+	return nil
+}
+
 func (v Validator) validateULID(value interface{}) error {
 	s, ok := value.(string)
 	if !ok {
