@@ -15,6 +15,8 @@ type Integration struct {
 	CreatedAt        time.Time
 }
 
+// Category The integrations we have are categorized into groups
+// Facebook Pixel and Google Ads (Classic) are placed in the Advertising category
 type Category string
 
 const (
@@ -27,6 +29,9 @@ const (
 	Surveys        Category = "Surveys"
 )
 
+// ConnectionType each third party destination are compatible with one of these methods
+// it means we have to deliver data to the destinations with these methods
+// https://github.com/ormushq/ormus/issues/9
 type ConnectionType string
 
 const (
