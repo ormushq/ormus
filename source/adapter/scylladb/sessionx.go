@@ -6,6 +6,7 @@ package scylladb
 
 import (
 	"context"
+
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2"
 )

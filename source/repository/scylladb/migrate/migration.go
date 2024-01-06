@@ -3,6 +3,8 @@ package migrate
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/golang-migrate/migrate/v4"
 	// Using a blank import for the Cassandra database package ensures that
 	// its side effects, such as registering the database driver, take place
@@ -10,7 +12,6 @@ import (
 	// referencing any of its identifiers in the code.
 	_ "github.com/golang-migrate/migrate/v4/database/cassandra"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"os"
 )
 
 type Manager struct {

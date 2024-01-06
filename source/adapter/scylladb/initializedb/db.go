@@ -7,10 +7,11 @@ package initializedb
 
 import (
 	"fmt"
-	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/adapter/scylladb"
 	"log"
 	"time"
+
+	"github.com/gocql/gocql"
+	"github.com/ormushq/ormus/source/adapter/scylladb"
 )
 
 type ScyllaDBConnection struct {
