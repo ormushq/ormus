@@ -106,6 +106,38 @@ func TestWriteKeyValidation(t *testing.T) {
 	}
 }
 
+func TestWriteKeyInValidation(t *testing.T) {
+
+	var wg sync.WaitGroup
+	fakeIDs := make([]string, 0)
+
+	for i := 0; i < 1000000; i++ {
+
+		wg.Add(1)
+		go func() {
+
+			fakeID, err := generateFakeULID()
+			if err != nil {
+				t.Errorf("error while generating writekey")
+				return
+			}
+
+			fakeIDs = append(fakeIDs, fakeID)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	for _, id := range fakeIDs {
+		if id != "" {
+			_, err := ulid.Parse(id)
+			assert.NotNil(t, err)
+			return
+		}
+	}
+}
+
 // Define a function that generates a fake ULID string
 func generateFakeULID() (string, error) {
 	chars := "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
