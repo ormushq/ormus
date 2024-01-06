@@ -11,6 +11,5 @@ type Connection struct {
 	Integrations []Integration
 }
 
-
 // TODO: Do we need source object?
 type Source struct{}

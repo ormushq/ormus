@@ -16,7 +16,7 @@ type Integration struct {
 }
 
 // Category The integrations we have are categorized into groups
-// Facebook Pixel and Google Ads (Classic) are placed in the Advertising category
+// Facebook Pixel and Google Ads (Classic) are placed in the Advertising category.
 type Category string
 
 const (
