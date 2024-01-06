@@ -2,7 +2,27 @@ module github.com/ormushq/ormus
 
 go 1.21.0
 
-require gopkg.in/natefinch/lumberjack.v2 v2.2.1
+require (
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/knadh/koanf v1.5.0
+	github.com/labstack/echo/v4 v4.11.3
+	github.com/redis/go-redis/v9 v9.3.0
+	github.com/stretchr/testify v1.8.4
+	golang.org/x/crypto v0.16.0
+	google.golang.org/grpc v1.59.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+)
+
+require (
+	github.com/golang/snappy v0.0.4 // indirect
+	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/scylladb/go-reflectx v1.0.1 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	gopkg.in/inf.v0 v0.9.1 // indirect
+)
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
@@ -38,6 +58,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
+	github.com/scylladb/gocqlx/v2 v2.8.0
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
