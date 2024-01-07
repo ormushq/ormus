@@ -9,4 +9,5 @@ type ConsumerConfig struct {
 // TODO: implement a hybrid solution (get topic from config file and constructor method).
 type Consumer interface {
 	Consume() <-chan event.CoreEvent
+	Close() error
 }
