@@ -114,6 +114,7 @@ func generateFakeULID() (string, error) {
 		r := runes[rand.Intn(len(runes))]
 		result[i] = byte(r)
 	}
+	result[25] = 'L'
 
 	return string(result), nil
 }
