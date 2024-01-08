@@ -105,7 +105,7 @@ func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
 
 		return &ValidatorError{
 			Fields: fieldErr,
-			Err: richerror.New("sourcevalidator.ValidateUpdateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New("sourcevalidator.ValidateIDToDelete").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": id}).WhitWarpError(err),
 		}
 	}
