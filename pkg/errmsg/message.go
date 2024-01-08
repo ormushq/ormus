@@ -10,4 +10,5 @@ const (
 	ErrPasswordIsNotValid = "password is not valid"
 	ErrorMsgInvalidInput  = "invalid input"
 	ErrBadRequest         = "Bad request"
+	ErrUserNotFound       = "user not found"
 )
