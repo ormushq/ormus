@@ -1,7 +1,6 @@
 package writekey_test
 
 import (
-	"fmt"
 	"math/rand"
 	"sync"
 	"testing"
@@ -34,7 +33,6 @@ func TestWriteKeyUniqueness(t *testing.T) {
 
 	m := make(map[string]bool)
 	for _, id := range ids {
-		fmt.Println(id)
 		if m[id] {
 			t.Errorf("there is same write key")
 			return
@@ -114,7 +112,7 @@ func generateFakeULID() (string, error) {
 		r := runes[rand.Intn(len(runes))]
 		result[i] = byte(r)
 	}
-	result[25] = 'L'
+	result[25] = byte('L')
 
 	return string(result), nil
 }
