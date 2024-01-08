@@ -106,13 +106,12 @@ func TestWriteKeyInValidation(t *testing.T) {
 func generateFakeULID() (string, error) {
 	chars := "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 	runes := []rune(chars)
-	result := make([]byte, 26)
+	result := make([]byte, 25)
 
-	for i := 0; i < 26; i++ {
+	for i := 0; i < 25; i++ {
 		r := runes[rand.Intn(len(runes))]
 		result[i] = byte(r)
 	}
-	result[25] = byte('L')
 
 	return string(result), nil
 }
