@@ -3,7 +3,6 @@ package sourceservice
 import (
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/param"
-	"github.com/ormushq/ormus/pkg/richerror"
 )
 
 func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceResponse, error) {
@@ -18,7 +17,7 @@ func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceRes
 
 	response, err := s.repo.InsertSource(source)
 	if err != nil {
-		return nil, richerror.New("CreateSource").WhitWarpError(err)
+		return nil, err
 	}
 
 	return response, nil

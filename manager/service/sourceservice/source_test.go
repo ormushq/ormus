@@ -23,11 +23,11 @@ func TestDeleteSource(t *testing.T) {
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.DeleteSource").WhitWarpError(fmt.Errorf(sourcemock.RepoErr)),
-			req:         "write_key",
+			req:         "writekey",
 		},
 		{
 			name: "ordinary",
-			req:  "write_key",
+			req:  "writekey",
 		},
 	}
 
@@ -64,7 +64,7 @@ func TestUpdateSource(t *testing.T) {
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.GetUserSourceById").WhitWarpError(fmt.Errorf(sourcemock.RepoErr)),
-			req:         "write_key",
+			req:         "writekey",
 			req1: param.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
@@ -75,7 +75,7 @@ func TestUpdateSource(t *testing.T) {
 		{
 			name:    "ordinary",
 			repoErr: false,
-			req:     "write_key",
+			req:     "writekey",
 			req1: param.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",

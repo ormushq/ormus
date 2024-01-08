@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/mock/sourcemock"
 	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
@@ -25,6 +26,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 		{
@@ -35,6 +37,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 		{
@@ -45,6 +48,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "de",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 		{
@@ -55,6 +59,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "more then max description len la la la la la la la la la la la la la lal la la lal al al lal ala lal al lala l l",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 		{
@@ -65,6 +70,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "new normal description",
 				ProjectID:   "invalide project id",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 		{
@@ -75,6 +81,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
 				OwnerID:     "01HJDQ386MW8EM6WMC8B6J5HAN",
+				Status:      entity.StatusNotActive,
 			},
 		},
 	}

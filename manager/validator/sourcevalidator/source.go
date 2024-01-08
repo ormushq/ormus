@@ -5,6 +5,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/oklog/ulid/v2"
+	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -85,7 +86,6 @@ func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *Vali
 }
 
 func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
-
 	if err := validation.Validate(id,
 		validation.By(v.isSourceAlreadyCreated),
 	); err != nil {
@@ -146,7 +146,7 @@ func (v Validator) isSourceAlreadyCreated(value interface{}) error {
 }
 
 func (v Validator) validateStatus(value interface{}) error {
-	s, ok := value.(string)
+	s, ok := value.(entity.Status)
 	if !ok {
 		return errors.New("error while reflection interface")
 	}
