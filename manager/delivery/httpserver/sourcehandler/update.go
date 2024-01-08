@@ -18,18 +18,18 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 	// binding addsource request form
 	updateSourceReq := new(param.UpdateSourceRequest)
 	if err := ctx.Bind(updateSourceReq); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
+		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}
 
 	if err := h.validateSvc.ValidateUpdateSourceForm(*updateSourceReq); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
+		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}
 
 	// call save method in service
 	sourceResp, err := h.sourceSvc.UpdateSource(sourceID, updateSourceReq)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error())) // TODO maybe need change response structure
+		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}
 
-	return ctx.JSON(http.StatusCreated, sourceResp) // TODO maybe need change response structure
+	return ctx.JSON(http.StatusCreated, sourceResp)
 }
