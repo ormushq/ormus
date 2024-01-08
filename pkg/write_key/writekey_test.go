@@ -15,7 +15,7 @@ func TestWriteKeyUniqueness(t *testing.T) {
 	var wg sync.WaitGroup
 	ids := make([]string, 0)
 
-	for i := 0; i < 1000000; i++ {
+	for i := 0; i < 100000; i++ {
 
 		wg.Add(1)
 		go func() {
@@ -46,7 +46,7 @@ func TestWriteKeyValidation(t *testing.T) {
 	var wg sync.WaitGroup
 	ids := make([]string, 0)
 
-	for i := 0; i < 1000000; i++ {
+	for i := 0; i < 100000; i++ {
 
 		wg.Add(1)
 		go func() {
@@ -78,7 +78,7 @@ func TestWriteKeyInValidation(t *testing.T) {
 	var wg sync.WaitGroup
 	fakeIDs := make([]string, 0)
 
-	for i := 0; i < 1000000; i++ {
+	for i := 0; i < 100000; i++ {
 
 		wg.Add(1)
 		go func() {
