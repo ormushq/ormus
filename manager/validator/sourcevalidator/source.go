@@ -22,7 +22,6 @@ func (v Validator) ValidateCreateSourceForm(req param.AddSourceRequest) *Validat
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength), validation.By(v.isSourceAlreadyCreated)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
 		validation.Field(&req.ProjectID, validation.Required, validation.By(v.validateULID)),
-		validation.Field(&req.OwnerID, validation.Required, validation.By(v.validateULID)),
 	); err != nil {
 
 		fieldErr := make(map[string]string)

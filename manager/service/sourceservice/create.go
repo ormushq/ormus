@@ -6,7 +6,7 @@ import (
 	writekey "github.com/ormushq/ormus/pkg/write_key"
 )
 
-func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceResponse, error) {
+func (s Service) CreateSource(req *param.AddSourceRequest, ownerID string) (*param.AddSourceResponse, error) {
 	w, err := writekey.GenerateNewWriteKey()
 	if err != nil {
 		return nil, err
@@ -17,7 +17,7 @@ func (s *Service) CreateSource(req *param.AddSourceRequest) (*param.AddSourceRes
 		WriteKey:    entity.WriteKey(w),
 		Name:        req.Name,
 		Description: req.Description,
-		OwnerID:     req.OwnerID,
+		OwnerID:     ownerID,
 		ProjectID:   req.ProjectID,
 	}
 

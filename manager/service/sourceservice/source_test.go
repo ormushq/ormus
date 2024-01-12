@@ -23,11 +23,11 @@ func TestDeleteSource(t *testing.T) {
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.DeleteSource").WhitWarpError(fmt.Errorf(sourcemock.RepoErr)),
-			req:         "writekey",
+			req:         "source_id",
 		},
 		{
 			name: "ordinary",
-			req:  "writekey",
+			req:  "source_id",
 		},
 	}
 
@@ -57,42 +57,43 @@ func TestUpdateSource(t *testing.T) {
 		name        string
 		repoErr     bool
 		expectedErr error
-		req         string
+		sourceID    string
+		ownerID     string
 		req1        param.UpdateSourceRequest
 	}{
 		{
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.GetUserSourceById").WhitWarpError(fmt.Errorf(sourcemock.RepoErr)),
-			req:         "writekey",
+			sourceID:    "source_id",
+			ownerID:     "owner_id",
 			req1: param.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
-				OwnerID:     "owner_id",
 			},
 		},
 		{
-			name:    "ordinary",
-			repoErr: false,
-			req:     "writekey",
+			name:     "ordinary",
+			repoErr:  false,
+			sourceID: "source_id",
+			ownerID:  "owner_id",
 			req1: param.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
-				OwnerID:     "owner_id",
 			},
 		},
 		{
 			name:        "user not found",
 			repoErr:     false,
 			expectedErr: richerror.New("MockRepo.GetUserSourceById").WhitMessage(errmsg.ErrUserNotFound),
-			req:         "invalide write_key",
+			sourceID:    "invalide source_id",
+			ownerID:     "owner_id",
 			req1: param.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
-				OwnerID:     "owner_id",
 			},
 		},
 	}
@@ -104,7 +105,7 @@ func TestUpdateSource(t *testing.T) {
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
-			response, err := service.UpdateSource(tc.req, &tc.req1)
+			response, err := service.UpdateSource(tc.ownerID, tc.sourceID, &tc.req1)
 
 			// 3. assertion
 			if tc.expectedErr != nil {
@@ -124,27 +125,28 @@ func TestCreateSource(t *testing.T) {
 		name        string
 		repoErr     bool
 		expectedErr error
+		ownerID     string
 		req         param.AddSourceRequest
 	}{
 		{
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.InsertSource").WhitWarpError(fmt.Errorf(sourcemock.RepoErr)),
+			ownerID:     "owner_id",
 			req: param.AddSourceRequest{
 				Name:        "name",
 				Description: "description",
 				ProjectID:   "project id",
-				OwnerID:     "owner_id",
 			},
 		},
 		{
 			name:    "ordinary",
 			repoErr: false,
+			ownerID: "owner_id",
 			req: param.AddSourceRequest{
 				Name:        "un existed name",
 				Description: "description",
 				ProjectID:   "project id",
-				OwnerID:     "owner_id",
 			},
 		},
 	}
@@ -156,7 +158,7 @@ func TestCreateSource(t *testing.T) {
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
-			response, err := service.CreateSource(&tc.req)
+			response, err := service.CreateSource(&tc.req, tc.ownerID)
 
 			// 3. assertion
 			if tc.expectedErr != nil {

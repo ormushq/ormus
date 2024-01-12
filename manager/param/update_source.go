@@ -10,7 +10,6 @@ type UpdateSourceRequest struct {
 	Name        string
 	Description string
 	ProjectID   string
-	OwnerID     string
 	Status      entity.Status
 }
 

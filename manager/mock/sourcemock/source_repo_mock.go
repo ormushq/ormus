@@ -12,6 +12,7 @@ import (
 const RepoErr = "repository error"
 
 type DefaultSourceTest struct {
+	ID          string
 	WriteKey    entity.WriteKey
 	Name        string
 	Description string
@@ -21,6 +22,7 @@ type DefaultSourceTest struct {
 
 func DefaultSource() DefaultSourceTest {
 	return DefaultSourceTest{
+		ID:          "source_id",
 		WriteKey:    entity.WriteKey("writekey"),
 		Name:        "name name",
 		Description: "description",
@@ -39,6 +41,7 @@ func NewMockRepository(hasErr bool) *MockRepo {
 	defaultSource := DefaultSource()
 	sources = append(sources,
 		&entity.Source{
+			ID:          defaultSource.ID,
 			WriteKey:    defaultSource.WriteKey,
 			Name:        defaultSource.Name,
 			Description: defaultSource.Description,
@@ -60,6 +63,7 @@ func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse
 	m.sources = append(m.sources, source)
 
 	return &param.AddSourceResponse{
+		ID:          source.ID,
 		WriteKey:    string(source.WriteKey),
 		Name:        source.Name,
 		Description: source.Description,
@@ -78,10 +82,11 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.Update
 	}
 
 	for i, s := range m.sources {
-		if string(s.WriteKey) == id {
+		if s.ID == id {
 			m.sources[i] = source
 
 			return &param.UpdateSourceResponse{
+				ID:          source.ID,
 				WriteKey:    string(source.WriteKey),
 				Name:        source.Name,
 				Description: source.Description,
@@ -104,7 +109,7 @@ func (m *MockRepo) DeleteSource(id string) error {
 	}
 
 	for i, s := range m.sources {
-		if string(s.WriteKey) == id {
+		if s.ID == id {
 			m.sources[i] = &entity.Source{}
 
 			return nil
@@ -120,7 +125,7 @@ func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error)
 	}
 
 	for _, s := range m.sources {
-		if string(s.WriteKey) == id && s.OwnerID == ownerID {
+		if s.ID == id && s.OwnerID == ownerID {
 			return s, nil
 		}
 	}

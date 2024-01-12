@@ -40,5 +40,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
+	// TODO : set cookie
+
 	return ctx.JSON(http.StatusOK, response)
 }

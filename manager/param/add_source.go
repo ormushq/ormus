@@ -10,10 +10,10 @@ type AddSourceRequest struct {
 	Name        string
 	Description string
 	ProjectID   string
-	OwnerID     string
 }
 
 type AddSourceResponse struct {
+	ID          string
 	WriteKey    string
 	Name        string
 	Description string
