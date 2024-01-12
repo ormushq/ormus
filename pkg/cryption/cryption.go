@@ -2,15 +2,15 @@ package cryption
 
 import "fmt"
 
-type CryptionConfing struct {
+type CryptConfing struct {
 	CryptionSecretKey string `koanf:"cryption_secret_key"`
 }
 
 type Service struct {
-	config CryptionConfing
+	config CryptConfing
 }
 
-func New(config CryptionConfing) *Service {
+func New(config CryptConfing) *Service {
 	return &Service{
 		config: config,
 	}

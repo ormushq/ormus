@@ -23,7 +23,7 @@ type JWT struct {
 	Cryption ClaimsEncryption
 }
 
-func NewJWT(cfg JwtConfig) *JWT {
+func NewJWT(cfg JwtConfig, cryption ClaimsEncryption) *JWT {
 	hoursInDay := 24
 
 	accessExpDuration := cfg.AccessExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
@@ -37,6 +37,7 @@ func NewJWT(cfg JwtConfig) *JWT {
 			AccessSubject:              cfg.AccessSubject,
 			RefreshSubject:             cfg.RefreshSubject,
 		},
+		Cryption: cryption,
 	}
 }
 

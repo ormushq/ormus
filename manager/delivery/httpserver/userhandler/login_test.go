@@ -11,11 +11,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	"github.com/ormushq/ormus/manager/mock"
+	usermock "github.com/ormushq/ormus/manager/mock"
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/cryption"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
 )
@@ -81,7 +82,8 @@ func TestIntegrationHandler_Login(t *testing.T) {
 
 	cfg := config.C()
 	repo := usermock.NewMockRepository(false)
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+	crypt := cryption.New(cryption.CryptConfing{})
+	jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
 	service := userservice.New(jwt, repo)
 	validator := uservalidator.New(repo)
 	handler := userhandler.New(service, validator)

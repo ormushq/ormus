@@ -8,6 +8,7 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/pkg/cryption"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,8 @@ func TestNewJWT(t *testing.T) {
 			RefreshExpirationTimeInDay: 28, // 28 * 24 * 60 * 60 * 1000 * 1000 = 2,419,200,000,000,000
 		}
 
-		jwt := authservice.NewJWT(cfg)
+		crypt := cryption.New(cryption.CryptConfing{})
+		jwt := authservice.NewJWT(cfg, crypt)
 
 		// 2. execution
 		jwtCfg := jwt.GetConfig()
@@ -58,7 +60,8 @@ func Test_ParseToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+			crypt := cryption.New(cryption.CryptConfing{})
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
 
 			// 2. execution
 			claims, err := jwt.ParseToken(tc.bearerToken)
@@ -102,7 +105,8 @@ func Test_CreateAccessToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+			crypt := cryption.New(cryption.CryptConfing{})
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)
