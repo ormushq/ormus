@@ -8,7 +8,18 @@ import (
 )
 
 func (h Handler) UpdateSource(ctx echo.Context) error {
-	// TODO  get owner(user) id
+	// get user email from context
+	u := ctx.Get("userEmail")
+	userEmail, ok := u.(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage("can not get userEmail"))
+	}
+
+	// get user because we need user ID
+	user, err := h.userSvc.GetUserByEmail(userEmail)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage(err.Error()))
+	}
 
 	// TODO  get project id ?
 
@@ -26,7 +37,7 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 	}
 
 	// call save method in service
-	sourceResp, err := h.sourceSvc.UpdateSource(sourceID, updateSourceReq)
+	sourceResp, err := h.sourceSvc.UpdateSource(user.ID, sourceID, updateSourceReq)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}

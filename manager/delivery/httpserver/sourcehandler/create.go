@@ -9,13 +9,20 @@ import (
 
 // ? Handler or *Handler.
 func (h Handler) CreateSource(ctx echo.Context) error {
-	// TODO  get owner(user) id
-	// to implement this todo
-	//		1 : give token from header or cookie but in login handler just return jwt token as response body
-	// 		2 : then pars token with jwt.ParsToken() function i think its better that we implement middelware to pars and set email in contxt "ctx.set(...)"
-	// 		3 : than here "ctx.Get(...)" than pass email to service layer to find owner(user) id to create new source
+	// get user email from context
+	u := ctx.Get("userEmail")
+	userEmail, ok := u.(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage("can not get userEmail"))
+	}
 
-	// TODO  get project id ?
+	// get user because we need user ID
+	user, err := h.userSvc.GetUserByEmail(userEmail)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage(err.Error()))
+	}
+
+	// TODO  get project id  if get from param dont forget add to route ?
 
 	// binding addsource request form
 	AddSourceReq := new(param.AddSourceRequest)
@@ -29,9 +36,9 @@ func (h Handler) CreateSource(ctx echo.Context) error {
 	}
 
 	// call save method in service
-	sourceResp, err := h.sourceSvc.CreateSource(AddSourceReq)
+	sourceResp, err := h.sourceSvc.CreateSource(AddSourceReq, user.ID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage(err.Error()))
 	}
 
 	return ctx.JSON(http.StatusCreated, sourceResp)
