@@ -69,7 +69,7 @@ func Test_ParseToken(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, claims)
-				assert.Equal(t, tc.expectedUser, claims.UserEmail)
+				assert.Equal(t, tc.expectedUser, claims.EnUserEmail)
 				// Add more assertions if needed for other claim data
 			}
 		})

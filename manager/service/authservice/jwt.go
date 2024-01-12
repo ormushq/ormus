@@ -19,7 +19,8 @@ type JwtConfig struct {
 }
 
 type JWT struct {
-	configs JwtConfig
+	configs  JwtConfig
+	Cryption ClaimsEncryption
 }
 
 func NewJWT(cfg JwtConfig) *JWT {
@@ -78,13 +79,20 @@ func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration
 	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
 
+	// encrypt userEmail than add to claim
+	// TODO : maybe we need add other user data to claim for example user ID
+	encryptionUserEmail, err := s.Cryption.Encrypt(userEmail)
+	if err != nil {
+		return "", richerror.New("jwt.createToken").WhitWarpError(err).WhitKind(richerror.KindUnexpected)
+	}
+
 	// set our claims
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   subject,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 		},
-		UserEmail: userEmail,
+		EnUserEmail: encryptionUserEmail,
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
