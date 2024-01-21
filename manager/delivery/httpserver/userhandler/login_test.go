@@ -16,7 +16,6 @@ import (
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
-	"github.com/ormushq/ormus/pkg/cryption"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
 )
@@ -82,8 +81,7 @@ func TestIntegrationHandler_Login(t *testing.T) {
 
 	cfg := config.C()
 	repo := usermock.NewMockRepository(false)
-	crypt := cryption.New(cryption.CryptConfing{})
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
+	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 	service := userservice.New(jwt, repo)
 	validator := uservalidator.New(repo)
 	handler := userhandler.New(service, validator)

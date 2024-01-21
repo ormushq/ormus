@@ -37,7 +37,7 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 			return ctx.JSON(http.StatusUnauthorized, EchoErrorMessage(errmsg.ErrWrongCredentials))
 		}
 
-		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(errmsg.ErrBadRequest))
+		return ctx.JSON(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}
 
 	// TODO : set cookie

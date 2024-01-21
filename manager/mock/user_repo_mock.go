@@ -11,6 +11,7 @@ import (
 const RepoErr = "repository error"
 
 type DefaultUserTest struct {
+	ID       string
 	Email    string
 	Hash     string
 	Password string
@@ -18,6 +19,7 @@ type DefaultUserTest struct {
 
 func DefaultUser() DefaultUserTest {
 	return DefaultUserTest{
+		ID:       "0000000000",
 		Email:    "test@example.com",
 		Hash:     "$2a$10$GkuJxcHmx.wsVAVl3V/c3uuj75jWVE5awuxJVfoXzIQBA5zQvl572",
 		Password: "HeavYPasS123!",
@@ -32,7 +34,7 @@ type MockRepository struct {
 func NewMockRepository(hasErr bool) *MockRepository {
 	var users []entity.User
 	defaultUser := DefaultUser()
-	users = append(users, entity.User{Email: defaultUser.Email, Password: defaultUser.Hash})
+	users = append(users, entity.User{ID: defaultUser.ID, Email: defaultUser.Email, Password: defaultUser.Hash})
 
 	return &MockRepository{
 		users:  users,

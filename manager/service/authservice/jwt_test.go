@@ -8,7 +8,6 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/service/authservice"
-	"github.com/ormushq/ormus/pkg/cryption"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/stretchr/testify/assert"
@@ -22,8 +21,7 @@ func TestNewJWT(t *testing.T) {
 			RefreshExpirationTimeInDay: 28, // 28 * 24 * 60 * 60 * 1000 * 1000 = 2,419,200,000,000,000
 		}
 
-		crypt := cryption.New(cryption.CryptConfing{})
-		jwt := authservice.NewJWT(cfg, crypt)
+		jwt := authservice.NewJWT(cfg)
 
 		// 2. execution
 		jwtCfg := jwt.GetConfig()
@@ -60,8 +58,7 @@ func Test_ParseToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			crypt := cryption.New(cryption.CryptConfing{})
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			claims, err := jwt.ParseToken(tc.bearerToken)
@@ -72,7 +69,7 @@ func Test_ParseToken(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, claims)
-				assert.Equal(t, tc.expectedUser, claims.EnUserEmail)
+				assert.Equal(t, tc.expectedUser, claims.UserID)
 				// Add more assertions if needed for other claim data
 			}
 		})
@@ -87,7 +84,7 @@ func Test_CreateAccessToken(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			user: entity.User{Email: "testemail@example.com"},
+			user: entity.User{ID: "0000000000000000000"},
 		},
 		{
 			name: "empty user",
@@ -105,8 +102,7 @@ func Test_CreateAccessToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			crypt := cryption.New(cryption.CryptConfing{})
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
+			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)

@@ -131,56 +131,6 @@ func TestService_Login(t *testing.T) {
 	}
 }
 
-func TestService_GetUserByEmail(t *testing.T) {
-	defaultUser := usermock.DefaultUser()
-
-	testCases := []struct {
-		name        string
-		repoErr     bool
-		expectedErr error
-		email       string
-	}{
-		{
-			name:  "ordinary",
-			email: defaultUser.Email,
-		},
-		{
-			name:        "user not available",
-			expectedErr: richerror.New("GetUserByEmail").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
-			email:       "not@existing.com",
-		},
-		{
-			name:        "repo fails",
-			repoErr:     true,
-			expectedErr: richerror.New("GetUserByEmail").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
-			email:       "test@example.com",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// 1. setup
-			jwt := MockJwtEngine{}
-
-			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo)
-
-			// 2. execution
-			user, err := svc.GetUserByEmail(tc.email)
-
-			// 3. assertion
-			if tc.expectedErr != nil {
-				assert.Equal(t, tc.expectedErr.Error(), err.Error())
-				assert.Empty(t, user)
-				return
-			}
-
-			assert.NoError(t, err)
-			assert.NotEmpty(t, user)
-		})
-	}
-}
-
 type MockJwtEngine struct{}
 
 func (m MockJwtEngine) CreateAccessToken(user entity.User) (string, error) {

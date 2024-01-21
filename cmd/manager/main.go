@@ -8,7 +8,6 @@ import (
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
-	"github.com/ormushq/ormus/pkg/cryption"
 )
 
 func main() {
@@ -22,8 +21,7 @@ func main() {
 }
 
 func setupServices(cfg config.Config) httpserver.SetupServicesResponse {
-	crypt := cryption.New(cryption.CryptConfing{})
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig, crypt)
+	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 	unknownRepo := usermock.NewMockRepository(false)
 	userSvc := userservice.New(jwt, unknownRepo)
 	validateUserSvc := uservalidator.New(unknownRepo)
