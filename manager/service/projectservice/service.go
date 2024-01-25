@@ -3,7 +3,7 @@ package projectservice
 import "github.com/ormushq/ormus/manager/entity"
 
 type Repository interface {
-	Create(name string, userID string) (entity.Project, error)
+	Create(name string, email string) (entity.Project, error)
 }
 
 type Service struct {
