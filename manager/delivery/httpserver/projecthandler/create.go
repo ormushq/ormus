@@ -5,8 +5,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/echomsg"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/httpmsg"
 )
@@ -15,7 +15,7 @@ func (h Handler) Create(ctx echo.Context) error {
 	var req param.CreateProjectRequest
 
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpserver.EchoErrorMessage(errmsg.ErrBadRequest))
+		return ctx.JSON(http.StatusBadRequest, echomsg.DefaultMessage(errmsg.ErrBadRequest))
 	}
 
 	vErr := h.projectValidator.ValidateCreateRequest(req)
@@ -29,7 +29,7 @@ func (h Handler) Create(ctx echo.Context) error {
 
 	newProject, err := h.projectSvc.Create(req)
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpserver.EchoErrorMessage(errmsg.ErrBadRequest))
+		return ctx.JSON(http.StatusBadRequest, echomsg.DefaultMessage(errmsg.ErrBadRequest))
 	}
 
 	resp := param.CreateProjectResponse{
