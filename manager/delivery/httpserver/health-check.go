@@ -1,10 +1,10 @@
 package httpserver
 
 import (
-	"github.com/ormushq/ormus/pkg/echomsg"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ormushq/ormus/pkg/echomsg"
 )
 
 func (s *Server) healthCheck(ctx echo.Context) error {

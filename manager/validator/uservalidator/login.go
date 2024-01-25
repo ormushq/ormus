@@ -2,11 +2,11 @@ package uservalidator
 
 import (
 	"errors"
-	"github.com/ormushq/ormus/manager/validator"
 	"regexp"
 	"unicode"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"

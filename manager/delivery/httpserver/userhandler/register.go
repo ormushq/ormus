@@ -1,11 +1,11 @@
 package userhandler
 
 import (
-	"github.com/ormushq/ormus/pkg/echomsg"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/echomsg"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/httpmsg"
 )
