@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"errors"
+	"github.com/ormushq/ormus/pkg/regex"
 	"regexp"
 	"unicode"
 
@@ -18,7 +19,7 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error
 	maxPasswordLength := 32
 
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserRegistered)),
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserRegistered)),
 		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid))); err != nil {
 
 		fieldErr := make(map[string]string)
