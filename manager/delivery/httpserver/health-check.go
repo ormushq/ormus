@@ -7,7 +7,5 @@ import (
 )
 
 func (s *Server) healthCheck(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, echo.Map{
-		"message": "health check message from server",
-	})
+	return ctx.JSON(http.StatusOK, EchoErrorMessage("health check message from server"))
 }
