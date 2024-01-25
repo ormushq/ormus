@@ -1,35 +1,40 @@
-package userhandler
+package projecthandler
 
 import (
-	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
+	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/httpmsg"
 )
 
-func (h Handler) RegisterUser(ctx echo.Context) error {
-	var Req param.RegisterRequest
-	if err := ctx.Bind(&Req); err != nil {
+func (h Handler) Create(ctx echo.Context) error {
+	var req param.CreateProjectRequest
+
+	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, httpserver.EchoErrorMessage(errmsg.ErrBadRequest))
 	}
 
-	result := h.userValidator.ValidateRegisterRequest(Req)
-	if result != nil {
-		msg, code := httpmsg.Error(result.Err)
-
+	vErr := h.projectValidator.ValidateCreateRequest(req)
+	if vErr != nil {
+		msg, code := httpmsg.Error(vErr.Err)
 		return ctx.JSON(code, echo.Map{
 			"message": msg,
-			"errors":  result.Fields,
+			"errors":  vErr.Fields,
 		})
 	}
 
-	// TODO: should we return service error? or should we only return bad request error?
-	resp, err := h.userSvc.Register(Req)
+	newProject, err := h.projectSvc.Create(req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, httpserver.EchoErrorMessage(errmsg.ErrBadRequest))
+	}
+
+	resp := param.CreateProjectResponse{
+		Name: newProject.Name,
+		ID:   newProject.ID,
 	}
 
 	return ctx.JSON(http.StatusCreated, resp)
