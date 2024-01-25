@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"errors"
+	"github.com/ormushq/ormus/manager/validator"
 	"regexp"
 	"unicode"
 
@@ -12,7 +13,7 @@ import (
 )
 
 // ValidateLoginRequest is used to validate login request.
-func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError {
+func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error {
 	minPasswordLength := 8
 	maxPasswordLength := 32
 
@@ -33,7 +34,7 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError 
 			}
 		}
 
-		return &ValidatorError{
+		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),

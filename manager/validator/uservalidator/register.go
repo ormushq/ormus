@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"errors"
+	"github.com/ormushq/ormus/manager/validator"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -12,7 +13,7 @@ import (
 
 // TODO: should we change the name to just `Register`?
 
-func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *ValidatorError {
+func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator.Error {
 	minNameLength := 3
 	maxNameLength := 50
 
@@ -38,7 +39,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *Validator
 			}
 		}
 
-		return &ValidatorError{
+		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
