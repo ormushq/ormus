@@ -36,7 +36,3 @@ func (s *Server) Server() {
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
-
-func EchoErrorMessage(message string) echo.Map {
-	return echo.Map{"message": message}
-}
