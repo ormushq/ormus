@@ -3,7 +3,8 @@ package projectvalidator
 import (
 	"errors"
 	"fmt"
-	"github.com/go-ozzo/ozzo-validation/v4"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -22,8 +23,10 @@ import (
 func (v Validator) ValidateCreateRequest(req param.CreateProjectRequest) *validator.Error {
 	const op = "projectvalidator.ValidateCreateRequest"
 
+	const minNameLength = 3
+
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Name, validation.Required, validation.Min(3)),
+		validation.Field(&req.Name, validation.Required, validation.Min(minNameLength)),
 		validation.Field(&req.UserEmail, validation.Required, validation.By(v.isUserEmailValid)),
 	); err != nil {
 		fieldErr := make(map[string]string)

@@ -16,5 +16,6 @@ func (s Service) IsUserIDValid(email string) (bool, error) {
 	if user == nil {
 		return false, nil
 	}
+
 	return true, nil
 }
