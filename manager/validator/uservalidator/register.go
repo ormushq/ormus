@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"errors"
+	"github.com/ormushq/ormus/pkg/regex"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -22,7 +23,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator
 
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isEmailAlreadyRegistered)),
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isEmailAlreadyRegistered)),
 		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid)),
 	); err != nil {
 
