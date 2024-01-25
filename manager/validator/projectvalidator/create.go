@@ -3,6 +3,8 @@ package projectvalidator
 import (
 	"errors"
 	"fmt"
+	"github.com/ormushq/ormus/pkg/regex"
+	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/validator"
@@ -17,6 +19,7 @@ import (
 	1. Name is required
 	2. Email is required
 	3. Email have to be valid
+	4. Email regex have to match
 
 */
 
@@ -24,10 +27,11 @@ func (v Validator) ValidateCreateRequest(req param.CreateProjectRequest) *valida
 	const op = "projectvalidator.ValidateCreateRequest"
 
 	const minNameLength = 3
+	const maxNameLength = 0
 
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Name, validation.Required, validation.Min(minNameLength)),
-		validation.Field(&req.UserEmail, validation.Required, validation.By(v.isUserEmailValid)),
+		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
+		validation.Field(&req.UserEmail, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserEmailValid)),
 	); err != nil {
 		fieldErr := make(map[string]string)
 
@@ -68,5 +72,5 @@ func (v Validator) isUserEmailValid(value interface{}) error {
 		return nil
 	}
 
-	return fmt.Errorf("user is not valid")
+	return fmt.Errorf(errmsg.ErrEmailIsNotValid)
 }
