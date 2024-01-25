@@ -3,8 +3,8 @@ package param
 // TODO: do we need project.description?
 
 type CreateProjectRequest struct {
-	Name   string
-	UserID string
+	Name      string
+	UserEmail string
 }
 
 type CreateProjectResponse struct {

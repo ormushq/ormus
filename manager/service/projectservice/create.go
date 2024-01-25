@@ -9,7 +9,7 @@ import (
 func (s Service) Create(req param.CreateProjectRequest) (*param.CreateProjectResponse, error) {
 	const op = "projectservice.Create"
 
-	newProject, err := s.repo.Create(req.Name, req.UserID)
+	newProject, err := s.repo.Create(req.Name, req.UserEmail)
 	if err != nil {
 		return nil, richerror.New(op).WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
