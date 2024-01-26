@@ -15,6 +15,7 @@ func (s Service) Create(req param.CreateProjectRequest) (*param.CreateProjectRes
 	}
 
 	return &param.CreateProjectResponse{
+		ID:   newProject.ID,
 		Name: newProject.Name,
 	}, nil
 }
