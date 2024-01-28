@@ -21,4 +21,6 @@
 go.work
 
 .idea
+# logs
 logs/
+mise.log
