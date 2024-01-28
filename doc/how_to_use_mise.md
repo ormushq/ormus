@@ -27,3 +27,5 @@ for update mise
 ```shell
 mise self-update
 ```
+# Full Documentation
+see https://mise.jdx.dev/
