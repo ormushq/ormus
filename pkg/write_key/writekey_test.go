@@ -12,7 +12,6 @@ import (
 )
 
 func TestWriteKeyUniqueness(t *testing.T) {
-
 	var wg sync.WaitGroup
 	ids := make([]string, 0)
 
@@ -20,7 +19,6 @@ func TestWriteKeyUniqueness(t *testing.T) {
 
 		wg.Add(1)
 		go func() {
-
 			id, err := writekey.GenerateNewWriteKey()
 			if err != nil {
 				t.Errorf("error while generating writekey")
@@ -42,11 +40,9 @@ func TestWriteKeyUniqueness(t *testing.T) {
 			return
 		}
 	}
-
 }
 
 func TestWriteKeyValidation(t *testing.T) {
-
 	var wg sync.WaitGroup
 	ids := make([]string, 0)
 
@@ -54,7 +50,6 @@ func TestWriteKeyValidation(t *testing.T) {
 
 		wg.Add(1)
 		go func() {
-
 			id, err := writekey.GenerateNewWriteKey()
 			if err != nil {
 				t.Errorf("error while generating writekey")
@@ -77,11 +72,9 @@ func TestWriteKeyValidation(t *testing.T) {
 			}
 		}
 	}
-
 }
 
 func TestWriteKeyInValidation(t *testing.T) {
-
 	var wg sync.WaitGroup
 	fakeIDs := make([]string, 0)
 
@@ -89,7 +82,6 @@ func TestWriteKeyInValidation(t *testing.T) {
 
 		wg.Add(1)
 		go func() {
-
 			fakeID, err := generateFakeULID()
 			if err != nil {
 				t.Errorf("error while generating writekey")
