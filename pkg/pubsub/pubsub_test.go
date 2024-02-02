@@ -1,7 +1,6 @@
 package pubsub_test
 
 import (
-	"log/slog"
 	"sync"
 	"testing"
 	"time"
@@ -31,7 +30,7 @@ func TestPublishSubscribe(t *testing.T) {
 		Loop:
 			select {
 			case receivedMessage := <-msg:
-				slog.Info("message", "msg", receivedMessage)
+				//slog.Info("message", "msg", receivedMessage)
 				assert.Equal(t, message, receivedMessage)
 				wg.Done()
 				return
@@ -47,7 +46,7 @@ func TestPublishSubscribe(t *testing.T) {
 		p := pubsub.NewPublisher("publisher")
 		err := PubSub.Publish(p, "test", message)
 		assert.NoError(t, err)
-		slog.Info("message published")
+		//slog.Info("message published")
 		wg.Done()
 	}(newPubSub)
 
