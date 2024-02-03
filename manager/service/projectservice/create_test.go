@@ -2,12 +2,13 @@ package projectservice_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/ormushq/ormus/manager/mock/projectmock"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestService_Create(t *testing.T) {
@@ -35,7 +36,7 @@ func TestService_Create(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			repo := projectmock.New(tc.repoErr)
-			svc := projectservice.New(repo)
+			svc := projectservice.New(&repo)
 
 			// 2. execution
 			newProject, err := svc.Create(tc.req)

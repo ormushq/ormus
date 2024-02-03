@@ -3,13 +3,13 @@ package projectvalidator
 import (
 	"errors"
 	"fmt"
-	"github.com/ormushq/ormus/pkg/regex"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/regex"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 

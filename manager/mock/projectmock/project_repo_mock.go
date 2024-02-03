@@ -2,8 +2,9 @@ package projectmock
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/manager/entity"
 	"time"
+
+	"github.com/ormushq/ormus/manager/entity"
 )
 
 // TODO: this package have to be renamed to stub... because this logic is not mocking, but stubbing.
@@ -15,7 +16,7 @@ type MockProject struct {
 	hasErr   bool
 }
 
-func (m MockProject) Create(name string, email string) (entity.Project, error) {
+func (m *MockProject) Create(name, email string) (entity.Project, error) {
 	if m.hasErr {
 		return entity.Project{}, fmt.Errorf(RepoErr)
 	}
@@ -31,10 +32,13 @@ func (m MockProject) Create(name string, email string) (entity.Project, error) {
 	}
 
 	m.projects = append(m.projects, project)
+
 	return project, nil
 }
 
 func New(hasErr bool) MockProject {
-	projects := make([]entity.Project, 10)
+	const projectInMemoryDBSize = 10
+	projects := make([]entity.Project, projectInMemoryDBSize)
+
 	return MockProject{hasErr: hasErr, projects: projects}
 }

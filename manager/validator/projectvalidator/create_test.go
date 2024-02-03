@@ -2,11 +2,12 @@ package projectvalidator_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/ormushq/ormus/manager/validator/projectvalidator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestValidator_ValidateCreateRequest(t *testing.T) {
