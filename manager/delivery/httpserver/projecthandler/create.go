@@ -14,7 +14,8 @@ func (h Handler) Create(ctx echo.Context) error {
 	var req param.CreateProjectRequest
 
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, echomsg.DefaultMessage(errmsg.ErrBadRequest))
+		// TODO: on bind error should we return 422 (StatusUnprocessableEntity) ?
+		return ctx.JSON(http.StatusUnprocessableEntity, echomsg.DefaultMessage(errmsg.ErrBadRequest))
 	}
 
 	vErr := h.projectValidator.ValidateCreateRequest(req)

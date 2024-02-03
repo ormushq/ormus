@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// TODO: this package have to be renamed to stub... because this logic is not mocking, but stubbing.
+
 const RepoErr = "repository error"
 
 type MockProject struct {
