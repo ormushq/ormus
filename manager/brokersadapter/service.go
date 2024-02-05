@@ -1,4 +1,4 @@
-package brokersAdapter
+package brokersadapter
 
 // MessageBroker defines the interface for a message broker client.
 type MessageBroker interface {
