@@ -11,3 +11,14 @@ type MessageBroker interface {
 	// Close closes the message broker client.
 	Close() error
 }
+
+type BrokerService struct {
+	Broker MessageBroker
+}
+
+func NewBroker(broker MessageBroker) *BrokerService {
+	return &BrokerService{
+		Broker: broker,
+	}
+
+}
