@@ -7,6 +7,12 @@ import (
 )
 
 func (h Handler) DeleteSource(ctx echo.Context) error {
+	// get user id from context
+	u := ctx.Get("userID")
+	userID, ok := u.(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage("can not get userID"))
+	}
 	// get id from param
 	sourceID := ctx.Param("sourceID")
 
@@ -16,7 +22,7 @@ func (h Handler) DeleteSource(ctx echo.Context) error {
 	}
 
 	// call delete service method
-	if err := h.sourceSvc.DeleteSource(sourceID); err != nil {
+	if err := h.sourceSvc.DeleteSource(sourceID, userID); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}
 

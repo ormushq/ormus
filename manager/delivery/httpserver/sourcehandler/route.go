@@ -6,8 +6,8 @@ import (
 )
 
 func (h Handler) SetSourceRoute(e *echo.Echo) {
-	sourceGroups := e.Group("/source")
-	sourceGroups.POST("/create", h.CreateSource, middleware.GetTokenFromCookie(h.authSvc))
-	sourceGroups.POST("/update/:sourceID", h.UpdateSource, middleware.GetTokenFromCookie(h.authSvc))
-	sourceGroups.DELETE("/remove/:sourceID", h.DeleteSource)
+	sourceGroups := e.Group("/sources")
+	sourceGroups.POST("/", h.CreateSource, middleware.GetTokenFromCookie(h.authSvc))
+	sourceGroups.POST("/:sourceID", h.UpdateSource, middleware.GetTokenFromCookie(h.authSvc))
+	sourceGroups.DELETE("/:sourceID", h.DeleteSource)
 }

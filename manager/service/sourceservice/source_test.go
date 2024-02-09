@@ -38,7 +38,7 @@ func TestDeleteSource(t *testing.T) {
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
-			err := service.DeleteSource(tc.req)
+			err := service.DeleteSource(tc.req, "userID")
 
 			// 3. assertion
 			if tc.expectedErr != nil {

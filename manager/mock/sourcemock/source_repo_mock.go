@@ -103,7 +103,7 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.Update
 	return nil, richerror.New("MockRepo.UpdateSource").WhitMessage(errmsg.ErrUserNotFound)
 }
 
-func (m *MockRepo) DeleteSource(id string) error {
+func (m *MockRepo) DeleteSource(id, userID string) error {
 	if m.hasErr {
 		return richerror.New("MockRepo.DeleteSource").WhitWarpError(fmt.Errorf(RepoErr))
 	}
