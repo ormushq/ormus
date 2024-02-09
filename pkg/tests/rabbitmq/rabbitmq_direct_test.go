@@ -11,6 +11,7 @@ import (
 // Define a TestCase struct to hold parameters for each test case
 type DirectTestCase struct {
 	Name         string
+	ExchangeName string
 	NumWorkers   int
 	NumMessages  int
 	ExpectedMsgs int
@@ -21,12 +22,14 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 	directtestCases := []DirectTestCase{
 		{
 			Name:         "SingleWorker",
+			ExchangeName: "test_exchange",
 			NumWorkers:   1,
 			NumMessages:  10,
 			ExpectedMsgs: 10,
 		},
 		{
 			Name:         "MultipleWorkers",
+			ExchangeName: "test_exchange",
 			NumWorkers:   10,
 			NumMessages:  100,
 			ExpectedMsgs: 100,
@@ -37,6 +40,7 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 	for _, tc := range directtestCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			runTest(t, tc)
+			time.Sleep(10 * time.Second)
 		})
 	}
 }
@@ -49,7 +53,10 @@ func runTest(t *testing.T, tc DirectTestCase) {
 		}
 	}()
 	queueName := "test_queue"
-
+	err := DeclareAndBindQueueDir(t, conn, queueName, tc.ExchangeName, true)
+	if err != nil {
+		t.Fatalf("Failed to create Queue: %v", err)
+	}
 	// Publish messages
 	publishMessagesDir(t, conn, queueName, tc.NumMessages)
 
@@ -62,7 +69,14 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsgs)
 }
-
+func DeclareAndBindQueueDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
+	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Queue created :", q.Name)
+	return nil
+}
 func setupRabbitMQDir(t *testing.T) *rabbitmq.RabbitMQ {
 	amqpCfg := rabbitmq.DefaultAMQPConfig()
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)

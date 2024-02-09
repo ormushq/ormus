@@ -34,8 +34,8 @@ func TestFanoutMessaging(t *testing.T) {
 				"queue3": 100,
 				"queue4": 100,
 			},
-			//! expected = number of message * number of queue = 400 => for all queue = 1600 if auto-delete queue is false
-			//! and the queue doesn't exist before and 1000 if its be true
+			//! expected = number of message * number of queue = 400 => for all queue :if auto-delete be false
+			//! and the queue exist before =1600 and 1000 if auto-delete be true
 			Expected: 1000,
 		},
 		{
@@ -66,7 +66,11 @@ func TestFanoutMessaging(t *testing.T) {
 func runFanoutTest(t *testing.T, tc FanoutTestCase) {
 	// Create a RabbitMQ connection
 	conn := setupRabbitMQFanout(t)
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			t.Fatalf("Failed to close RabbitMQ connection: %v", err)
+		}
+	}()
 
 	// Publish messages to the fanout exchange
 	for i := range tc.QueueNames {
@@ -75,11 +79,23 @@ func runFanoutTest(t *testing.T, tc FanoutTestCase) {
 		if err != nil {
 			t.Fatalf("Failed to declare fanout exchange %s: %v", tc.ExchangeName, err)
 		}
+		err = DeclareAndBindQueueFanout(t, conn, tc.QueueNames[i], tc.ExchangeName[i], true)
+		if err != nil {
+			t.Fatalf("Failed to create Queue: %v", err)
+		}
 		publishMessagesFanout(t, conn, tc.QueueNames[i], tc.NumMessages)
 	}
 
 	// Consume messages from each queue and verify counts
 	checkMessagesReceivedFanout(t, conn, tc)
+}
+func DeclareAndBindQueueFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
+	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Queue created :", q.Name)
+	return nil
 }
 
 // Helper function to create a RabbitMQ connection
@@ -116,6 +132,7 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 	channels := make([]<-chan *message_broker.Message, len(tc.QueueNames))
 	for i, queueName := range tc.QueueNames {
 		time.Sleep(125 * time.Millisecond)
+		conn.SetExchangeName(tc.ExchangeName[i])
 		chmsg, err := conn.ConsumeMessage(queueName)
 		if err != nil {
 			t.Fatalf("Failed to start consuming messages from queue %s: %v", queueName, err)
@@ -134,14 +151,13 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 		default:
 			for i, ch := range channels {
 				select {
-				case msg, ok := <-ch:
+				case _, ok := <-ch:
 					if !ok {
 						continue
 					}
 					receivedCount++
 					receivedMap[tc.QueueNames[i]]++
-					fmt.Printf("Received %d messages, expected %d", receivedCount, tc.Expected)
-					fmt.Printf("Received message from queue %s: %s\n", msg.Topic, string(msg.Payload))
+					fmt.Println("received:", receivedCount)
 				default:
 					// Do nothing, move to the next channel
 				}
@@ -150,6 +166,7 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 			if receivedCount > tc.Expected {
 				t.Fatalf("err")
 			}
+			fmt.Println("received:", receivedCount, "Expected:", tc.Expected)
 			// Check if all expected messages are received
 			if receivedCount == tc.Expected {
 				fmt.Println("Received all expected messages.")
