@@ -32,4 +32,17 @@ func main() {
 
 	// TODO: get entranceEvent from pub/sub
 	entranceEvent := generateFakeProcessedEvent()
+
+	for _, integration := range entranceEvent.Integration {
+		err := eventOrchestration(entranceEvent.Event, integration)
+		if err != nil {
+			// TODO: log error
+		}
+	}
+}
+
+func eventOrchestration(event event.CoreEvent, integrations entity.Integration) error {
+	//TODO; check cache for event id and integration id if status is failed or success than update layer 11 with event id
+	// else decide to send event with integration to the right queue
+	return nil
 }
