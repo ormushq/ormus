@@ -36,7 +36,7 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 			ExpectedMsgs: 100,
 		},
 	}
-
+	fmt.Println("start tests...")
 	// Run test cases
 	for _, tc := range directtestCases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -44,6 +44,7 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 			time.Sleep(10 * time.Second)
 		})
 	}
+	fmt.Println("All tests completed successfully")
 }
 
 func runTest(t *testing.T, tc DirectTestCase) {

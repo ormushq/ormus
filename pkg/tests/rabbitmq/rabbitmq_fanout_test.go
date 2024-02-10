@@ -54,7 +54,7 @@ func TestFanoutMessaging(t *testing.T) {
 			Expected: 400,
 		},
 	}
-
+	fmt.Println("start tests...")
 	// Run test cases
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -62,6 +62,8 @@ func TestFanoutMessaging(t *testing.T) {
 			time.Sleep(10 * time.Second)
 		})
 	}
+	fmt.Println("All tests completed successfully")
+
 }
 
 func runFanoutTest(t *testing.T, tc FanoutTestCase) {
@@ -159,7 +161,6 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 					}
 					receivedCount++
 					receivedMap[tc.QueueNames[i]]++
-					fmt.Println("received:", receivedCount)
 				default:
 					// Do nothing, move to the next channel
 				}
