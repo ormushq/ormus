@@ -1,4 +1,4 @@
-package message_broker
+package messageBroker
 
 // MessageBroker defines the interface for a message broker client.
 type MessageBroker interface {
@@ -20,5 +20,4 @@ func NewBroker(broker MessageBroker) *BrokerService {
 	return &BrokerService{
 		Broker: broker,
 	}
-
 }
