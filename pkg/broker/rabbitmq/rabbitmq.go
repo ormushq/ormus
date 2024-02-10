@@ -3,9 +3,15 @@ package rabbitmq
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/ormushq/ormus/logger"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/message_broker"
 	"github.com/streadway/amqp"
+	"time"
 )
+
+type additionalFields struct {
+	ExchangeName string
+}
 
 // RabbitMQ represents a RabbitMQ message broker client.
 type RabbitMQ struct {
@@ -13,15 +19,22 @@ type RabbitMQ struct {
 	ch               *amqp.Channel
 	additionalFields additionalFields
 }
-type additionalFields struct {
-	ExchangeName string
-	ExchangeKind string
+
+func (rb *RabbitMQ) SetExchangeName(ExchangeName string) {
+	rb.additionalFields.ExchangeName = ExchangeName
+}
+func (rb *RabbitMQ) getExchangeName() string {
+	return rb.additionalFields.ExchangeName
+}
+
+func (rb *RabbitMQ) CloseChannel() error {
+	return rb.ch.Close()
 }
 
 // DeclareExchange declares a new exchange with the given name and type.
 func (rb *RabbitMQ) DeclareExchange(ExchangeName, kind string) error {
+	// set the latest ExchangeName
 	rb.additionalFields.ExchangeName = ExchangeName
-	rb.additionalFields.ExchangeKind = kind
 	return rb.ch.ExchangeDeclare(
 		ExchangeName, // name
 		kind,         // type: "direct", "fanout", "topic", "headers"
@@ -31,6 +44,32 @@ func (rb *RabbitMQ) DeclareExchange(ExchangeName, kind string) error {
 		false,        // no-wait
 		nil,          // arguments
 	)
+}
+func (rb *RabbitMQ) DeclareAndBindQueue(topic, ExchangeName string, autoDelete bool) (*amqp.Queue, error) {
+	q, err := rb.ch.QueueDeclare(
+		topic,      // name
+		false,      // durable
+		autoDelete, // delete when unused
+		false,      // exclusive
+		false,      // no-wait
+		nil,        // arguments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to Declare a queue: %s", err)
+	}
+	logger.L().Info("queue created:", q)
+	err = rb.ch.QueueBind(
+		q.Name,       // queue name
+		topic,        // routing key
+		ExchangeName, // exchange
+		false,        // no-wait
+		nil,          // arguments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to bind a queue: %s", err)
+	}
+	return &q, nil
+
 }
 
 // NewRabbitMQBroker creates a new instance of RabbitMQ.
@@ -61,26 +100,13 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
 func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Message) error {
-
-	q, err := rb.ch.QueueDeclare(
-		topic, // name
-		false, // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(q)
-
+	time.Sleep(125 * time.Millisecond)
 	for _, msg := range messages {
 		err := rb.ch.Publish(
-			rb.additionalFields.ExchangeName, // exchange
-			topic,                            // routing key
-			false,                            // mandatory
-			false,                            // immediate
+			rb.getExchangeName(), // exchange
+			topic,                // routing key
+			false,                // mandatory
+			false,                // immediate
 			amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        msg.Payload,
@@ -95,37 +121,15 @@ func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Mess
 
 // ConsumeMessage consumes messages from a specified topic in RabbitMQ.
 func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message, error) {
-	q, err := rb.ch.QueueDeclare(
-		topic, // name
-		false, // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to declare a queue: %s", err)
-	}
-
-	err = rb.ch.QueueBind(
-		q.Name,                           // queue name
-		"",                               // routing key
-		rb.additionalFields.ExchangeName, // exchange
-		false,                            // no-wait
-		nil,                              // arguments
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to bind a queue: %s", err)
-	}
-
+	time.Sleep(125 * time.Millisecond)
 	msgs, err := rb.ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		topic, // queue
+		"",    // consumer
+		true,  // auto-ack
+		false, // exclusive
+		false, // no-local
+		false, // no-wait
+		nil,   // args
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to register a consumer: %s", err)
