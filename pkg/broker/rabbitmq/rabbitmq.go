@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/ormushq/ormus/logger"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/message_broker"
 	"github.com/streadway/amqp"
 	"time"
@@ -57,7 +56,6 @@ func (rb *RabbitMQ) DeclareAndBindQueue(topic, ExchangeName string, autoDelete b
 	if err != nil {
 		return nil, fmt.Errorf("failed to Declare a queue: %s", err)
 	}
-	logger.L().Info("queue created:", q)
 	err = rb.ch.QueueBind(
 		q.Name,       // queue name
 		topic,        // routing key
