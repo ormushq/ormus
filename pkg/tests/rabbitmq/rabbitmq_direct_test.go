@@ -129,12 +129,12 @@ func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Mes
 		default:
 			for _, ch := range channels {
 				select {
-				case msg, ok := <-ch:
+				case _, ok := <-ch:
 					if !ok {
 						continue
 					}
 					received++
-					fmt.Printf("ID : %v , topic : %v , payload : %s received : %d \n", msg.ID, msg.Topic, string(msg.Payload), received)
+
 				default:
 					// Do nothing, move to the next channel
 				}

@@ -168,7 +168,6 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 			if receivedCount > tc.Expected {
 				t.Fatalf("err")
 			}
-			fmt.Println("received:", receivedCount, "Expected:", tc.Expected)
 			// Check if all expected messages are received
 			if receivedCount == tc.Expected {
 				fmt.Println("Received all expected messages.")
