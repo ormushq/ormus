@@ -57,6 +57,7 @@ func TestFanoutMessaging(t *testing.T) {
 	fmt.Println("start tests...")
 	// Run test cases
 	for _, tc := range testCases {
+		fmt.Println("-----", tc.Name, "-----")
 		t.Run(tc.Name, func(t *testing.T) {
 			runFanoutTest(t, tc)
 			time.Sleep(10 * time.Second)
@@ -79,14 +80,17 @@ func runFanoutTest(t *testing.T, tc FanoutTestCase) {
 	for i := range tc.QueueNames {
 		// Declare the fanout exchange
 		err := conn.DeclareExchange(tc.ExchangeName[i], tc.Mode)
+		fmt.Println("1-DeclareExchange")
 		if err != nil {
 			t.Fatalf("Failed to declare fanout exchange %s: %v", tc.ExchangeName, err)
 		}
 		err = DeclareAndBindQueueFanout(t, conn, tc.QueueNames[i], tc.ExchangeName[i], true)
+		fmt.Println("2-DeclareAndBindQueueFanout")
 		if err != nil {
 			t.Fatalf("Failed to create Queue: %v", err)
 		}
-		publishMessagesFanout(t, conn, tc.QueueNames[i], tc.NumMessages)
+		fmt.Println("3-publishMessagesFanout")
+		publishMessagesFanout(t, tc, conn, tc.QueueNames[i], tc.NumMessages, i)
 	}
 
 	// Consume messages from each queue and verify counts
@@ -112,12 +116,26 @@ func setupRabbitMQFanout(t *testing.T) *rabbitmq.RabbitMQ {
 	return conn
 }
 
+/*
 // Helper function to publish messages to an exchange
-func publishMessagesFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
+
+	func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
+		for i := 0; i < numMessages; i++ {
+			message := fmt.Sprintf("Message %d", i+1)
+			time.Sleep(125 * time.Millisecond)
+			err := conn.PublishMessage(topic, tc.ExchangeName[j], tc.Mode, messagebroker.NewMessage(topic, []byte(message)))
+			if err != nil {
+				t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
+			}
+		}
+	}
+*/
+func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.RabbitMQ, topic string, numMessages int, currentEX int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
 		time.Sleep(125 * time.Millisecond)
-		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
+		fmt.Println("number of sent message:", i+1, "in queue:", topic)
+		err := conn.PublishMessage(topic, tc.ExchangeName[currentEX], messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
 		}
@@ -136,7 +154,6 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 	channels := make([]<-chan *messagebroker.Message, len(tc.QueueNames))
 	for i, queueName := range tc.QueueNames {
 		time.Sleep(125 * time.Millisecond)
-		conn.SetExchangeName(tc.ExchangeName[i])
 		chmsg, err := conn.ConsumeMessage(queueName)
 		if err != nil {
 			t.Fatalf("Failed to start consuming messages from queue %s: %v", queueName, err)

@@ -60,7 +60,7 @@ func runTest(t *testing.T, tc DirectTestCase) {
 		t.Fatalf("Failed to create Queue: %v", err)
 	}
 	// Publish messages
-	publishMessagesDir(t, conn, queueName, tc.NumMessages)
+	publishMessagesDir(t, tc.ExchangeName, conn, queueName, tc.NumMessages)
 
 	// Start worker goroutines
 	channels := startWorkers(t, conn, queueName, tc.NumWorkers)
@@ -111,10 +111,10 @@ func startWorkers(t *testing.T, conn *rabbitmq.RabbitMQ, queueName string, numWo
 	return channels
 }
 
-func publishMessagesDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
+func publishMessagesDir(t *testing.T, ex string, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
-		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
+		err := conn.PublishMessage(topic, ex, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message: %v", err)
 		}
