@@ -64,7 +64,6 @@ func TestFanoutMessaging(t *testing.T) {
 		})
 	}
 	fmt.Println("All tests completed successfully")
-
 }
 
 func runFanoutTest(t *testing.T, tc FanoutTestCase) {

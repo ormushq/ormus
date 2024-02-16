@@ -33,13 +33,16 @@ func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
 		nil,          // arguments
 	)
 }
+
 func (rb *RabbitMQ) DeclareExchangeAndBindQueue(topic, exchangeName, kind string, autoDelete bool) (*amqp.Queue, error) {
 	err := rb.DeclareExchange(exchangeName, kind)
 	if err != nil {
 		return nil, err
 	}
+
 	return rb.DeclareAndBindQueue(topic, exchangeName, autoDelete)
 }
+
 func (rb *RabbitMQ) DeclareAndBindQueue(topic, exchangeName string, autoDelete bool) (*amqp.Queue, error) {
 	q, err := rb.ch.QueueDeclare(
 		topic,      // name
@@ -93,7 +96,7 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 }
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
-func (rb *RabbitMQ) PublishMessage(topic string, exchangeName string, messages ...*MessageBroker.Message) error {
+func (rb *RabbitMQ) PublishMessage(topic, exchangeName string, messages ...*MessageBroker.Message) error {
 	time.Sleep(sleepTime * time.Millisecond)
 	for _, msg := range messages {
 		err := rb.ch.Publish(
