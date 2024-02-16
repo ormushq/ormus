@@ -11,7 +11,6 @@ type Connection struct {
 	Integrations []Integration
 }
 
-// TODO: I'm not sure integration is right name for destination object.
-type Integration struct{}
+
 
 
