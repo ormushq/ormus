@@ -116,20 +116,6 @@ func setupRabbitMQFanout(t *testing.T) *rabbitmq.RabbitMQ {
 	return conn
 }
 
-/*
-// Helper function to publish messages to an exchange
-
-	func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
-		for i := 0; i < numMessages; i++ {
-			message := fmt.Sprintf("Message %d", i+1)
-			time.Sleep(125 * time.Millisecond)
-			err := conn.PublishMessage(topic, tc.ExchangeName[j], tc.Mode, messagebroker.NewMessage(topic, []byte(message)))
-			if err != nil {
-				t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
-			}
-		}
-	}
-*/
 func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.RabbitMQ, topic string, numMessages int, currentEX int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
