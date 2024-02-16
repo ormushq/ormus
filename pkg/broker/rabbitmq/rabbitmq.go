@@ -11,23 +11,10 @@ import (
 
 const sleepTime = 125
 
-type additionalFields struct {
-	ExchangeName string
-}
-
 // RabbitMQ represents a RabbitMQ message broker client.
 type RabbitMQ struct {
-	conn             *amqp.Connection
-	ch               *amqp.Channel
-	additionalFields additionalFields
-}
-
-func (rb *RabbitMQ) SetExchangeName(exchangeName string) {
-	rb.additionalFields.ExchangeName = exchangeName
-}
-
-func (rb *RabbitMQ) getExchangeName() string {
-	return rb.additionalFields.ExchangeName
+	conn *amqp.Connection
+	ch   *amqp.Channel
 }
 
 func (rb *RabbitMQ) CloseChannel() error {
@@ -36,9 +23,6 @@ func (rb *RabbitMQ) CloseChannel() error {
 
 // DeclareExchange declares a new exchange with the given name and type.
 func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
-	// set the latest ExchangeName
-	rb.additionalFields.ExchangeName = exchangeName
-
 	return rb.ch.ExchangeDeclare(
 		exchangeName, // name
 		kind,         // type: "direct", "fanout", "topic", "headers"
@@ -49,7 +33,13 @@ func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
 		nil,          // arguments
 	)
 }
-
+func (rb *RabbitMQ) DeclareExchangeAndBindQueue(topic, exchangeName, kind string, autoDelete bool) (*amqp.Queue, error) {
+	err := rb.DeclareExchange(exchangeName, kind)
+	if err != nil {
+		return nil, err
+	}
+	return rb.DeclareAndBindQueue(topic, exchangeName, autoDelete)
+}
 func (rb *RabbitMQ) DeclareAndBindQueue(topic, exchangeName string, autoDelete bool) (*amqp.Queue, error) {
 	q, err := rb.ch.QueueDeclare(
 		topic,      // name
@@ -103,14 +93,14 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 }
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
-func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Message) error {
+func (rb *RabbitMQ) PublishMessage(topic string, exchangeName string, messages ...*MessageBroker.Message) error {
 	time.Sleep(sleepTime * time.Millisecond)
 	for _, msg := range messages {
 		err := rb.ch.Publish(
-			rb.getExchangeName(), // exchange
-			topic,                // routing key
-			false,                // mandatory
-			false,                // immediate
+			exchangeName, // exchange
+			topic,        // routing key
+			false,        // mandatory
+			false,        // immediate
 			amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        msg.Payload,
