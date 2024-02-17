@@ -1,6 +1,7 @@
 package authservice
 
 import (
+	b64 "encoding/base64"
 	"strings"
 	"time"
 
@@ -44,11 +45,11 @@ func (s JWT) GetConfig() *JwtConfig {
 }
 
 func (s JWT) CreateAccessToken(user entity.User) (string, error) {
-	return s.createToken(user.Email, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
+	return s.createToken(user.ID, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
 }
 
 func (s JWT) CreateRefreshToken(user entity.User) (string, error) {
-	return s.createToken(user.Email, s.configs.RefreshSubject, s.configs.RefreshExpirationTimeInDay)
+	return s.createToken(user.ID, s.configs.RefreshSubject, s.configs.RefreshExpirationTimeInDay)
 }
 
 func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
@@ -70,13 +71,15 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 	return nil, richerror.New("parse token failed").WhitWarpError(err)
 }
 
-func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration) (string, error) {
-	if userEmail == "" {
+func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (string, error) {
+	if userID == "" {
 		// it is weird to build a jwt token for no one, right?
 		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrJwtEmptyUser)
 	}
 	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
+
+	b64UserID := b64.StdEncoding.EncodeToString([]byte(userID))
 
 	// set our claims
 	claims := Claims{
@@ -84,7 +87,7 @@ func (s JWT) createToken(userEmail, subject string, expireDuration time.Duration
 			Subject:   subject,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 		},
-		UserEmail: userEmail,
+		UserID: b64UserID,
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

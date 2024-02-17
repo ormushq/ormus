@@ -1,8 +1,10 @@
 package authservice
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserEmail string `json:"user_email"`
+	UserID string `json:"user_id"`
 }

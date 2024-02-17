@@ -15,7 +15,9 @@ type Server struct {
 	userhandler userhandler.Handler
 }
 
-// Setup a new server object
+// Setup a new server object.
+// New Set up a new server object.
+// Setup a new server object.
 func New(c source.Config) Server {
 	return Server{
 		config: source.Config{
