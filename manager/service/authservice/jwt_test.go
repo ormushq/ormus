@@ -69,7 +69,7 @@ func Test_ParseToken(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, claims)
-				assert.Equal(t, tc.expectedUser, claims.UserEmail)
+				assert.Equal(t, tc.expectedUser, claims.UserID)
 				// Add more assertions if needed for other claim data
 			}
 		})
@@ -84,7 +84,7 @@ func Test_CreateAccessToken(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			user: entity.User{Email: "testemail@example.com"},
+			user: entity.User{ID: "0000000000000000000"},
 		},
 		{
 			name: "empty user",
