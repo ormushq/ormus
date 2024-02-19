@@ -8,4 +8,4 @@ experimental = true # enable experimental features
 [settings.status]
 missing_tools = true # warn if tools are not installed
 show_env = false     # show configured env vars
-show_tools = false   # show active tools
+show_tools =  false   # show active tools
