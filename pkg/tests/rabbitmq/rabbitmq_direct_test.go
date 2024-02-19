@@ -2,10 +2,11 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/pkg/broker/message_broker"
-	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 	"testing"
 	"time"
+
+	"github.com/ormushq/ormus/pkg/broker/messagebroker"
+	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 )
 
 // Define a TestCase struct to hold parameters for each test case
@@ -69,6 +70,7 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsgs)
 }
+
 func DeclareAndBindQueueDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
 	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
 	if err != nil {
@@ -77,6 +79,7 @@ func DeclareAndBindQueueDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic, Exchan
 	fmt.Println("Queue created :", q.Name)
 	return nil
 }
+
 func setupRabbitMQDir(t *testing.T) *rabbitmq.RabbitMQ {
 	amqpCfg := rabbitmq.DefaultAMQPConfig()
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
@@ -93,8 +96,8 @@ func setupRabbitMQDir(t *testing.T) *rabbitmq.RabbitMQ {
 	return conn
 }
 
-func startWorkers(t *testing.T, conn *rabbitmq.RabbitMQ, queueName string, numWorkers int) []<-chan *message_broker.Message {
-	channels := make([]<-chan *message_broker.Message, numWorkers)
+func startWorkers(t *testing.T, conn *rabbitmq.RabbitMQ, queueName string, numWorkers int) []<-chan *messagebroker.Message {
+	channels := make([]<-chan *messagebroker.Message, numWorkers)
 
 	for i := 0; i < numWorkers; i++ {
 		chmsg, err := conn.ConsumeMessage(queueName)
@@ -110,15 +113,14 @@ func startWorkers(t *testing.T, conn *rabbitmq.RabbitMQ, queueName string, numWo
 func publishMessagesDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
-		err := conn.PublishMessage(topic, message_broker.NewMessage(topic, []byte(message)))
+		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message: %v", err)
 		}
 	}
-
 }
-func checkMessagesReceivedDir(t *testing.T, channels []<-chan *message_broker.Message, expected int) {
 
+func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Message, expected int) {
 	received := 0
 	for received < expected {
 		select {

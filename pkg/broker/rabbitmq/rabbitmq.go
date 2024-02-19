@@ -2,11 +2,14 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	MessageBroker "github.com/ormushq/ormus/pkg/broker/message_broker"
-	"github.com/streadway/amqp"
 	"time"
+
+	"github.com/google/uuid"
+	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
+	"github.com/streadway/amqp"
 )
+
+const sleepTime = 125
 
 type additionalFields struct {
 	ExchangeName string
@@ -19,9 +22,10 @@ type RabbitMQ struct {
 	additionalFields additionalFields
 }
 
-func (rb *RabbitMQ) SetExchangeName(ExchangeName string) {
-	rb.additionalFields.ExchangeName = ExchangeName
+func (rb *RabbitMQ) SetExchangeName(exchangeName string) {
+	rb.additionalFields.ExchangeName = exchangeName
 }
+
 func (rb *RabbitMQ) getExchangeName() string {
 	return rb.additionalFields.ExchangeName
 }
@@ -31,11 +35,12 @@ func (rb *RabbitMQ) CloseChannel() error {
 }
 
 // DeclareExchange declares a new exchange with the given name and type.
-func (rb *RabbitMQ) DeclareExchange(ExchangeName, kind string) error {
+func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
 	// set the latest ExchangeName
-	rb.additionalFields.ExchangeName = ExchangeName
+	rb.additionalFields.ExchangeName = exchangeName
+
 	return rb.ch.ExchangeDeclare(
-		ExchangeName, // name
+		exchangeName, // name
 		kind,         // type: "direct", "fanout", "topic", "headers"
 		true,         // durable
 		false,        // auto-deleted
@@ -44,7 +49,8 @@ func (rb *RabbitMQ) DeclareExchange(ExchangeName, kind string) error {
 		nil,          // arguments
 	)
 }
-func (rb *RabbitMQ) DeclareAndBindQueue(topic, ExchangeName string, autoDelete bool) (*amqp.Queue, error) {
+
+func (rb *RabbitMQ) DeclareAndBindQueue(topic, exchangeName string, autoDelete bool) (*amqp.Queue, error) {
 	q, err := rb.ch.QueueDeclare(
 		topic,      // name
 		false,      // durable
@@ -54,25 +60,25 @@ func (rb *RabbitMQ) DeclareAndBindQueue(topic, ExchangeName string, autoDelete b
 		nil,        // arguments
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to Declare a queue: %s", err)
+		return nil, fmt.Errorf("failed to Declare a queue: %w", err)
 	}
 	err = rb.ch.QueueBind(
 		q.Name,       // queue name
 		topic,        // routing key
-		ExchangeName, // exchange
+		exchangeName, // exchange
 		false,        // no-wait
 		nil,          // arguments
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to bind a queue: %s", err)
+		return nil, fmt.Errorf("failed to bind a queue: %w", err)
 	}
-	return &q, nil
 
+	return &q, nil
 }
 
 // NewRabbitMQBroker creates a new instance of RabbitMQ.
 func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
-	//generate the AMQP URI from the AMQPConfig.
+	// generate the AMQP URI from the AMQPConfig.
 	amqpURI := fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
 		amqpCfg.Username,
 		amqpCfg.Password,
@@ -82,12 +88,12 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 	)
 	conn, err := amqp.Dial(amqpURI)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to RabbitMQ: %s", err)
+		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
-		return nil, fmt.Errorf("failed to open a channel: %s", err)
+		return nil, fmt.Errorf("failed to open a channel: %w", err)
 	}
 
 	return &RabbitMQ{
@@ -98,7 +104,7 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
 func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Message) error {
-	time.Sleep(125 * time.Millisecond)
+	time.Sleep(sleepTime * time.Millisecond)
 	for _, msg := range messages {
 		err := rb.ch.Publish(
 			rb.getExchangeName(), // exchange
@@ -110,7 +116,7 @@ func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Mess
 				Body:        msg.Payload,
 			})
 		if err != nil {
-			return fmt.Errorf("failed to publish a message: %s", err)
+			return fmt.Errorf("failed to publish a message: %w", err)
 		}
 	}
 
@@ -119,7 +125,7 @@ func (rb *RabbitMQ) PublishMessage(topic string, messages ...*MessageBroker.Mess
 
 // ConsumeMessage consumes messages from a specified topic in RabbitMQ.
 func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message, error) {
-	time.Sleep(125 * time.Millisecond)
+	time.Sleep(sleepTime * time.Millisecond)
 	msgs, err := rb.ch.Consume(
 		topic, // queue
 		"",    // consumer
@@ -130,7 +136,7 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 		nil,   // args
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to register a consumer: %s", err)
+		return nil, fmt.Errorf("failed to register a consumer: %w", err)
 	}
 
 	out := make(chan *MessageBroker.Message)
@@ -152,12 +158,12 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 func (rb *RabbitMQ) Close() error {
 	err := rb.ch.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close channel: %s", err)
+		return fmt.Errorf("failed to close channel: %w", err)
 	}
 
 	err = rb.conn.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close connection: %s", err)
+		return fmt.Errorf("failed to close connection: %w", err)
 	}
 
 	return nil

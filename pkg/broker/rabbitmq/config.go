@@ -1,5 +1,7 @@
 package rabbitmq
 
+const defaultPort = 5672
+
 // AMQPConfig holds configuration options for connecting to RabbitMQ using AMQP URI.
 type AMQPConfig struct {
 	Username    string
@@ -15,7 +17,7 @@ func DefaultAMQPConfig() *AMQPConfig {
 		Username:    "guest",
 		Password:    "guest",
 		Hostname:    "localhost",
-		Port:        5672,
+		Port:        defaultPort,
 		VirtualHost: "/",
 	}
 }

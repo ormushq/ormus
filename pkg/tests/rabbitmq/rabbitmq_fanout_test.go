@@ -2,10 +2,11 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/pkg/broker/message_broker"
-	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 	"testing"
 	"time"
+
+	"github.com/ormushq/ormus/pkg/broker/messagebroker"
+	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 )
 
 // Define a struct to hold parameters for the fanout test case
@@ -89,6 +90,7 @@ func runFanoutTest(t *testing.T, tc FanoutTestCase) {
 	// Consume messages from each queue and verify counts
 	checkMessagesReceivedFanout(t, conn, tc)
 }
+
 func DeclareAndBindQueueFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
 	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
 	if err != nil {
@@ -113,7 +115,7 @@ func publishMessagesFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, 
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
 		time.Sleep(125 * time.Millisecond)
-		err := conn.PublishMessage(topic, message_broker.NewMessage(topic, []byte(message)))
+		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
 		}
@@ -129,7 +131,7 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 	receivedMap := make(map[string]int)
 
 	// Create channels for each queue
-	channels := make([]<-chan *message_broker.Message, len(tc.QueueNames))
+	channels := make([]<-chan *messagebroker.Message, len(tc.QueueNames))
 	for i, queueName := range tc.QueueNames {
 		time.Sleep(125 * time.Millisecond)
 		conn.SetExchangeName(tc.ExchangeName[i])

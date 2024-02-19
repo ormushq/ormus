@@ -1,4 +1,4 @@
-package messageBroker
+package messagebroker
 
 import "github.com/google/uuid"
 
