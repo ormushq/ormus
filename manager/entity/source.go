@@ -6,6 +6,8 @@ import (
 
 type WriteKey string // because we might change the format in future
 
+type SourceCategory string
+
 type Status string
 
 const (
@@ -22,7 +24,15 @@ type Source struct {
 	ProjectID   string
 	OwnerID     string
 	Status      Status
+	Metadata    SourceMetadata
 	CreateAt    time.Time
 	UpdateAt    time.Time
 	DeleteAt    *time.Time
+}
+
+type SourceMetadata struct {
+	ID       string
+	Name     string
+	Slug     string
+	Category SourceCategory
 }
