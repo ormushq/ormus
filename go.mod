@@ -50,4 +50,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/google/uuid v1.3.1
+require (
+	github.com/google/uuid v1.3.1
+	github.com/streadway/amqp v1.1.0
+)

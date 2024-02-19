@@ -1,4 +1,4 @@
-package brokersadapter
+package message_broker
 
 import "github.com/google/uuid"
 
