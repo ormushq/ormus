@@ -10,7 +10,7 @@ import (
 )
 
 // Define a struct to hold parameters for the fanout test case
-type FanoutTestCase struct {
+type FanOutTestCase struct {
 	Name           string
 	Mode           string
 	ExchangeName   []string
@@ -22,7 +22,7 @@ type FanoutTestCase struct {
 
 func TestFanoutMessaging(t *testing.T) {
 	// Define test cases
-	testCases := []FanoutTestCase{
+	testCases := []FanOutTestCase{
 		{
 			Name:         "same exchange",
 			Mode:         "fanout",
@@ -66,36 +66,40 @@ func TestFanoutMessaging(t *testing.T) {
 	fmt.Println("All tests completed successfully")
 }
 
-func runFanoutTest(t *testing.T, tc FanoutTestCase) {
-	// Create a RabbitMQ connection
-	conn := setupRabbitMQFanout(t)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			t.Fatalf("Failed to close RabbitMQ connection: %v", err)
+func runFanoutTest(t *testing.T, tc FanOutTestCase) {
+	conn := make(map[int]*rabbitmq.RabbitMQ)
+	for i := 0; i < len(tc.QueueNames); i++ {
+		cfg := rabbitmq.AMQPConfig{
+			Username:     "guest",
+			Password:     "guest",
+			Hostname:     "localhost",
+			Port:         5672,
+			VirtualHost:  "/",
+			ExchangeName: tc.ExchangeName[i],
+			ExchangeMode: tc.Mode,
 		}
-	}()
+		fmt.Println("create conn:", i+1)
+		conn[i] = setupRabbitMQFanout(t, &cfg)
+
+	}
+	defer deferAllConnfan(conn, t)
 
 	// Publish messages to the fanout exchange
-	for i := range tc.QueueNames {
-		// Declare the fanout exchange
-		err := conn.DeclareExchange(tc.ExchangeName[i], tc.Mode)
-		fmt.Println("1-DeclareExchange")
-		if err != nil {
-			t.Fatalf("Failed to declare fanout exchange %s: %v", tc.ExchangeName, err)
-		}
-		err = DeclareAndBindQueueFanout(t, conn, tc.QueueNames[i], tc.ExchangeName[i], true)
-		fmt.Println("2-DeclareAndBindQueueFanout")
-		if err != nil {
-			t.Fatalf("Failed to create Queue: %v", err)
-		}
-		fmt.Println("3-publishMessagesFanout")
-		publishMessagesFanout(t, tc, conn, tc.QueueNames[i], tc.NumMessages, i)
+	for i := range conn {
+		fmt.Println("-publishMessagesFanout")
+		publishMessagesFanout(t, conn[i], tc.QueueNames[i], tc.NumMessages)
 	}
 
 	// Consume messages from each queue and verify counts
 	checkMessagesReceivedFanout(t, conn, tc)
 }
-
+func deferAllConnfan(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
+	for i := 0; i < len(conn); i++ {
+		if err := conn[i].Close(); err != nil {
+			t.Fatalf("Failed to close RabbitMQ connection: %v", err)
+		}
+	}
+}
 func DeclareAndBindQueueFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
 	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
 	if err != nil {
@@ -106,8 +110,8 @@ func DeclareAndBindQueueFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic, Exc
 }
 
 // Helper function to create a RabbitMQ connection
-func setupRabbitMQFanout(t *testing.T) *rabbitmq.RabbitMQ {
-	amqpCfg := rabbitmq.DefaultAMQPConfig()
+func setupRabbitMQFanout(t *testing.T, cfg *rabbitmq.AMQPConfig) *rabbitmq.RabbitMQ {
+	amqpCfg := rabbitmq.NEWAMQPConfig(cfg)
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
 	if err != nil {
 		t.Fatalf("Failed to create RabbitMQ broker: %v", err)
@@ -115,12 +119,13 @@ func setupRabbitMQFanout(t *testing.T) *rabbitmq.RabbitMQ {
 	return conn
 }
 
-func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.RabbitMQ, topic string, numMessages int, currentEX int) {
+func publishMessagesFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
 		time.Sleep(125 * time.Millisecond)
 		fmt.Println("number of sent message:", i+1, "in queue:", topic)
-		err := conn.PublishMessage(topic, tc.ExchangeName[currentEX], messagebroker.NewMessage(topic, []byte(message)))
+		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
+
 		if err != nil {
 			t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
 		}
@@ -129,7 +134,7 @@ func publishMessagesFanout(t *testing.T, tc FanoutTestCase, conn *rabbitmq.Rabbi
 
 // Helper function to consume messages from a queue and verify counts
 // Helper function to consume messages from queues and verify counts
-func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc FanoutTestCase) {
+func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ, tc FanOutTestCase) {
 	receivedCount := 0
 
 	// Create a map to track the number of messages received from each queue
@@ -137,14 +142,14 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 
 	// Create channels for each queue
 	channels := make([]<-chan *messagebroker.Message, len(tc.QueueNames))
-	for i, queueName := range tc.QueueNames {
+	for i, conn := range conns {
 		time.Sleep(125 * time.Millisecond)
-		chmsg, err := conn.ConsumeMessage(queueName)
+		chMsg, err := conn.ConsumeMessage(tc.QueueNames[i])
 		if err != nil {
-			t.Fatalf("Failed to start consuming messages from queue %s: %v", queueName, err)
+			t.Fatalf("Failed to start consuming messages from queue %s: %v", tc.QueueNames[i], err)
 		}
-		channels[i] = chmsg
-		receivedMap[queueName] = 0
+		channels[i] = chMsg
+		receivedMap[tc.QueueNames[i]] = 0
 	}
 
 	// Use a select statement to receive messages from all queues
@@ -162,6 +167,7 @@ func checkMessagesReceivedFanout(t *testing.T, conn *rabbitmq.RabbitMQ, tc Fanou
 						continue
 					}
 					receivedCount++
+					fmt.Println("receivedCount:", receivedCount)
 					receivedMap[tc.QueueNames[i]]++
 				default:
 					// Do nothing, move to the next channel

@@ -13,8 +13,63 @@ const sleepTime = 125
 
 // RabbitMQ represents a RabbitMQ message broker client.
 type RabbitMQ struct {
-	conn *amqp.Connection
-	ch   *amqp.Channel
+	conn         *amqp.Connection
+	ch           *amqp.Channel
+	exchangeName string
+	exchangeMode string
+}
+
+// NewRabbitMQBroker creates a new instance of RabbitMQ.
+func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
+	// generate the AMQP URI from the AMQPConfig.
+	amqpURI := fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
+		amqpCfg.Username,
+		amqpCfg.Password,
+		amqpCfg.Hostname,
+		amqpCfg.Port,
+		amqpCfg.VirtualHost,
+	)
+	conn, err := amqp.Dial(amqpURI)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("failed to open a channel: %w", err)
+	}
+
+	return &RabbitMQ{
+		conn:         conn,
+		ch:           ch,
+		exchangeName: amqpCfg.ExchangeName,
+		exchangeMode: amqpCfg.ExchangeMode,
+	}, nil
+}
+
+// PublishMessage publishes messages to a specified topic in RabbitMQ.
+func (rb *RabbitMQ) PublishMessage(topic string, messages ...MessageBroker.Message) error {
+	queue, err := rb.DeclareExchangeAndBindQueue(topic, rb.exchangeName, rb.exchangeMode, true)
+	if err != nil {
+		return err
+	}
+	time.Sleep(sleepTime * time.Millisecond)
+	for _, msg := range messages {
+		err = rb.ch.Publish(
+			rb.exchangeName, // exchange
+			queue.Name,      // routing key
+			false,           // mandatory
+			false,           // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        msg.Payload,
+			})
+		if err != nil {
+			return fmt.Errorf("failed to publish a message: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (rb *RabbitMQ) CloseChannel() error {
@@ -67,53 +122,6 @@ func (rb *RabbitMQ) DeclareAndBindQueue(topic, exchangeName string, autoDelete b
 	}
 
 	return &q, nil
-}
-
-// NewRabbitMQBroker creates a new instance of RabbitMQ.
-func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
-	// generate the AMQP URI from the AMQPConfig.
-	amqpURI := fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
-		amqpCfg.Username,
-		amqpCfg.Password,
-		amqpCfg.Hostname,
-		amqpCfg.Port,
-		amqpCfg.VirtualHost,
-	)
-	conn, err := amqp.Dial(amqpURI)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
-	}
-
-	ch, err := conn.Channel()
-	if err != nil {
-		return nil, fmt.Errorf("failed to open a channel: %w", err)
-	}
-
-	return &RabbitMQ{
-		conn: conn,
-		ch:   ch,
-	}, nil
-}
-
-// PublishMessage publishes messages to a specified topic in RabbitMQ.
-func (rb *RabbitMQ) PublishMessage(topic, exchangeName string, messages ...*MessageBroker.Message) error {
-	time.Sleep(sleepTime * time.Millisecond)
-	for _, msg := range messages {
-		err := rb.ch.Publish(
-			exchangeName, // exchange
-			topic,        // routing key
-			false,        // mandatory
-			false,        // immediate
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        msg.Payload,
-			})
-		if err != nil {
-			return fmt.Errorf("failed to publish a message: %w", err)
-		}
-	}
-
-	return nil
 }
 
 // ConsumeMessage consumes messages from a specified topic in RabbitMQ.

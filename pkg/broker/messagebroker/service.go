@@ -3,7 +3,7 @@ package messagebroker
 // Consumer defines the interface for a message consumer.
 type Consumer interface {
 	// ConsumeMessage consumes messages on the specified topic.
-	ConsumeMessage(topic string) (<-chan *Message, error)
+	ConsumeMessage(topic string) (<-chan Message, error)
 
 	// Close closes the consumer.
 	Close() error
@@ -12,7 +12,7 @@ type Consumer interface {
 // Publisher defines the interface for a message publisher.
 type Publisher interface {
 	// PublishMessage publishes messages to a specified topic.
-	PublishMessage(topic string, exchangeName string, messages ...*Message) error
+	PublishMessage(topic string, messages ...Message) error
 
 	// Close closes the publisher.
 	Close() error

@@ -13,32 +13,35 @@ import (
 type DirectTestCase struct {
 	Name         string
 	ExchangeName string
+	Kind         string
 	NumWorkers   int
 	NumMessages  int
-	ExpectedMsgs int
+	ExpectedMsg  int
 }
 
 func TestRabbitMQConcurrentConsumption(t *testing.T) {
 	// Define test cases
-	directtestCases := []DirectTestCase{
+	directTestCases := []DirectTestCase{
 		{
 			Name:         "SingleWorker",
 			ExchangeName: "test_exchange",
+			Kind:         "direct",
 			NumWorkers:   1,
 			NumMessages:  10,
-			ExpectedMsgs: 10,
+			ExpectedMsg:  10,
 		},
 		{
 			Name:         "MultipleWorkers",
 			ExchangeName: "test_exchange",
+			Kind:         "direct",
 			NumWorkers:   10,
 			NumMessages:  100,
-			ExpectedMsgs: 100,
+			ExpectedMsg:  1000,
 		},
 	}
 	fmt.Println("start tests...")
 	// Run test cases
-	for _, tc := range directtestCases {
+	for _, tc := range directTestCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			runTest(t, tc)
 			time.Sleep(10 * time.Second)
@@ -48,73 +51,70 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 }
 
 func runTest(t *testing.T, tc DirectTestCase) {
-	conn := setupRabbitMQDir(t)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			t.Fatalf("Failed to close RabbitMQ connection: %v", err)
-		}
-	}()
+	conn := make(map[int]*rabbitmq.RabbitMQ)
 	queueName := "test_queue"
-	err := DeclareAndBindQueueDir(t, conn, queueName, tc.ExchangeName, true)
-	if err != nil {
-		t.Fatalf("Failed to create Queue: %v", err)
+	for i := 0; i < tc.NumWorkers; i++ {
+		fmt.Println("create conn :", i+1)
+		conn[i] = setupRabbitMQDir(t, tc)
+		// Publish messages
+		fmt.Println("publishing mes")
+		publishMessagesDir(t, conn[i], queueName, tc.NumMessages)
 	}
-	// Publish messages
-	publishMessagesDir(t, tc.ExchangeName, conn, queueName, tc.NumMessages)
 
+	defer deferAllConn(conn, t)
+	fmt.Println("Start worker goroutines")
 	// Start worker goroutines
 	channels := startWorkers(t, conn, queueName, tc.NumWorkers)
-
+	fmt.Println(" Wait 500 Millisecond for messages to be consumed")
 	// Wait for messages to be consumed
 	time.Sleep(500 * time.Millisecond)
-
+	fmt.Println("Check if the correct number of messages was received")
 	// Check if the correct number of messages was received
-	checkMessagesReceivedDir(t, channels, tc.ExpectedMsgs)
+	checkMessagesReceivedDir(t, channels, tc.ExpectedMsg)
 }
-
-func DeclareAndBindQueueDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic, ExchangeName string, autoDelete bool) error {
-	q, err := conn.DeclareAndBindQueue(topic, ExchangeName, autoDelete)
-	if err != nil {
-		return err
+func deferAllConn(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
+	for i := 0; i < len(conn); i++ {
+		if err := conn[i].Close(); err != nil {
+			t.Fatalf("Failed to close RabbitMQ connection: %v", err)
+		}
 	}
-	fmt.Println("Queue created :", q.Name)
-	return nil
 }
-
-func setupRabbitMQDir(t *testing.T) *rabbitmq.RabbitMQ {
-	amqpCfg := rabbitmq.DefaultAMQPConfig()
+func setupRabbitMQDir(t *testing.T, tc DirectTestCase) *rabbitmq.RabbitMQ {
+	cfg := rabbitmq.AMQPConfig{
+		Username:     "guest",
+		Password:     "guest",
+		Hostname:     "localhost",
+		Port:         5672,
+		VirtualHost:  "/",
+		ExchangeName: tc.ExchangeName,
+		ExchangeMode: tc.Kind,
+	}
+	amqpCfg := rabbitmq.NEWAMQPConfig(&cfg)
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
 	if err != nil {
 		t.Fatalf("Failed to create RabbitMQ broker: %v", err)
 	}
-
-	// Declare exchange
-	err = conn.DeclareExchange("test_exchange", "direct")
-	if err != nil {
-		t.Fatalf("Failed to declare exchange: %v", err)
-	}
-
 	return conn
 }
 
-func startWorkers(t *testing.T, conn *rabbitmq.RabbitMQ, queueName string, numWorkers int) []<-chan *messagebroker.Message {
+func startWorkers(t *testing.T, conn map[int]*rabbitmq.RabbitMQ, queueName string, numWorkers int) []<-chan *messagebroker.Message {
 	channels := make([]<-chan *messagebroker.Message, numWorkers)
-
-	for i := 0; i < numWorkers; i++ {
-		chmsg, err := conn.ConsumeMessage(queueName)
+	for i := 0; i < len(conn); i++ {
+		chMsg, err := conn[i].ConsumeMessage(queueName)
 		if err != nil {
 			t.Fatalf("Failed to start worker: %v", err)
 		}
-		channels[i] = chmsg
+		channels[i] = chMsg
 	}
 
 	return channels
 }
 
-func publishMessagesDir(t *testing.T, ex string, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
+func publishMessagesDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
-		err := conn.PublishMessage(topic, ex, messagebroker.NewMessage(topic, []byte(message)))
+		fmt.Println(message, " published")
+		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message: %v", err)
 		}
@@ -145,4 +145,5 @@ func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Mes
 	if received != expected {
 		t.Errorf("Received %d messages, expected %d", received, expected)
 	}
+	fmt.Println("--Received", received, "messages expected", expected, "--")
 }

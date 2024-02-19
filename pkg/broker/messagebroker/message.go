@@ -10,8 +10,8 @@ type Message struct {
 }
 
 // NewMessage creates a new message with the given topic, payload, and metadata.
-func NewMessage(topic string, payload []byte) *Message {
-	return &Message{
+func NewMessage(topic string, payload []byte) Message {
+	return Message{
 		ID:      uuid.New(),
 		Topic:   topic,
 		Payload: payload,
