@@ -1,0 +1,14 @@
+19:32:56 [DEBUG] mise::cli: ARGS: /home/cno_ubuntu/.local/bin/mise hook-env -s bash
+19:32:56 [DEBUG] mise::config: Config {
+    Config Files: [
+        "~/golang_programs/team/ormus/ormus/.rtx.toml",
+    ],
+    Env: {
+        "GO_ENV": "GOLANG_RTX",
+        "RTX_DEBUG": "0",
+        "RTX_USE_TOML": "0",
+        "RTX_LOG_FILE": "./rtx.log",
+        "RTX_VERBOSE": "1",
+    },
+}
+19:32:56 [DEBUG] mise::toolset::builder: Toolset: go@1.21.4, protoc@25.1
