@@ -37,6 +37,18 @@ func (r RichError) WhitMessage(message string) RichError {
 	return r
 }
 
+func (r RichError) WithWrappedError(kind Kind) RichError {
+	r.kind = kind
+
+	return r
+}
+
+func (r RichError) WithKind(kind Kind) RichError {
+	r.kind = kind
+
+	return r
+}
+
 func (r RichError) WhitKind(kind Kind) RichError {
 	r.kind = kind
 

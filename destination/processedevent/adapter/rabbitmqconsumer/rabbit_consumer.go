@@ -6,8 +6,9 @@ import (
 	gc "github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/config"
 	"github.com/ormushq/ormus/destination/entity"
+	"github.com/ormushq/ormus/destination/taskidemotency/adapter/inmemorytaskrepo"
+	"github.com/ormushq/ormus/destination/taskidemotency/service/taskidempotencyservice"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
-	"github.com/ormushq/ormus/destination/taskstorage/adapter/redistaskstorage"
 	"github.com/ormushq/ormus/event"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -84,14 +85,17 @@ func (c *Consumer) Consume() error {
 			var pe event.ProcessedEvent
 			if err := json.Unmarshal(d.Body, &pe); err != nil {
 				fmt.Println("Error on unMarshaling processed event:", err)
+				continue
 			}
-			//TODO how to get corresponding task manager? I think we need strategy of factory design pattern or something like pool of task managers.
-			// we need to find suitable task manager using consumer_topic or even processed event info.
+			//todo  we need to find suitable task manager using consumer_topic or even processed event info.
+			// how to get corresponding task manager? I think we need strategy or factory design pattern or something like pool of task managers.
 			// but now for simplicity I used hard coded approach.
 
-			ts := redistaskstorage.New()
+			taskIdempotencyRepo := inmemorytaskrepo.New()
+			taskIdempotencySrv := taskidempotencyservice.New(taskIdempotencyRepo)
+
 			rmqTaskManagerConnConfig := gc.C().Destination.RabbitMQTaskManagerConnection
-			rmqTaskManager := rabbitmqtaskmanager.NewTaskManager(rmqTaskManagerConnConfig, "webhook_queue", ts)
+			rmqTaskManager := rabbitmqtaskmanager.NewTaskManager(rmqTaskManagerConnConfig, "webhook_queue", taskIdempotencySrv)
 			webhookTask := GenerateTaskUsingProcessedEvent(pe)
 			err := rmqTaskManager.SendToQueue(&webhookTask)
 			if err != nil {
@@ -105,6 +109,11 @@ func (c *Consumer) Consume() error {
 	log.Printf(" [*] Waiting for logs. To exit press CTRL+C")
 	<-forever
 
+	return nil
+}
+
+func (c *Consumer) Close() error {
+	//todo close rabbit consumer
 	return nil
 }
 

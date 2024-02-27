@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"github.com/ormushq/ormus/destination/config"
 	"github.com/ormushq/ormus/destination/entity"
-	"github.com/ormushq/ormus/destination/taskstorage"
+	"github.com/ormushq/ormus/destination/taskidemotency/service/taskidempotencyservice"
 )
 
 type TaskManager struct {
-	queueName   string
-	config      config.RabbitMQTaskManagerConnection
-	taskStorage taskstorage.Storage
-	queue       *Queue
+	queueName       string
+	config          config.RabbitMQTaskManagerConnection
+	taskIdempotency taskidempotencyservice.Service
+	queue           *Queue
 }
 
-func NewTaskManager(c config.RabbitMQTaskManagerConnection, queueName string, ts taskstorage.Storage) *TaskManager {
+func NewTaskManager(c config.RabbitMQTaskManagerConnection, queueName string, ti taskidempotencyservice.Service) *TaskManager {
 	return &TaskManager{
-		queueName:   queueName,
-		config:      c,
-		taskStorage: ts,
+		queueName:       queueName,
+		config:          c,
+		taskIdempotency: ti,
 	}
 }
 

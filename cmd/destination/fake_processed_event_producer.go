@@ -43,7 +43,7 @@ func main() {
 	pageName := "Home"
 	pe := event.ProcessedEvent{
 		SourceID:          "1",
-		Integration:       entity.Integration{ID: "1"},
+		Integration:       entity.Integration{ID: "2"},
 		MessageID:         "1",
 		EventType:         "page",
 		Name:              &pageName,

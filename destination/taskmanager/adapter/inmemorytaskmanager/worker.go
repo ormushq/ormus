@@ -1,6 +1,7 @@
 package inmemorytaskmanager
 
 import (
+	"github.com/ormushq/ormus/destination/entity"
 	"github.com/ormushq/ormus/destination/integrationhandler"
 	"log"
 )
@@ -22,18 +23,38 @@ func (w *Worker) ProcessJobs() {
 	var forever chan struct{}
 	go func() {
 
-		for task := range w.TaskManager.Queue.Tasks {
+		for task := range w.TaskManager.Queue.tasks {
 
-			log.Printf("Task [%s] received by In-Memory worker.", task.ID)
-			err := w.Handler.Handle(task.ProcessedEvent)
+			ti := w.TaskManager.taskIdempotency
+			var taskStatus entity.TaskStatus
+			taskID := task.ID
+
+			log.Printf("Task [%s] received by In-Memory worker.", taskID)
+
+			enabled, err := ti.IntegrationHandlerIsEnable(taskID)
+
 			if err != nil {
-				//todo change task status to success
-				//w.TaskManager.taskStorage.ChangeTaskStatus("", "FAILED")
+				log.Println("Error on IntegrationHandlerIsEnable.", err)
+				continue
+			}
+
+			if enabled {
+				err := w.Handler.Handle(task.ProcessedEvent)
+				if err != nil {
+					taskStatus = entity.FAILED_IN_INTEGRATION_HANDLER
+				}
+			} else {
+				log.Printf("\033[33mPrevent to handling duplicate processed event in idempotency.!\033[0m\n")
 
 			}
 
-			//todo change task status to success
-			//w.TaskManager.taskStorage.ChangeTaskStatus("", "SUCCESS")
+			taskStatus = entity.SUCCESS_IN_INTEGRATION_HANDLER
+
+			err = ti.Save(taskID, taskStatus)
+			if err != nil {
+				log.Println("Error on Saving task status.", err)
+				continue
+			}
 		}
 	}()
 

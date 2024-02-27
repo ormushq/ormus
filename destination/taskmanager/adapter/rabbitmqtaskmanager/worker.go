@@ -2,6 +2,7 @@ package rabbitmqtaskmanager
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/destination/entity"
 	"github.com/ormushq/ormus/destination/integrationhandler"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -65,36 +66,44 @@ func (w *Worker) ProcessJobs() {
 		for d := range msgs {
 
 			//todo should we ack message if we encounter any error ?
-
-			storage := w.TaskManager.taskStorage
+			//Acknowledge that message Received
+			if err = d.Ack(false); err != nil {
+				printWorkersError(err, "Failed to acknowledge message")
+			}
 
 			task, err := w.TaskManager.UnmarshalMessageToTask(d.Body)
 			if err != nil {
 				printWorkersError(err, "Failed to unmarshall message")
-				return
+				continue
 			}
 			log.Printf("Task [%s] received by RabbitMQ worker.", task.ID)
 
-			//todo check if task already have handled (Idempotency).
-			//just if task exists just if status is FAILED_IN_HANDLER we should call w.Handler.Handle()
+			ti := w.TaskManager.taskIdempotency
+			var taskStatus entity.TaskStatus
+			taskID := task.ID
 
-			if err = w.Handler.Handle(task.ProcessedEvent); err != nil {
-				if err = storage.ChangeTaskStatus(task.ID, "FAILED_IN_HANDLER"); err != nil {
-					printWorkersError(err, "Failed to change status")
-				}
+			enabled, err := ti.IntegrationHandlerIsEnable(taskID)
+
+			if err != nil {
+				log.Println("Error on IntegrationHandlerIsEnable.", err)
+				continue
 			}
 
-			//Acknowledge that message Received
-
-			if err = d.Ack(false); err != nil {
-				printWorkersError(err, "Failed to acknowledge message")
-				if err = storage.ChangeTaskStatus(task.ID, "FAILED_IN_ACK"); err != nil {
-					printWorkersError(err, "Failed to change status")
+			if enabled {
+				err := w.Handler.Handle(task.ProcessedEvent)
+				if err != nil {
+					taskStatus = entity.FAILED_IN_INTEGRATION_HANDLER
 				}
+			} else {
+				log.Printf("\033[33mPrevent to handling duplicate processed event in idempotency.!\033[0m\n")
 			}
 
-			if err = storage.ChangeTaskStatus(task.ID, "SUCCESS"); err != nil {
-				printWorkersError(err, "Failed to change status")
+			taskStatus = entity.SUCCESS_IN_INTEGRATION_HANDLER
+
+			err = ti.Save(taskID, taskStatus)
+			if err != nil {
+				log.Println("Error on Saving task status.", err)
+				continue
 			}
 
 		}
