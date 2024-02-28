@@ -1,32 +1,19 @@
 package entity
 
-import (
-	"time"
-)
+import "time"
 
-type Integration struct {
-	Name             string
-	Category         Category
-	Status           bool
-	Source           Source
-	Type             string
-	ConnectionType   ConnectionType
-	LatestSyncStatus time.Time
-	CreatedAt        time.Time
-}
+type IntegrationConfig map[string]any
 
-// Category The integrations we have are categorized into groups
-// Facebook Pixel and Google Ads (Classic) are placed in the Advertising category.
-type Category string
+type DestinationCategory string
 
 const (
-	Analytics      Category = "analytics"
-	Advertising    Category = "advertising"
-	CRM            Category = "crm"
-	EmailMarketing Category = "email-marketing"
-	Livechat       Category = "livechat"
-	Payments       Category = "payments"
-	Surveys        Category = "Surveys"
+	Analytics      DestinationCategory = "analytics"
+	Advertising    DestinationCategory = "advertising"
+	CRM            DestinationCategory = "crm"
+	EmailMarketing DestinationCategory = "email-marketing"
+	Livechat       DestinationCategory = "livechat"
+	Payments       DestinationCategory = "payments"
+	Surveys        DestinationCategory = "Surveys"
 )
 
 // ConnectionType each third party destination are compatible with one of these methods
@@ -39,3 +26,22 @@ const (
 	Storage     ConnectionType = "storage"
 	ReversETL   ConnectionType = "reverse-ETL"
 )
+
+// Integration is a connector that allows our app send data to an external service or application.
+type Integration struct {
+	ID             string
+	SourceID       string
+	Name           string
+	Metadata       DestinationMetadata
+	ConnectionType ConnectionType
+	Enabled        bool
+	Config         IntegrationConfig
+	CreatedAt      time.Time
+}
+
+type DestinationMetadata struct {
+	ID         string
+	Name       string // Javascript, Google Universal Analytics
+	Slug       string // javascript, google-analytics
+	Categories []DestinationCategory
+}
