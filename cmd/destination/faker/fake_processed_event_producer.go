@@ -115,10 +115,36 @@ func main() {
 
 	// generate fake processedEvent
 	pageName := "Home"
+	//pe := event.ProcessedEvent{
+	//	SourceID:          "1",
+	//	Integration:       entity.Integration{ID: "2"},
+	//	MessageID:         "2",
+	//	EventType:         "page",
+	//	Name:              &pageName,
+	//	Version:           1,
+	//	SentAt:            time.Now(),
+	//	ReceivedAt:        time.Now(),
+	//	OriginalTimestamp: time.Now(),
+	//	Timestamp:         time.Now(),
+	//}
 	pe := event.ProcessedEvent{
-		SourceID:          "1",
-		Integration:       fakeIntegration,
-		MessageID:         "1",
+		SourceID: "2",
+		Integration: entity.Integration{
+			Config: entity.WebhookConfig{
+				Headers: []entity.Header{
+					{Key: "Authorization", Value: "Basic MY_BASIC_AUTH_TOKEN"},
+					{Key: "Content-Type", Value: "MY_CONTENT_TYPE"},
+				},
+				Payload: []entity.Payload{
+					{Key: "test1", Value: "value test1"},
+					{Key: "test2", Value: "value test2"},
+					{Key: "test3", Value: "value test3"},
+				},
+				Method: entity.GETWebhookMethod,
+				Url:    "https://eoc0z7vqfxu6io.m.pipedream.net",
+			},
+		},
+		MessageID:         "12",
 		EventType:         "page",
 		Name:              &pageName,
 		Version:           1,
