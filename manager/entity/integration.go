@@ -1,6 +1,8 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type IntegrationConfig map[string]any
 
@@ -35,7 +37,7 @@ type Integration struct {
 	Metadata       DestinationMetadata
 	ConnectionType ConnectionType
 	Enabled        bool
-	Config         IntegrationConfig
+	Config         WebhookConfig //TODO: this Config is only for mvp (webhook)
 	CreatedAt      time.Time
 }
 

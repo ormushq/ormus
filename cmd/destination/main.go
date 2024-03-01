@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/destination/integrationhandler/adapters/fakeintegrationhandler"
+	"github.com/ormushq/ormus/destination/integrationhandler/adapters/webhookhandler"
 	"github.com/ormushq/ormus/destination/processedevent/adapter/rabbitmqconsumer"
 	"github.com/ormushq/ormus/destination/taskidemotency/adapter/inmemorytaskrepo"
 	"github.com/ormushq/ormus/destination/taskidemotency/service/taskidempotencyservice"
@@ -18,7 +18,8 @@ func main() {
 	//-----Setup queue and workers-----
 	var workers []taskmanager.Worker
 
-	fh := fakeintegrationhandler.New()
+	//fh := fakeintegrationhandler.New()
+	webhookHandler := webhookhandler.New()
 
 	taskIdempotencyRepo := inmemorytaskrepo.New()
 	taskIdempotencySrv := taskidempotencyservice.New(taskIdempotencyRepo)
@@ -28,11 +29,11 @@ func main() {
 
 	// Create RabbitMQ Queue and Workers for webhooks integration
 	rmqTaskManager := rabbitmqtaskmanager.NewTaskManager(rmqTaskManagerConnConfig, "webhook_queue", taskIdempotencySrv)
-	workers = append(workers, rabbitmqtaskmanager.NewWorker(rmqTaskManager, fh))
+	workers = append(workers, rabbitmqtaskmanager.NewWorker(rmqTaskManager, webhookHandler))
 
 	// Create In Memory Queue and Workers for webhooks integration
 	inMemoryTaskManager := inmemorytaskmanager.NewTaskManager(taskIdempotencySrv)
-	workers = append(workers, inmemorytaskmanager.NewWorker(inMemoryTaskManager, fh))
+	workers = append(workers, inmemorytaskmanager.NewWorker(inMemoryTaskManager, webhookHandler))
 
 	// Start workers
 	wg := sync.WaitGroup{}
