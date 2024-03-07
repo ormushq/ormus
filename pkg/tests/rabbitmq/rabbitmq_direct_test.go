@@ -72,6 +72,7 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsg)
 }
+
 func deferAllConn(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
 	for i := 0; i < len(conn); i++ {
 		if err := conn[i].Close(); err != nil {
@@ -79,6 +80,7 @@ func deferAllConn(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
 		}
 	}
 }
+
 func setupRabbitMQDir(t *testing.T, tc DirectTestCase) *rabbitmq.RabbitMQ {
 	cfg := rabbitmq.AMQPConfig{
 		Username:     "guest",
