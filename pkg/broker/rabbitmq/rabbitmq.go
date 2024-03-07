@@ -2,11 +2,10 @@ package rabbitmq
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/google/uuid"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/streadway/amqp"
+	"sync"
 )
 
 const sleepTime = 125
@@ -17,6 +16,7 @@ type RabbitMQ struct {
 	ch           *amqp.Channel
 	exchangeName string
 	exchangeMode string
+	wg           sync.WaitGroup // WaitGroup for synchronization
 }
 
 // NewRabbitMQBroker creates a new instance of RabbitMQ.
@@ -53,7 +53,6 @@ func (rb *RabbitMQ) PublishMessage(topic string, messages ...MessageBroker.Messa
 	if err != nil {
 		return err
 	}
-	time.Sleep(sleepTime * time.Millisecond)
 	for _, msg := range messages {
 		err = rb.ch.Publish(
 			rb.exchangeName, // exchange
@@ -126,7 +125,6 @@ func (rb *RabbitMQ) DeclareAndBindQueue(topic, exchangeName string, autoDelete b
 
 // ConsumeMessage consumes messages from a specified topic in RabbitMQ.
 func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message, error) {
-	time.Sleep(sleepTime * time.Millisecond)
 	msgs, err := rb.ch.Consume(
 		topic, // queue
 		"",    // consumer
@@ -139,17 +137,21 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 	if err != nil {
 		return nil, fmt.Errorf("failed to register a consumer: %w", err)
 	}
-
 	out := make(chan *MessageBroker.Message)
-
 	go func() {
+		defer close(out) // Close the 'out' channel when all messages have been processed
 		for amqpMsg := range msgs {
-			out <- &MessageBroker.Message{
-				ID:      uuid.New(),
-				Topic:   topic,
-				Payload: amqpMsg.Body,
-			}
+			rb.wg.Add(1)
+			go func(amqpMsg amqp.Delivery) {
+				defer rb.wg.Done()
+				out <- &MessageBroker.Message{
+					ID:      uuid.New(),
+					Topic:   topic,
+					Payload: amqpMsg.Body,
+				}
+			}(amqpMsg)
 		}
+		rb.wg.Wait() // Wait for all goroutines to finish
 	}()
 
 	return out, nil
