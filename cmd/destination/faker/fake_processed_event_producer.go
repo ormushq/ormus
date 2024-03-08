@@ -17,6 +17,7 @@ import (
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/metricname"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
@@ -103,7 +104,7 @@ func main() {
 	failOnError(err, "Failed to declare an exchange")
 	span.AddEvent("exchange-declared")
 
-	fakeIntegration := entity.Integration{
+	_ = entity.Integration{
 		ID:       "10",
 		SourceID: "1",
 		Metadata: entity.DestinationMetadata{
@@ -115,36 +116,24 @@ func main() {
 
 	// generate fake processedEvent
 	pageName := "Home"
-	//pe := event.ProcessedEvent{
-	//	SourceID:          "1",
-	//	Integration:       entity.Integration{ID: "2"},
-	//	MessageID:         "2",
-	//	EventType:         "page",
-	//	Name:              &pageName,
-	//	Version:           1,
-	//	SentAt:            time.Now(),
-	//	ReceivedAt:        time.Now(),
-	//	OriginalTimestamp: time.Now(),
-	//	Timestamp:         time.Now(),
-	//}
 	pe := event.ProcessedEvent{
 		SourceID: "2",
 		Integration: entity.Integration{
-			Config: entity.WebhookConfig{
-				Headers: []entity.Header{
+			Config: webhookintegration.WebhookConfig{
+				Headers: []webhookintegration.Header{
 					{Key: "Authorization", Value: "Basic MY_BASIC_AUTH_TOKEN"},
 					{Key: "Content-Type", Value: "MY_CONTENT_TYPE"},
 				},
-				Payload: []entity.Payload{
-					{Key: "test1", Value: "value test1"},
-					{Key: "test2", Value: "value test2"},
-					{Key: "test3", Value: "value test3"},
+				Payload: []webhookintegration.Payload{
+					{Key: "name", Value: "ali"},
+					{Key: "birth_day", Value: "2020-12-12"},
+					{Key: "mail", Value: "ali@mail.com"},
 				},
-				Method: entity.GETWebhookMethod,
+				Method: webhookintegration.GETWebhookMethod,
 				Url:    "https://eoc0z7vqfxu6io.m.pipedream.net",
 			},
 		},
-		MessageID:         "12",
+		MessageID:         "13",
 		EventType:         "page",
 		Name:              &pageName,
 		Version:           1,
@@ -202,7 +191,7 @@ func publishEvent(pe event.ProcessedEvent, ch *amqp.Channel) {
 
 	jpe, err := json.Marshal(pe)
 	if err != nil {
-		log.Panicf("Error: %e", err)
+		log.Panicf("Error: %s", err)
 	}
 	taskSpan.AddEvent("json-event-created", trace.WithAttributes(
 		attribute.String("source-id", pe.SourceID),

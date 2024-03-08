@@ -1,4 +1,4 @@
-package entity
+package webhookintegration
 
 type Header struct {
 	Key   string
@@ -22,4 +22,9 @@ type WebhookConfig struct {
 	Payload []Payload
 	Method  WebhookMethod
 	Url     string
+
+	// what about time out retryable
+	// general config
+	PaxBroadcast uint
+	MaxAttempt   uint
 }

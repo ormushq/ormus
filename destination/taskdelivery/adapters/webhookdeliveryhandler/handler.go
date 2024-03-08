@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ormushq/ormus/event"
-	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"net/http"
 	"net/url"
 )
@@ -22,12 +22,13 @@ func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
 
 	// TODO: The methods have a lot of duplicated code and need to be cleaned up a bit
 	switch e.Integration.Config.Method {
-	case entity.GETWebhookMethod:
+	case webhookintegration.GETWebhookMethod:
 		response, err = WebhookGetHandler(e.Integration.Config)
 		if err != nil {
+			//	TODO: use Ormus built-in logger
 			fmt.Println("WebhookGetHandler error : ", err)
 		}
-	case entity.POSTWebhookMethod:
+	case webhookintegration.POSTWebhookMethod:
 		response, err = WebhookPostHandler(e.Integration.Config)
 		if err != nil {
 			fmt.Println("WebhookGetHandler error : ", err)
@@ -38,7 +39,7 @@ func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
 	return nil
 }
 
-func WebhookPostHandler(config entity.WebhookConfig) (*http.Response, error) {
+func WebhookPostHandler(config webhookintegration.WebhookConfig) (*http.Response, error) {
 	payloadMap := make(map[string]string)
 	for _, item := range config.Payload {
 		payloadMap[item.Key] = item.Value
@@ -70,7 +71,7 @@ func WebhookPostHandler(config entity.WebhookConfig) (*http.Response, error) {
 	return response, nil
 }
 
-func WebhookGetHandler(config entity.WebhookConfig) (*http.Response, error) {
+func WebhookGetHandler(config webhookintegration.WebhookConfig) (*http.Response, error) {
 	client := &http.Client{}
 
 	u, err := url.Parse(config.Url)
