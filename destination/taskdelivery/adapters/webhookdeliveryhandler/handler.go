@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"net/http"
-	"net/url"
 )
 
 type WebhookHandler struct{}
