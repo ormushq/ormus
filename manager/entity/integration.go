@@ -1,8 +1,8 @@
 package entity
 
-import "time"
-
-type IntegrationConfig map[string]any
+import (
+	"time"
+)
 
 type DestinationCategory string
 
@@ -35,9 +35,11 @@ type Integration struct {
 	Metadata       DestinationMetadata
 	ConnectionType ConnectionType
 	Enabled        bool
-	Config         IntegrationConfig
+	Config         Config
 	CreatedAt      time.Time
 }
+
+type Config interface{}
 
 type DestinationMetadata struct {
 	ID         string
