@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/event"
-	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"net/http"
 	"net/url"
+
+	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 )
 
 type WebhookHandler struct{}
@@ -52,7 +53,7 @@ func WebhookPostHandler(config webhookintegration.WebhookConfig) (*http.Response
 
 	client := &http.Client{}
 
-	req, err := http.NewRequest(string(config.Method), config.Url, bytes.NewBuffer(payloadJSON))
+	req, err := http.NewRequest(string(config.Method), config.URL, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func WebhookPostHandler(config webhookintegration.WebhookConfig) (*http.Response
 func WebhookGetHandler(config webhookintegration.WebhookConfig) (*http.Response, error) {
 	client := &http.Client{}
 
-	u, err := url.Parse(config.Url)
+	u, err := url.Parse(config.URL)
 	if err != nil {
 		return nil, err
 	}
