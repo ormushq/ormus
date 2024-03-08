@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ormushq/ormus/manager/mock/projectmock"
+	"github.com/ormushq/ormus/manager/mock/projectstub"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -35,7 +35,7 @@ func TestService_Create(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			repo := projectmock.New(tc.repoErr)
+			repo := projectstub.New(tc.repoErr)
 			svc := projectservice.New(&repo)
 
 			// 2. execution
