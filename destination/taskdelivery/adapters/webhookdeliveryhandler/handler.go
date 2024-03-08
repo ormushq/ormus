@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
-
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
+	"github.com/ormushq/ormus/pkg/richerror"
+	"net/http"
+	"net/url"
 )
 
 type WebhookHandler struct{}
@@ -18,25 +18,33 @@ func New() *WebhookHandler {
 }
 
 func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
+	const op = "webhookhandler.Handle"
+
 	var response *http.Response
 	var err error
 
+	config, ok := e.Integration.Config.(webhookintegration.WebhookConfig)
+	if !ok {
+		return richerror.New(op).WithKind(richerror.KindInvalid).
+			WhitMessage("invalid configuration for webhook")
+	}
+
 	// TODO: The methods have a lot of duplicated code and need to be cleaned up a bit
-	switch e.Integration.Config.Method {
+	switch config.Method {
 	case webhookintegration.GETWebhookMethod:
-		response, err = WebhookGetHandler(e.Integration.Config)
+		response, err = WebhookGetHandler(config)
 		if err != nil {
 			//	TODO: use Ormus built-in logger
 			fmt.Println("WebhookGetHandler error : ", err)
 		}
 	case webhookintegration.POSTWebhookMethod:
-		response, err = WebhookPostHandler(e.Integration.Config)
+		response, err = WebhookPostHandler(config)
 		if err != nil {
 			fmt.Println("WebhookGetHandler error : ", err)
 		}
 	}
 
-	fmt.Println(response.Status)
+	fmt.Println(response.StatusCode)
 	return nil
 }
 

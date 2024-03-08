@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"time"
 )
 
@@ -42,9 +41,11 @@ type Integration struct {
 	Metadata       DestinationMetadata
 	ConnectionType ConnectionType
 	Enabled        bool
-	Config         webhookintegration.WebhookConfig //TODO: this Config is only for mvp (webhook)
+	Config         Config
 	CreatedAt      time.Time
 }
+
+type Config interface{}
 
 type DestinationMetadata struct {
 	ID         string
