@@ -61,14 +61,14 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 		return []byte(s.configs.SecretKey), nil
 	})
 	if err != nil {
-		return nil, richerror.New("parse token failed").WhitWarpError(err)
+		return nil, richerror.New("parse token failed").WithWrappedError(err)
 	}
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return claims, nil
 	}
 
-	return nil, richerror.New("parse token failed").WhitWarpError(err)
+	return nil, richerror.New("parse token failed").WithWrappedError(err)
 }
 
 func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (string, error) {
@@ -93,7 +93,7 @@ func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := accessToken.SignedString([]byte(s.configs.SecretKey))
 	if err != nil {
-		return "", richerror.New("jwt.createToken").WhitWarpError(err)
+		return "", richerror.New("jwt.createToken").WithWrappedError(err)
 	}
 
 	return tokenString, nil

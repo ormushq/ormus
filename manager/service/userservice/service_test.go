@@ -25,7 +25,7 @@ func TestService_Register(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("register.repo").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
+			expectedErr: richerror.New("register.repo").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			req: param.RegisterRequest{
 				Email:    "new@example.com",
 				Password: "very_safe_password",
@@ -81,7 +81,7 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name:        "user not available",
-			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
+			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			req: param.LoginRequest{
 				Email:    "not@existing.com",
 				Password: "123",
@@ -98,7 +98,7 @@ func TestService_Login(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("Login").WhitWarpError(fmt.Errorf(usermock.RepoErr)),
+			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "wrongpassword",
