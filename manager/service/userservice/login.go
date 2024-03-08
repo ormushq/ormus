@@ -12,21 +12,21 @@ func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
 	// get user by email address
 	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
-		return nil, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WithWrappedError(err)
 	}
 
 	if !password.CheckPasswordHash(req.Password, user.Password) {
-		return nil, richerror.New("Login").WhitWarpError(err).WhitMessage(errmsg.ErrWrongCredentials)
+		return nil, richerror.New("Login").WithWrappedError(err).WhitMessage(errmsg.ErrWrongCredentials)
 	}
 
 	// jwt token
 	AccessToken, err := s.jwt.CreateAccessToken(*user)
 	if err != nil {
-		return nil, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WithWrappedError(err)
 	}
 	RefreshToken, err := s.jwt.CreateRefreshToken(*user)
 	if err != nil {
-		return nil, richerror.New("Login").WhitWarpError(err)
+		return nil, richerror.New("Login").WithWrappedError(err)
 	}
 
 	// return ok

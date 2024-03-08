@@ -43,7 +43,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator
 		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -70,7 +70,7 @@ func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isEmailAlreadyRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isEmailAlreadyRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if exists {

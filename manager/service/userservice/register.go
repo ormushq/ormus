@@ -10,7 +10,7 @@ import (
 func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, error) {
 	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
-		return nil, richerror.New("register.hash").WhitWarpError(err)
+		return nil, richerror.New("register.hash").WithWrappedError(err)
 	}
 
 	user := entity.User{
@@ -22,7 +22,7 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 
 	createdUser, err := s.repo.Register(user)
 	if err != nil {
-		return nil, richerror.New("register.repo").WhitWarpError(err)
+		return nil, richerror.New("register.repo").WithWrappedError(err)
 	}
 
 	// TODO: we have to trigger an event of registration in this phase of function

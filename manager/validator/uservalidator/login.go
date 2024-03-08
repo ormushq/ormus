@@ -38,7 +38,7 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error
 		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -53,7 +53,7 @@ func (v Validator) isUserRegistered(value interface{}) error {
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isUserRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isUserRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if !exists {

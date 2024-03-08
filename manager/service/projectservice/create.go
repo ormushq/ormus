@@ -11,7 +11,7 @@ func (s Service) Create(req param.CreateProjectRequest) (*param.CreateProjectRes
 
 	newProject, err := s.repo.Create(req.Name, req.UserEmail)
 	if err != nil {
-		return nil, richerror.New(op).WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return nil, richerror.New(op).WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	return &param.CreateProjectResponse{
