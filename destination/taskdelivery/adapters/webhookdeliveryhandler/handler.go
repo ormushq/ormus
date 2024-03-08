@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"net/http"
@@ -25,6 +26,8 @@ func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
 
 	config, ok := e.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
+		logger.L().Info("invalid configuration for webhook")
+
 		return richerror.New(op).WithKind(richerror.KindInvalid).
 			WhitMessage("invalid configuration for webhook")
 	}
@@ -34,13 +37,18 @@ func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
 	case webhookintegration.GETWebhookMethod:
 		response, err = WebhookGetHandler(config)
 		if err != nil {
-			//	TODO: use Ormus built-in logger
-			fmt.Println("WebhookGetHandler error : ", err)
+			logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
+
+			return richerror.New(op).WithKind(richerror.KindUnexpected).
+				WhitMessage("unexpected error when try to do GET webhook request")
 		}
 	case webhookintegration.POSTWebhookMethod:
 		response, err = WebhookPostHandler(config)
 		if err != nil {
-			fmt.Println("WebhookGetHandler error : ", err)
+			logger.L().Error("error in webhookhandler.Handle when try to Do POST request", err)
+
+			return richerror.New(op).WithKind(richerror.KindUnexpected).
+				WhitMessage("unexpected error when try to do POST webhook request")
 		}
 	}
 
