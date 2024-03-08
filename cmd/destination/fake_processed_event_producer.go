@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"time"
+
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
-	"time"
 )
 
 func failOnError(err error, msg string) {
@@ -40,7 +41,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//generate fake processedEvent
+	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
 		SourceID: "2",
@@ -55,11 +56,11 @@ func main() {
 					{Key: "birth_day", Value: "2020-12-12"},
 					{Key: "mail", Value: "ali@mail.com"},
 				},
-				Method: webhookintegration.GETWebhookMethod,
-				Url:    "https://eoc0z7vqfxu6io.m.pipedream.net",
+				Method: webhookintegration.POSTWebhookMethod,
+				URL:    "https://eoc0z7vqfxu6io.m.pipedream.net",
 			},
 		},
-		MessageID:         "13",
+		MessageID:         "14",
 		EventType:         "page",
 		Name:              &pageName,
 		Version:           1,
