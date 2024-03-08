@@ -1,10 +1,9 @@
 package entity
 
 import (
+	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"time"
 )
-
-type IntegrationConfig map[string]any
 
 type DestinationCategory string
 
@@ -37,7 +36,7 @@ type Integration struct {
 	Metadata       DestinationMetadata
 	ConnectionType ConnectionType
 	Enabled        bool
-	Config         WebhookConfig //TODO: this Config is only for mvp (webhook)
+	Config         webhookintegration.WebhookConfig //TODO: this Config is only for mvp (webhook)
 	CreatedAt      time.Time
 }
 
