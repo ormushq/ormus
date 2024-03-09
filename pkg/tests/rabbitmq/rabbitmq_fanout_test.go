@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"testing"
 	"time"
 
@@ -54,16 +55,13 @@ func TestFanoutMessaging(t *testing.T) {
 			Expected: 400,
 		},
 	}
-	fmt.Println("start tests...")
 	// Run test cases
 	for _, tc := range testCases {
-		fmt.Println("-----", tc.Name, "-----")
 		t.Run(tc.Name, func(t *testing.T) {
 			runFanoutTest(t, tc)
 			time.Sleep(10 * time.Second)
 		})
 	}
-	fmt.Println("All tests completed successfully")
 }
 
 func runFanoutTest(t *testing.T, tc FanOutTestCase) {
@@ -78,7 +76,6 @@ func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 			ExchangeName: tc.ExchangeName[i],
 			ExchangeMode: tc.Mode,
 		}
-		fmt.Println("create conn:", i+1)
 		conn[i] = setupRabbitMQFanout(t, &cfg)
 
 	}
@@ -86,7 +83,6 @@ func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 
 	// Publish messages to the fanout exchange
 	for i := range conn {
-		fmt.Println("publishMessagesFanout")
 		publishMessagesFanout(t, conn[i], tc.QueueNames[i], tc.NumMessages)
 	}
 
@@ -115,8 +111,6 @@ func setupRabbitMQFanout(t *testing.T, cfg *rabbitmq.AMQPConfig) *rabbitmq.Rabbi
 func publishMessagesFanout(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
-		//time.Sleep(125 * time.Millisecond) // DEBUG : for seeing publish Message
-		fmt.Println("number of sent message:", i+1, "in queue:", topic)
 		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message to exchange %s: %v", topic, err)
@@ -134,7 +128,6 @@ func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ,
 	// Create channels for each queue
 	channels := make([]<-chan *messagebroker.Message, len(tc.QueueNames))
 	for i, conn := range conns {
-		//time.Sleep(125 * time.Millisecond)  // DEBUG : for seeing Consume Message
 		chMsg, err := conn.ConsumeMessage(tc.QueueNames[i])
 		if err != nil {
 			t.Fatalf("Failed to start consuming messages from queue %s: %v", tc.QueueNames[i], err)
@@ -158,7 +151,6 @@ func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ,
 						continue
 					}
 					receivedCount++
-					fmt.Println("receivedCount:", receivedCount)
 					receivedMap[tc.QueueNames[i]]++
 				default:
 					// Do nothing, move to the next channel
@@ -170,7 +162,7 @@ func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ,
 			}
 			// Check if all expected messages are received
 			if receivedCount == tc.Expected {
-				fmt.Println("Received all expected messages.")
+				logger.L().Debug("Received all expected messages.")
 				return
 			}
 		}
