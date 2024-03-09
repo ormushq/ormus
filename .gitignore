@@ -26,3 +26,4 @@ logs/
 mise.log
 
 destination/logs.json
+*.log
