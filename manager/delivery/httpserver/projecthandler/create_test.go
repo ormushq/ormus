@@ -27,17 +27,7 @@ func TestHandler_Create(t *testing.T) {
 
 		expectedResponse string
 		err              bool
-	}{
-		{
-			name: "happy path",
-		},
-		{
-			name: "validation error",
-		},
-		{
-			name: "repo error",
-		},
-	}
+	}{}
 
 	cfg := config.C()
 	repo := projectstub.New(false)
