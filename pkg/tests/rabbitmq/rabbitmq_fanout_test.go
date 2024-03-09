@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 )

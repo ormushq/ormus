@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/google/uuid"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
@@ -14,6 +15,7 @@ type RabbitMQ struct {
 	ch           *amqp.Channel
 	exchangeName string
 	exchangeMode string
+	wg           sync.WaitGroup // WaitGroup for synchronization
 }
 
 // NewRabbitMQBroker creates a new instance of RabbitMQ.
@@ -50,7 +52,6 @@ func (rb *RabbitMQ) PublishMessage(topic string, messages ...MessageBroker.Messa
 	if err != nil {
 		return err
 	}
-	// TODO : What should we do if the message is not published?
 	for _, msg := range messages {
 		err = rb.ch.Publish(
 			rb.exchangeName, // exchange
@@ -86,9 +87,6 @@ func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
 	)
 }
 
-// DeclareExchangeAndBindQueue declares a queue to hold messages and deliver to consumers.
-// Declaring creates a queue if it doesn't already exist, or ensures that an
-// existing queue matches the same parameters.
 func (rb *RabbitMQ) DeclareExchangeAndBindQueue(topic, exchangeName, kind string, autoDelete bool) (*amqp.Queue, error) {
 	err := rb.DeclareExchange(exchangeName, kind)
 	if err != nil {
@@ -138,19 +136,21 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 	if err != nil {
 		return nil, fmt.Errorf("failed to register a consumer: %w", err)
 	}
-	ChanSize := 10
-	out := make(chan *MessageBroker.Message, ChanSize)
+	out := make(chan *MessageBroker.Message)
 	go func() {
-		defer close(out) // Close the channel when the processing goroutine exits
-
+		defer close(out) // Close the 'out' channel when all messages have been processed
 		for amqpMsg := range msgs {
-			msg := &MessageBroker.Message{
-				ID:      uuid.New(),
-				Topic:   topic,
-				Payload: amqpMsg.Body,
-			}
-			out <- msg
+			rb.wg.Add(1)
+			go func(amqpMsg amqp.Delivery) {
+				defer rb.wg.Done()
+				out <- &MessageBroker.Message{
+					ID:      uuid.New(),
+					Topic:   topic,
+					Payload: amqpMsg.Body,
+				}
+			}(amqpMsg)
 		}
+		rb.wg.Wait() // Wait for all goroutines to finish
 	}()
 
 	return out, nil
