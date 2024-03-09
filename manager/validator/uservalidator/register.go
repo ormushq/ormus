@@ -5,14 +5,16 @@ import (
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/regex"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
 // TODO: should we change the name to just `Register`?
 
-func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *ValidatorError {
+func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator.Error {
 	minNameLength := 3
 	maxNameLength := 50
 
@@ -21,7 +23,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *Validator
 
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isEmailAlreadyRegistered)),
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isEmailAlreadyRegistered)),
 		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid)),
 	); err != nil {
 
@@ -38,10 +40,10 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *Validator
 			}
 		}
 
-		return &ValidatorError{
+		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -68,7 +70,7 @@ func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isEmailAlreadyRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isEmailAlreadyRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if exists {

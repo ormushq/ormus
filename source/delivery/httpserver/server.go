@@ -15,7 +15,6 @@ type Server struct {
 	userhandler userhandler.Handler
 }
 
-// Setup a new server object.
 // New Set up a new server object.
 // Setup a new server object.
 func New(c source.Config) Server {
@@ -27,7 +26,7 @@ func New(c source.Config) Server {
 	}
 }
 
-// Start server connection.
+// Serve Start server connection.
 func (s Server) Serve() {
 	s.userhandler.SetRoutes(s.Router)
 

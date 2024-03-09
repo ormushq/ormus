@@ -1,7 +1,6 @@
 package userhandler
 
 import (
-	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 )
@@ -17,8 +16,4 @@ func New(userSvc *userservice.Service, userValidator uservalidator.Validator) *H
 		userSvc:       userSvc,
 		userValidator: userValidator,
 	}
-}
-
-func EchoErrorMessage(message string) echo.Map {
-	return echo.Map{"message": message}
 }

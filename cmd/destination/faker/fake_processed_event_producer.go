@@ -56,7 +56,7 @@ func main() {
 
 	jpe, err := json.Marshal(pe)
 	if err != nil {
-		log.Panicf("Error:", err)
+		log.Panicln("Error:", err)
 	}
 
 	err = ch.PublishWithContext(ctx,
