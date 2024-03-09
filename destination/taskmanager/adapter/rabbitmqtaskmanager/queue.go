@@ -4,33 +4,27 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ormushq/ormus/destination/config"
+	"github.com/ormushq/ormus/destination/entity"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
-
-	"github.com/ormushq/ormus/destination/dconfig"
-	"github.com/ormushq/ormus/event"
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Queue struct {
 	name   string
-	config dconfig.RabbitMQTaskManagerConnection
+	config config.RabbitMQTaskManagerConnection
 }
 
-const timeoutSeconds = 5
-
-func newQueue(c dconfig.RabbitMQTaskManagerConnection, n string) *Queue {
+func NewQueue(c config.RabbitMQTaskManagerConnection, n string) *Queue {
 	return &Queue{
 		name:   n,
 		config: c,
 	}
 }
 
-func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
-	defer cancel()
+func (q *Queue) Enqueue(task *entity.Task) error {
 
-	// Connect to RabbitMQ
 	connectionConfig := q.config
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", connectionConfig.User, connectionConfig.Password, connectionConfig.Host, connectionConfig.Port))
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -40,7 +34,6 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	// Declare queue
 	rq, err := ch.QueueDeclare(
 		q.name, // name
 		true,   // durable
@@ -51,15 +44,15 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	// Convert Processed event to json
-	jsonEvent, err := json.Marshal(pe)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	jsonTask, err := json.Marshal(task)
 	if err != nil {
 		fmt.Println("Error:", err)
-
 		return err
 	}
 
-	// Publish message to queue
 	err = ch.PublishWithContext(ctx,
 		"",      // exchange
 		rq.Name, // routing key
@@ -68,10 +61,10 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
-			Body:         jsonEvent,
+			Body:         jsonTask,
 		})
-
 	failOnError(err, "Failed to publish a message")
+	log.Printf("Task [%s] is published to RabbitMQ queue.", task.ID)
 
 	return nil
 }

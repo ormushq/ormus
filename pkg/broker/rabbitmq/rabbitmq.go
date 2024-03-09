@@ -2,6 +2,8 @@ package rabbitmq
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/google/uuid"
 	"sync"
 
