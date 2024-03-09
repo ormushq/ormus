@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/ormushq/ormus/destination/config"
 	"github.com/ormushq/ormus/destination/entity"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
-	"time"
 )
 
 type Queue struct {
@@ -24,7 +25,6 @@ func NewQueue(c config.RabbitMQTaskManagerConnection, n string) *Queue {
 }
 
 func (q *Queue) Enqueue(task *entity.Task) error {
-
 	connectionConfig := q.config
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", connectionConfig.User, connectionConfig.Password, connectionConfig.Host, connectionConfig.Port))
 	failOnError(err, "Failed to connect to RabbitMQ")

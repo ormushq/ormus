@@ -2,13 +2,12 @@ package rabbitmq
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/google/uuid"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/streadway/amqp"
-	"sync"
 )
-
-const sleepTime = 125
 
 // RabbitMQ represents a RabbitMQ message broker client.
 type RabbitMQ struct {

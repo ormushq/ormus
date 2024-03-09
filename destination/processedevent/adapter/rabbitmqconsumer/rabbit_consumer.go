@@ -3,6 +3,9 @@ package rabbitmqconsumer
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
 	gc "github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/config"
 	"github.com/ormushq/ormus/destination/entity"
@@ -11,8 +14,6 @@ import (
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
 	"github.com/ormushq/ormus/event"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
-	"time"
 )
 
 type Consumer struct {
@@ -28,7 +29,6 @@ func NewConsumer(t config.ConsumerTopic, c config.RabbitMQConsumerConnection) *C
 }
 
 func (c *Consumer) Consume() error {
-
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", c.connectionConfig.User, c.connectionConfig.Password, c.connectionConfig.Host, c.connectionConfig.Port))
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -85,9 +85,10 @@ func (c *Consumer) Consume() error {
 			var pe event.ProcessedEvent
 			if err := json.Unmarshal(d.Body, &pe); err != nil {
 				fmt.Println("Error on unMarshaling processed event:", err)
+
 				continue
 			}
-			//todo  we need to find suitable task manager using consumer_topic or even processed event info.
+			// todo  we need to find suitable task manager using consumer_topic or even processed event info.
 			// how to get corresponding task manager? I think we need strategy or factory design pattern or something like pool of task managers.
 			// but now for simplicity I used hard coded approach.
 
@@ -113,7 +114,7 @@ func (c *Consumer) Consume() error {
 }
 
 func (c *Consumer) Close() error {
-	//todo close rabbit consumer
+	// todo close rabbit consumer
 	return nil
 }
 

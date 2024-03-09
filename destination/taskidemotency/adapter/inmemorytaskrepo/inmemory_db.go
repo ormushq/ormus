@@ -8,5 +8,6 @@ type DB struct {
 
 func New() DB {
 	tasks := make(map[string]entity.TaskStatus)
+
 	return DB{tasks: tasks}
 }

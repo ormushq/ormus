@@ -38,14 +38,13 @@ func (s ServiceImpl) GetStatusByTaskID(taskID string) (entity.TaskStatus, error)
 }
 
 func (s ServiceImpl) IntegrationHandlerIsEnable(taskID string) (bool, error) {
-
 	status, err := s.GetStatusByTaskID(taskID)
 	if err != nil {
 		return false, err
 	}
 
 	// A task doesn't exist in the idempotency system or has failed in previous integration handlers.
-	if status == entity.NOT_EXISTS || status == entity.FAILED_IN_INTEGRATION_HANDLER {
+	if status == entity.NotExists || status == entity.FailedInIntegrationHandler {
 		return true, nil
 	}
 
