@@ -54,21 +54,16 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	conn := make(map[int]*rabbitmq.RabbitMQ)
 	queueName := "test_queue"
 	for i := 0; i < tc.NumWorkers; i++ {
-		fmt.Println("create conn :", i+1)
 		conn[i] = setupRabbitMQDir(t, tc)
 		// Publish messages
-		fmt.Println("publishing mes")
 		publishMessagesDir(t, conn[i], queueName, tc.NumMessages)
 	}
 
 	defer deferAllConn(conn, t)
-	fmt.Println("Start worker goroutines")
 	// Start worker goroutines
 	channels := startWorkers(t, conn, queueName, tc.NumWorkers)
-	fmt.Println(" Wait 500 Millisecond for messages to be consumed")
 	// Wait for messages to be consumed
 	time.Sleep(500 * time.Millisecond)
-	fmt.Println("Check if the correct number of messages was received")
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsg)
 }
@@ -115,7 +110,6 @@ func startWorkers(t *testing.T, conn map[int]*rabbitmq.RabbitMQ, queueName strin
 func publishMessagesDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, numMessages int) {
 	for i := 0; i < numMessages; i++ {
 		message := fmt.Sprintf("Message %d", i+1)
-		fmt.Println(message, " published")
 		err := conn.PublishMessage(topic, messagebroker.NewMessage(topic, []byte(message)))
 		if err != nil {
 			t.Fatalf("Failed to publish message: %v", err)
@@ -147,5 +141,4 @@ func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Mes
 	if received != expected {
 		t.Errorf("Received %d messages, expected %d", received, expected)
 	}
-	fmt.Println("--Received", received, "messages expected", expected, "--")
 }
