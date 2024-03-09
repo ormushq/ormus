@@ -2,6 +2,7 @@ package inmemorytaskmanager
 
 import (
 	"fmt"
+
 	"github.com/ormushq/ormus/destination/entity"
 	"github.com/ormushq/ormus/destination/taskidemotency/service/taskidempotencyservice"
 )
@@ -20,7 +21,6 @@ func NewTaskManager(ti taskidempotencyservice.Service) *TaskManager {
 }
 
 func (tm *TaskManager) SendToQueue(t *entity.Task) error {
-
 	err := tm.Queue.Enqueue(t)
 	if err != nil {
 		fmt.Println("enqueue Error : ", err)

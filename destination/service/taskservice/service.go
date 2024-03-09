@@ -2,6 +2,7 @@ package taskservice
 
 import (
 	"context"
+
 	"github.com/ormushq/ormus/destination/entity"
 )
 
@@ -15,5 +16,4 @@ type Repository interface {
 
 func New(repo Repository) Service {
 	return Service{repo: repo}
-
 }

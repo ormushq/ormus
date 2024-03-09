@@ -1,18 +1,19 @@
 package entity
 
 import (
-	"github.com/ormushq/ormus/event"
 	"time"
+
+	"github.com/ormushq/ormus/event"
 )
 
 type TaskStatus uint8
 
 const (
-	NOT_EXISTS                        TaskStatus = 1
-	FAILED_IN_INTEGRATION_HANDLER     TaskStatus = 2
-	SUCCESS_IN_INTEGRATION_HANDLER    TaskStatus = 3
-	SUCCESS_IN_UPDATE_DELIVERY_STATUS TaskStatus = 4
-	FAILDE_IN_UPDATE_DELIVERY_STATUS  TaskStatus = 5
+	NotExists                     TaskStatus = 1
+	FailedInIntegrationHandler    TaskStatus = 2
+	SuccessInIntegrationHandler   TaskStatus = 3
+	SuccessInUpdateDeliveryStatus TaskStatus = 4
+	FailedInUpdateDeliveryStatus  TaskStatus = 5
 )
 
 // Task represents a delivering processed event to third party integrations.

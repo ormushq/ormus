@@ -16,8 +16,15 @@ jobs:
           go-version: '1.21'
       - name: Install dependencies
         run: go mod tidy
+
+      - name: dockerUp
+        run: sudo docker-compose up -d
+
       - name: Test
         run: make test
+
+      - name: dockerDown
+        run: sudo docker-compose down
 
       - name: Format
         run: make format

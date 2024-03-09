@@ -2,10 +2,11 @@ package rabbitmqtaskmanager
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/ormushq/ormus/destination/entity"
 	"github.com/ormushq/ormus/destination/integrationhandler"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 )
 
 type Worker struct {
@@ -21,7 +22,6 @@ func NewWorker(tm *TaskManager, h integrationhandler.IntegrationHandler) *Worker
 }
 
 func (w *Worker) ProcessJobs() {
-
 	connectionConfig := w.TaskManager.config
 
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", connectionConfig.User, connectionConfig.Password, connectionConfig.Host, connectionConfig.Port))
@@ -65,8 +65,8 @@ func (w *Worker) ProcessJobs() {
 	go func() {
 		for d := range msgs {
 
-			//todo should we ack message if we encounter any error ?
-			//Acknowledge that message Received
+			// todo should we ack message if we encounter any error ?
+			// Acknowledge that message Received
 			if err = d.Ack(false); err != nil {
 				printWorkersError(err, "Failed to acknowledge message")
 			}
@@ -83,7 +83,6 @@ func (w *Worker) ProcessJobs() {
 			taskID := task.ID
 
 			enabled, err := ti.IntegrationHandlerIsEnable(taskID)
-
 			if err != nil {
 				log.Println("Error on IntegrationHandlerIsEnable.", err)
 				continue
@@ -92,17 +91,18 @@ func (w *Worker) ProcessJobs() {
 			if enabled {
 				err := w.Handler.Handle(task.ProcessedEvent)
 				if err != nil {
-					taskStatus = entity.FAILED_IN_INTEGRATION_HANDLER
+					taskStatus = entity.FailedInIntegrationHandler
 				}
 			} else {
 				log.Printf("\033[33mPrevent to handling duplicate processed event in idempotency.!\033[0m\n")
 			}
 
-			taskStatus = entity.SUCCESS_IN_INTEGRATION_HANDLER
+			taskStatus = entity.SuccessInIntegrationHandler
 
 			err = ti.Save(taskID, taskStatus)
 			if err != nil {
 				log.Println("Error on Saving task status.", err)
+
 				continue
 			}
 

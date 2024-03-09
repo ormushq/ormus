@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"time"
+
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/manager/entity"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
-	"time"
 )
 
 func failOnError(err error, msg string) {
@@ -39,7 +40,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//generate fake processedEvent
+	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
 		SourceID:          "1",

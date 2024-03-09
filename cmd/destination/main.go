@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"sync"
+
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/integrationhandler/adapters/fakeintegrationhandler"
 	"github.com/ormushq/ormus/destination/processedevent/adapter/rabbitmqconsumer"
@@ -9,12 +12,9 @@ import (
 	"github.com/ormushq/ormus/destination/taskmanager"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/inmemorytaskmanager"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
-	"log"
-	"sync"
 )
 
 func main() {
-
 	//-----Setup queue and workers-----
 	var workers []taskmanager.Worker
 

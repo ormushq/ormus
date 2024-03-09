@@ -1,8 +1,9 @@
 package inmemorytaskmanager
 
 import (
-	"github.com/ormushq/ormus/destination/entity"
 	"log"
+
+	"github.com/ormushq/ormus/destination/entity"
 )
 
 // Queue represents an in-memory job queue.
