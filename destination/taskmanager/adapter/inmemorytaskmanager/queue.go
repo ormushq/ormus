@@ -1,26 +1,29 @@
 package inmemorytaskmanager
 
 import (
-	"github.com/ormushq/ormus/destination/entity"
 	"log"
+
+	"github.com/ormushq/ormus/event"
 )
 
 // Queue represents an in-memory job queue.
 type Queue struct {
-	tasks chan *entity.Task
+	events chan event.ProcessedEvent
 }
 
 func NewQueue() *Queue {
-	tasks := make(chan *entity.Task, 1)
+	channelSize := 100
+	events := make(chan event.ProcessedEvent, channelSize)
+
 	return &Queue{
-		tasks: tasks,
+		events: events,
 	}
 }
 
 // Enqueue adds a new job to the in-memory queue.
-func (q *Queue) Enqueue(task *entity.Task) error {
-	log.Printf("Task [%s] is published to In-Memory queue.", task.ID)
-	q.tasks <- task
+func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
+	log.Printf("Task [%s] is published to In-Memory queue.", pe.ID())
+	q.events <- pe
 
 	return nil
 }

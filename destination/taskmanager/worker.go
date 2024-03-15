@@ -1,6 +1,10 @@
 package taskmanager
 
+import (
+	"sync"
+)
+
 // Worker represents a worker that processes jobs of queue.
 type Worker interface {
-	ProcessJobs()
+	Run(done <-chan bool, wg *sync.WaitGroup)
 }

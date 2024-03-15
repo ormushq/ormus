@@ -10,7 +10,3 @@ type Connection struct {
 	Pipes        []Pipeline
 	Integrations []Integration
 }
-
-
-
-
