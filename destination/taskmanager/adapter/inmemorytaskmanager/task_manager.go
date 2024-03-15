@@ -2,28 +2,28 @@ package inmemorytaskmanager
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/destination/entity"
-	"github.com/ormushq/ormus/destination/taskidemotency/service/taskidempotencyservice"
+
+	"github.com/ormushq/ormus/event"
 )
 
 type TaskManager struct {
-	Queue           *Queue
-	taskIdempotency taskidempotencyservice.Service
+	Queue *Queue
 }
 
-func NewTaskManager(ti taskidempotencyservice.Service) *TaskManager {
+func New() *TaskManager {
 	q := NewQueue()
+
 	return &TaskManager{
-		Queue:           q,
-		taskIdempotency: ti,
+		Queue: q,
 	}
 }
 
-func (tm *TaskManager) SendToQueue(t *entity.Task) error {
-
-	err := tm.Queue.Enqueue(t)
+func (tm *TaskManager) Publish(e event.ProcessedEvent) error {
+	// send task to queue
+	err := tm.Queue.Enqueue(e)
 	if err != nil {
 		fmt.Println("enqueue Error : ", err)
+
 		return err
 	}
 
