@@ -1,116 +1,115 @@
 package rabbitmqtaskmanager
 
 import (
+	"context"
 	"fmt"
-	"github.com/ormushq/ormus/destination/entity"
-	"github.com/ormushq/ormus/destination/integrationhandler"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+	"log/slog"
+	"sync"
+	"time"
+
+	"github.com/ormushq/ormus/destination/entity/taskentity"
+	"github.com/ormushq/ormus/destination/integrationhandler"
+	"github.com/ormushq/ormus/destination/taskmanager"
+	"github.com/ormushq/ormus/destination/taskservice"
+	"github.com/ormushq/ormus/event"
 )
 
+const timeoutInSeconds = 5
+
 type Worker struct {
-	TaskManager *TaskManager
-	Handler     integrationhandler.IntegrationHandler
+	TaskConsumer taskmanager.Consumer
+	Handler      integrationhandler.IntegrationHandler
+	TaskService  taskservice.Service
 }
 
-func NewWorker(tm *TaskManager, h integrationhandler.IntegrationHandler) *Worker {
-	return &Worker{
-		TaskManager: tm,
-		Handler:     h,
+func (w *Worker) handleEvent(ctx context.Context, newEvent event.ProcessedEvent) error {
+	var task taskentity.Task
+	var err error
+
+	ts := w.TaskService
+	var taskStatus taskentity.IntegrationDeliveryStatus
+
+	taskID := newEvent.ID()
+
+	// check idempotency
+	if taskStatus, err = ts.GetTaskStatusByID(ctx, taskID); err != nil {
+		// todo use richError
+		return err
 	}
+
+	if taskStatus.CanBeExecuted() {
+
+		if taskStatus.IsBroadcast() {
+			task, err = ts.GetTaskByID(taskID)
+			if err != nil {
+				slog.Error(fmt.Sprintf("Error on GetTaskByID : %v", err))
+			}
+		} else {
+			task = taskentity.MakeTaskUsingProcessedEvent(newEvent)
+		}
+
+		res, err := w.Handler.Handle(task, newEvent)
+
+		if err != nil {
+			task.FailedReason = res.FailedReason
+			task.Attempts = res.Attempts
+			task.IntegrationDeliveryStatus = res.DeliveryStatus
+		} else {
+			return err
+		}
+
+		err = ts.UpsertTaskAndSaveIdempotency(ctx, task)
+		if err != nil {
+			// todo what should we do if error occurs in updating task repo or idempotency ?
+			slog.Error(fmt.Sprintf("Error on UpsertTaskAndSaveIdempotency : %v", err))
+		}
+
+	} else {
+		slog.Error(fmt.Sprintf("Task [%s] is not executable", taskID))
+	}
+
+	return nil
 }
 
-func (w *Worker) ProcessJobs() {
+func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
+	processedEventsChannel, err := w.TaskConsumer.Consume(done, wg)
+	if err != nil {
+		return err
+	}
 
-	connectionConfig := w.TaskManager.config
-
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", connectionConfig.User, connectionConfig.Password, connectionConfig.Host, connectionConfig.Port))
-	panicOnWorkersError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	panicOnWorkersError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	q, err := ch.QueueDeclare(
-		w.TaskManager.queueName, // name
-		true,                    // durable
-		false,                   // delete when unused
-		false,                   // exclusive
-		false,                   // no-wait
-		nil,                     // arguments
-	)
-	panicOnWorkersError(err, "Failed to declare a queue")
-
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	panicOnWorkersError(err, "Failed to set QoS")
-
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	panicOnWorkersError(err, "Failed to register a consumer")
-
-	var forever chan struct{}
-
+	wg.Add(1)
 	go func() {
-		for d := range msgs {
+		defer wg.Done()
+		slog.Info("Start rabbitmq worker for handling tasks.")
 
-			//todo should we ack message if we encounter any error ?
-			//Acknowledge that message Received
-			if err = d.Ack(false); err != nil {
-				printWorkersError(err, "Failed to acknowledge message")
+		for {
+			select {
+			case newEvent := <-processedEventsChannel:
+				go func() {
+					ctx, cancel := context.WithTimeout(context.Background(), timeoutInSeconds*time.Second)
+					defer cancel()
+					err := w.handleEvent(ctx, newEvent)
+					if err != nil {
+						slog.Error(fmt.Sprintf("Error on handling event using integration handler.Error : %v", err))
+					}
+				}()
+			case <-done:
+
+				return
 			}
-
-			task, err := w.TaskManager.UnmarshalMessageToTask(d.Body)
-			if err != nil {
-				printWorkersError(err, "Failed to unmarshall message")
-				continue
-			}
-			log.Printf("Task [%s] received by RabbitMQ worker.", task.ID)
-
-			ti := w.TaskManager.taskIdempotency
-			var taskStatus entity.TaskStatus
-			taskID := task.ID
-
-			enabled, err := ti.IntegrationHandlerIsEnable(taskID)
-
-			if err != nil {
-				log.Println("Error on IntegrationHandlerIsEnable.", err)
-				continue
-			}
-
-			if enabled {
-				err := w.Handler.Handle(task.ProcessedEvent)
-				if err != nil {
-					taskStatus = entity.FAILED_IN_INTEGRATION_HANDLER
-				}
-			} else {
-				log.Printf("\033[33mPrevent to handling duplicate processed event in idempotency.!\033[0m\n")
-			}
-
-			taskStatus = entity.SUCCESS_IN_INTEGRATION_HANDLER
-
-			err = ti.Save(taskID, taskStatus)
-			if err != nil {
-				log.Println("Error on Saving task status.", err)
-				continue
-			}
-
 		}
 	}()
 
-	log.Printf(" [RabbitMQ] Waiting for messages. To exit press CTRL+C")
-	<-forever
+	return nil
+}
+
+func NewWorker(c taskmanager.Consumer, h integrationhandler.IntegrationHandler, srv taskservice.Service) *Worker {
+	return &Worker{
+		TaskConsumer: c,
+		Handler:      h,
+		TaskService:  srv,
+	}
 }
 
 func panicOnWorkersError(err error, msg string) {
