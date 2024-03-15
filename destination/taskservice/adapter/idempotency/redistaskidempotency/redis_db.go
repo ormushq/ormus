@@ -1,4 +1,4 @@
-package redistaskstorage
+package redistaskidempotency
 
 import "github.com/ormushq/ormus/adapter/redis"
 

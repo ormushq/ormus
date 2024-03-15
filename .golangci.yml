@@ -14,6 +14,7 @@ run:
 
   skip-dirs:
     - (^|/)vendor($|/)
+    - "cmd/destination/example/*"
 
   skip-files:
     - .*_test.go

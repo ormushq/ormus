@@ -11,7 +11,7 @@ redis:
   password: ""
 destination:
 
-  consumer_topic: "pe.#"    # pe stands for processed event. and # substitute for zero or more words.
+  consumer_topic: "pe.webhook"    # pe stands for processed event. and # substitute for zero or more words.
   rabbitmq_consumer_connection:
     user: guest
     password: guest

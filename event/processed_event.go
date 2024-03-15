@@ -1,12 +1,13 @@
 package event
 
 import (
-	"github.com/ormushq/ormus/manager/entity"
 	"time"
+
+	"github.com/ormushq/ormus/manager/entity"
 )
 
 type ProcessedEvent struct {
-	//required fields
+	// required fields
 	SourceID    string // Write key or sourceID shows that which source, events coming from
 	Integration entity.Integration
 	MessageID   string // Automatically collected by Segment, a unique identifier for each message
@@ -18,14 +19,22 @@ type ProcessedEvent struct {
 	OriginalTimestamp time.Time // Time on the client device when call was invoked
 	Timestamp         time.Time // Calculated by Server to correct client-device clock skew using the following formula: receivedAt - (sentAt - originalTimestamp)
 
-	//optional fields
+	// optional fields
 	UserID      *string     // Unique identifier for the user in your database. A userId or an anonymousId is required.
-	AnonymousId *string     // A uniqueID substitute for a User ID, for cases when you don’t have an absolutely unique identifier.
+	AnonymousID *string     // A uniqueID substitute for a User ID, for cases when you don’t have an absolutely unique identifier.
 	Event       *string     // track
 	Name        *string     // page | screen
 	GroupID     *string     // group
-	PreviousId  *string     // alias
+	PreviousID  *string     // alias
 	Context     *Context    // Dictionary of extra information that provides useful context about a message
 	Properties  *Properties // Custom information about the event
 	Traits      *Traits     // identify | group
+}
+
+func (e ProcessedEvent) ID() string {
+	return e.MessageID + "-" + e.Integration.ID
+}
+
+func (e ProcessedEvent) DestinationType() string {
+	return e.Integration.Metadata.Slug
 }

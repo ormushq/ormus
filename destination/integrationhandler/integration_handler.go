@@ -1,10 +1,11 @@
 package integrationhandler
 
 import (
-	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/destination/entity/taskentity"
+	"github.com/ormushq/ormus/destination/integrationhandler/param"
 )
 
 // IntegrationHandler defines the interface for a topic handler.
 type IntegrationHandler interface {
-	Handle(processedEvent event.ProcessedEvent) error
+	Handle(task *taskentity.Task) (param.HandleTaskResponse, error)
 }

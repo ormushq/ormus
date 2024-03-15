@@ -1,22 +1,32 @@
 package fakeintegrationhandler
 
 import (
-	"github.com/ormushq/ormus/event"
 	"log"
 	"time"
+
+	"github.com/ormushq/ormus/destination/entity/taskentity"
+	"github.com/ormushq/ormus/destination/integrationhandler/param"
 )
 
-type FakeHandler struct {
-}
+type FakeHandler struct{}
 
 func New() *FakeHandler {
 	return &FakeHandler{}
 }
 
-func (h FakeHandler) Handle(e event.ProcessedEvent) error {
-	time.Sleep(2 * time.Second)
+const fakeProcessingTimeSecond = 2
 
-	log.Printf("\033[32mIntegration Message [%s::%s] handled successfully.!\033[0m\n", e.MessageID, e.Integration.ID)
+func (h FakeHandler) Handle(t *taskentity.Task) (param.HandleTaskResponse, error) {
+	time.Sleep(fakeProcessingTimeSecond * time.Second)
 
-	return nil
+	// TODO consider max_retry_exceeded, is_broadcasted and other necessary configs
+
+	log.Printf("\033[32mTask [%s] handled successfully.!\033[0m\n", t.ID)
+
+	res := param.HandleTaskResponse{
+		ErrorReason:    nil,
+		DeliveryStatus: taskentity.Success,
+	}
+
+	return res, nil
 }

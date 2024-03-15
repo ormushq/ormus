@@ -1,4 +1,4 @@
-package config
+package dconfig
 
 type RabbitMQTaskManagerConnection struct {
 	User     string `koanf:"user"`
