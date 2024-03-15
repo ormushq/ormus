@@ -35,6 +35,26 @@ func main() {
 		FileMaxSizeInMB:  fileMaxSizeInMB,
 		FileMaxAgeInDays: fileMaxAgeInDays,
 	}
+	opt := slog.HandlerOptions{}
+	l := logger.New(cfg, &opt)
+	slog.SetDefault(l)
+
+	// Setup Task Service
+
+	// In-Memory task idempotency
+	// taskIdempotency := inmemorytaskidempotency.New()
+
+	// Redis task idempotency
+	// todo do we need to use separate db number for redis task idempotency or destination module?
+	redisAdapter, err := redis.New(config.C().Redis)
+	if err != nil {
+		log.Panicf("error in new redis")
+	}
+	taskIdempotency := redistaskidempotency.New(redisAdapter, "tasks:", 30*24*time.Hour)
+	taskRepo := inmemorytaskrepo.New()
+	taskService := taskservice.New(taskIdempotency, taskRepo)
+
+	//----- Consuming processed events -----//
 
 	logLevel := slog.LevelInfo
 	if config.C().Destination.DebugMode {
