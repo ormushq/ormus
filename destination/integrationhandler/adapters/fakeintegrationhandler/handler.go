@@ -4,10 +4,10 @@ import (
 	"log"
 	"time"
 
+	"github.com/ormushq/ormus/destination/entity/taskentity"
+	"github.com/ormushq/ormus/destination/integrationhandler/param"
 	"github.com/ormushq/ormus/event"
 )
-
-const sleepTime = 2
 
 type FakeHandler struct{}
 
@@ -15,10 +15,17 @@ func New() *FakeHandler {
 	return &FakeHandler{}
 }
 
-func (h FakeHandler) Handle(e event.ProcessedEvent) error {
-	time.Sleep(sleepTime * time.Second)
+const fakeProcessingTimeSecond = 2
 
-	log.Printf("\033[32mIntegration Message [%s::%s] handled successfully.!\033[0m\n", e.MessageID, e.Integration.ID)
+func (h FakeHandler) Handle(t taskentity.Task, _ event.ProcessedEvent) (param.HandleTaskResponse, error) {
+	time.Sleep(fakeProcessingTimeSecond * time.Second)
 
-	return nil
+	log.Printf("\033[32mTask [%s] handled successfully.!\033[0m\n", t.ID)
+
+	res := param.HandleTaskResponse{
+		FailedReason:   nil,
+		DeliveryStatus: taskentity.SuccessTaskStatus,
+	}
+
+	return res, nil
 }

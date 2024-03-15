@@ -26,7 +26,7 @@ func New(c source.Config) Server {
 	}
 }
 
-// Start server connection.
+// Run server connection.
 func (s Server) Serve() {
 	s.userhandler.SetRoutes(s.Router)
 

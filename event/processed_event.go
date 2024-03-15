@@ -30,3 +30,11 @@ type ProcessedEvent struct {
 	Properties  *Properties // Custom information about the event
 	Traits      *Traits     // identify | group
 }
+
+func (e ProcessedEvent) ID() string {
+	return e.MessageID + "-" + e.Integration.ID
+}
+
+func (e ProcessedEvent) DestinationType() string {
+	return e.Integration.Metadata.Slug
+}

@@ -11,6 +11,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+const timeoutSeconds = 5
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Panicf("%s: %s", msg, err)
@@ -27,7 +29,7 @@ func main() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		"processed_events_exchange", // name
+		"processed-events-exchange", // name
 		"topic",                     // type
 		true,                        // durable
 		false,                       // auto-deleted
@@ -37,7 +39,7 @@ func main() {
 	)
 	failOnError(err, "Failed to declare an exchange")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
 
 	// generate fake processedEvent
@@ -57,11 +59,11 @@ func main() {
 
 	jpe, err := json.Marshal(pe)
 	if err != nil {
-		log.Panicf("Error:", err)
+		log.Panicf("Error: %e", err)
 	}
 
 	err = ch.PublishWithContext(ctx,
-		"processed_events_exchange", // exchange
+		"processed-events-exchange", // exchange
 		"pe.webhook",                // routing key
 		false,                       // mandatory
 		false,                       // immediate
