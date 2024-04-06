@@ -27,6 +27,10 @@ func newQueue(c dconfig.RabbitMQTaskManagerConnection, n string) *Queue {
 }
 
 func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
+	defer cancel()
+
+	// Connect to RabbitMQ
 	connectionConfig := q.config
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", connectionConfig.User, connectionConfig.Password, connectionConfig.Host, connectionConfig.Port))
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -36,6 +40,7 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
+	// Declare queue
 	rq, err := ch.QueueDeclare(
 		q.name, // name
 		true,   // durable
@@ -46,9 +51,7 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
-	defer cancel()
-
+	// Convert Processed event to json
 	jsonEvent, err := json.Marshal(pe)
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -56,6 +59,7 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 		return err
 	}
 
+	// Publish message to queue
 	err = ch.PublishWithContext(ctx,
 		"",      // exchange
 		rq.Name, // routing key
