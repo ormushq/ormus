@@ -27,16 +27,16 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 			ExchangeName: "test_exchange",
 			Kind:         "direct",
 			NumWorkers:   1,
-			NumMessages:  10,
-			ExpectedMsg:  10,
+			NumMessages:  1000,
+			ExpectedMsg:  1000,
 		},
 		{
 			Name:         "MultipleWorkers",
 			ExchangeName: "test_exchange",
 			Kind:         "direct",
-			NumWorkers:   10,
-			NumMessages:  100,
-			ExpectedMsg:  1000,
+			NumWorkers:   100,
+			NumMessages:  1000,
+			ExpectedMsg:  100000,
 		},
 	}
 	// Run test cases
@@ -60,8 +60,8 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	defer deferAllConn(conn, t)
 	// Start worker goroutines
 	channels := startWorkers(t, conn, queueName, tc.NumWorkers)
-	// Wait for messages to be consumed
-	time.Sleep(500 * time.Millisecond)
+	// sleep 5 second to wait for see the published messages on ui
+	//time.Sleep(30 * time.Second)
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsg)
 }
@@ -117,11 +117,12 @@ func publishMessagesDir(t *testing.T, conn *rabbitmq.RabbitMQ, topic string, num
 
 func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Message, expected int) {
 	received := 0
-	for received < expected {
+	for {
 		select {
 		case <-time.After(1 * time.Second):
 			t.Fatalf("Timeout: Received %d messages, expected %d", received, expected)
 		default:
+			allClosed := true
 			for _, ch := range channels {
 				select {
 				case _, ok := <-ch:
@@ -129,14 +130,23 @@ func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Mes
 						continue
 					}
 					received++
-
+					allClosed = false
 				default:
 					// Do nothing, move to the next channel
 				}
 			}
+			if allClosed {
+				break
+			}
+		}
+		if received == expected {
+			break
 		}
 	}
 	if received != expected {
 		t.Errorf("Received %d messages, expected %d", received, expected)
+	} else {
+		fmt.Printf("Received %d messages, expected %d\n", received, expected)
 	}
+
 }

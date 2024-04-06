@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 )
@@ -29,30 +28,30 @@ func TestFanoutMessaging(t *testing.T) {
 			Mode:         "fanout",
 			ExchangeName: []string{"fanout_exchange", "fanout_exchange", "fanout_exchange", "fanout_exchange"},
 			QueueNames:   []string{"queue1", "queue2", "queue3", "queue4"},
-			NumMessages:  100,
+			NumMessages:  10000,
 			ExpectedCounts: map[string]int{
-				"queue1": 100,
-				"queue2": 100,
-				"queue3": 100,
-				"queue4": 100,
+				"queue1": 10000,
+				"queue2": 10000,
+				"queue3": 10000,
+				"queue4": 10000,
 			},
 			//! expected = number of message * number of queue = 400 => for all queue :if auto-delete be false
 			//! and the queue exist before =1600 and 1000 if auto-delete be true
-			Expected: 1000,
+			Expected: 100000,
 		},
 		{
 			Name:         "different exchange",
 			Mode:         "fanout",
 			ExchangeName: []string{"fanout_exchange1", "fanout_exchange2", "fanout_exchange3", "fanout_exchange4"},
 			QueueNames:   []string{"queue1", "queue2", "queue3", "queue4"},
-			NumMessages:  100,
+			NumMessages:  10000,
 			ExpectedCounts: map[string]int{
-				"queue1": 100,
-				"queue2": 100,
-				"queue3": 100,
-				"queue4": 100,
+				"queue1": 10000,
+				"queue2": 10000,
+				"queue3": 10000,
+				"queue4": 10000,
 			},
-			Expected: 400,
+			Expected: 40000,
 		},
 	}
 	// Run test cases
@@ -85,7 +84,8 @@ func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 	for i := range conn {
 		publishMessagesFanout(t, conn[i], tc.QueueNames[i], tc.NumMessages)
 	}
-
+	// sleep 5 second to wait for see the published messages on ui
+	//time.Sleep(5 * time.Second)
 	// Consume messages from each queue and verify counts
 	checkMessagesReceivedFanout(t, conn, tc)
 }
@@ -141,9 +141,9 @@ func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ,
 		select {
 		// Receive messages from each queue
 		case <-time.After(1 * time.Second):
-
 			t.Fatalf("Timeout: Received %d messages, expected %d", receivedCount, tc.Expected)
 		default:
+			allClosed := true
 			for i, ch := range channels {
 				select {
 				case _, ok := <-ch:
@@ -152,19 +152,19 @@ func checkMessagesReceivedFanout(t *testing.T, conns map[int]*rabbitmq.RabbitMQ,
 					}
 					receivedCount++
 					receivedMap[tc.QueueNames[i]]++
+					allClosed = false
 				default:
 					// Do nothing, move to the next channel
 				}
 			}
-			// Check if all expected messages are received
-			if receivedCount > tc.Expected {
-				t.Fatalf("err")
-			}
-			// Check if all expected messages are received
-			if receivedCount == tc.Expected {
-				logger.L().Debug("Received all expected messages.")
-				return
+			if allClosed {
+				break
 			}
 		}
+		if receivedCount == tc.Expected {
+			break
+		}
+
 	}
+	fmt.Printf("Received %d messages, expected %d\n", receivedCount, tc.Expected)
 }

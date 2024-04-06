@@ -2,9 +2,9 @@ package rabbitmq
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"sync"
 
-	"github.com/google/uuid"
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/streadway/amqp"
 )
@@ -48,10 +48,12 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
 func (rb *RabbitMQ) PublishMessage(topic string, messages ...MessageBroker.Message) error {
+
 	queue, err := rb.DeclareExchangeAndBindQueue(topic, rb.exchangeName, rb.exchangeMode, true)
 	if err != nil {
 		return err
 	}
+	// TODO : What should we do if the message is not published?
 	for _, msg := range messages {
 		err = rb.ch.Publish(
 			rb.exchangeName, // exchange
@@ -87,6 +89,9 @@ func (rb *RabbitMQ) DeclareExchange(exchangeName, kind string) error {
 	)
 }
 
+// DeclareExchangeAndBindQueue declares a queue to hold messages and deliver to consumers.
+// Declaring creates a queue if it doesn't already exist, or ensures that an
+// existing queue matches the same parameters.
 func (rb *RabbitMQ) DeclareExchangeAndBindQueue(topic, exchangeName, kind string, autoDelete bool) (*amqp.Queue, error) {
 	err := rb.DeclareExchange(exchangeName, kind)
 	if err != nil {
@@ -136,21 +141,18 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 	if err != nil {
 		return nil, fmt.Errorf("failed to register a consumer: %w", err)
 	}
-	out := make(chan *MessageBroker.Message)
+	out := make(chan *MessageBroker.Message, 10)
 	go func() {
-		defer close(out) // Close the 'out' channel when all messages have been processed
+		defer close(out) // Close the channel when the processing goroutine exits
+
 		for amqpMsg := range msgs {
-			rb.wg.Add(1)
-			go func(amqpMsg amqp.Delivery) {
-				defer rb.wg.Done()
-				out <- &MessageBroker.Message{
-					ID:      uuid.New(),
-					Topic:   topic,
-					Payload: amqpMsg.Body,
-				}
-			}(amqpMsg)
+			msg := &MessageBroker.Message{
+				ID:      uuid.New(),
+				Topic:   topic,
+				Payload: amqpMsg.Body,
+			}
+			out <- msg
 		}
-		rb.wg.Wait() // Wait for all goroutines to finish
 	}()
 
 	return out, nil
