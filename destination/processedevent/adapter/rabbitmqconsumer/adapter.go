@@ -26,7 +26,9 @@ func New(c dconfig.RabbitMQConsumerConnection, topic dconfig.ConsumerTopic) *Con
 
 func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.ProcessedEvent, error) {
 	// Start a goroutine to handle incoming messages
-	events := make(chan event.ProcessedEvent)
+	// todo get size of channel from configs.
+	channelSize := 100
+	events := make(chan event.ProcessedEvent, channelSize)
 
 	wg.Add(1)
 	go func() {
