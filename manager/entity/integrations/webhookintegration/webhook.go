@@ -3,8 +3,9 @@ package webhookintegration
 type WebhookMethod string
 
 const (
-	POSTWebhookMethod WebhookMethod = "POST"
-	GETWebhookMethod  WebhookMethod = "GET"
+	POSTWebhookMethod  WebhookMethod = "POST"
+	PUTWebhookMethod   WebhookMethod = "PUT"
+	PATCHWebhookMethod WebhookMethod = "PATCH"
 )
 
 type Header struct {
