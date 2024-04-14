@@ -3,14 +3,13 @@ package webhookdeliveryhandler
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"net/url"
-
+	"github.com/ormushq/ormus/destination/entity/taskentity"
+	"github.com/ormushq/ormus/destination/integrationhandler/param"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/richerror"
+	"net/http"
 )
 
 type WebhookHandler struct{}
@@ -19,45 +18,35 @@ func New() *WebhookHandler {
 	return &WebhookHandler{}
 }
 
-func (h WebhookHandler) Handle(e event.ProcessedEvent) error {
+// Handle TODO: why we have processedEvent here?! since we have processedEvent in task
+// Handle TODO: why we should have error and fail reason on HandleTaskResponse
+func (h WebhookHandler) Handle(task taskentity.Task, processedEvent event.ProcessedEvent) (param.HandleTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
-	var response *http.Response
-	var err error
-
-	config, ok := e.Integration.Config.(webhookintegration.WebhookConfig)
+	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
 		logger.L().Info("invalid configuration for webhook")
 
-		return richerror.New(op).WithKind(richerror.KindInvalid).
+		return param.HandleTaskResponse{}, richerror.New(op).WithKind(richerror.KindInvalid).
 			WhitMessage("invalid configuration for webhook")
 	}
 
-	// TODO: The methods have a lot of duplicated code and need to be cleaned up a bit
-	switch config.Method {
-	case webhookintegration.GETWebhookMethod:
-		response, err = WebhookGetHandler(config)
-		if err != nil {
-			logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
+	_, err := MakeHTTPRequest(config)
+	if err != nil {
+		logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
 
-			return richerror.New(op).WithKind(richerror.KindUnexpected).
-				WhitMessage("unexpected error when try to do GET webhook request")
-		}
-	case webhookintegration.POSTWebhookMethod:
-		response, err = WebhookPostHandler(config)
-		if err != nil {
-			logger.L().Error("error in webhookhandler.Handle when try to Do POST request", err)
-
-			return richerror.New(op).WithKind(richerror.KindUnexpected).
-				WhitMessage("unexpected error when try to do POST webhook request")
-		}
+		return param.HandleTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
+			WhitMessage("unexpected error when try to do GET webhook request")
 	}
 
-	fmt.Println(response.StatusCode)
-	return nil
+	return param.HandleTaskResponse{
+		FailedReason:   nil,
+		Attempts:       0,
+		DeliveryStatus: taskentity.SuccessTaskStatus,
+	}, nil
 }
 
-func WebhookPostHandler(config webhookintegration.WebhookConfig) (*http.Response, error) {
+func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, error) {
 	payloadMap := make(map[string]string)
 	for _, item := range config.Payload {
 		payloadMap[item.Key] = item.Value
@@ -71,38 +60,6 @@ func WebhookPostHandler(config webhookintegration.WebhookConfig) (*http.Response
 	client := &http.Client{}
 
 	req, err := http.NewRequest(string(config.Method), config.URL, bytes.NewBuffer(payloadJSON))
-	if err != nil {
-		return nil, err
-	}
-
-	for _, header := range config.Headers {
-		req.Header.Set(header.Key, header.Value)
-	}
-
-	response, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer response.Body.Close()
-
-	return response, nil
-}
-
-func WebhookGetHandler(config webhookintegration.WebhookConfig) (*http.Response, error) {
-	client := &http.Client{}
-
-	u, err := url.Parse(config.URL)
-	if err != nil {
-		return nil, err
-	}
-	q := u.Query()
-	for _, item := range config.Payload {
-		q.Add(item.Key, item.Value)
-	}
-	u.RawQuery = q.Encode()
-
-	req, err := http.NewRequest(string(config.Method), u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
