@@ -33,6 +33,10 @@ func (t IntegrationDeliveryStatus) String() string {
 	return []string{"invalid", "not_executed", "retriable_failed", "unretriable_failed", "success"}[t]
 }
 
+func (t IntegrationDeliveryStatus) ToNumericString() string {
+	return []string{"0", "1", "2", "3", "4"}[t]
+}
+
 func (t IntegrationDeliveryStatus) IsValid() bool {
 	return t > InvalidTaskStatus && t <= SuccessTaskStatus
 }
@@ -70,7 +74,7 @@ func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	return pe, nil
 }
 
-func StringToIntegrationDeliveryStatus(statusStr string) IntegrationDeliveryStatus {
+func NumericStringToIntegrationDeliveryStatus(statusStr string) IntegrationDeliveryStatus {
 	switch statusStr {
 	case "0":
 		return InvalidTaskStatus

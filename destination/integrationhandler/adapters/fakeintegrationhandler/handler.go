@@ -1,7 +1,8 @@
 package fakeintegrationhandler
 
 import (
-	"log"
+	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/ormushq/ormus/destination/entity/taskentity"
@@ -20,9 +21,10 @@ const fakeProcessingTimeSecond = 2
 func (h FakeHandler) Handle(t taskentity.Task, _ event.ProcessedEvent) (param.HandleTaskResponse, error) {
 	time.Sleep(fakeProcessingTimeSecond * time.Second)
 
-	log.Printf("\033[32mTask [%s] handled successfully.!\033[0m\n", t.ID)
+	slog.Info(fmt.Sprintf("Task [%s] handled successfully!", t.ID))
 
 	res := param.HandleTaskResponse{
+		Attempts:       1,
 		FailedReason:   nil,
 		DeliveryStatus: taskentity.SuccessTaskStatus,
 	}
