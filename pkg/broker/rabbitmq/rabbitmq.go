@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"sync"
 
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/streadway/amqp"
