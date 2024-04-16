@@ -11,7 +11,7 @@ type AMQPConfig struct {
 	ExchangeMode string
 }
 
-// NEWAMQPConfig generates the AMQPConfig from the AMQPConfig.
+// NEWAMQPConfig generates the AMQPConfig from the AMQPConfig .
 func NEWAMQPConfig(config *AMQPConfig) *AMQPConfig {
 	return &AMQPConfig{
 		Username:     config.Username,
