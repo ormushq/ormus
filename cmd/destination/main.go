@@ -35,7 +35,16 @@ func main() {
 		FileMaxSizeInMB:  fileMaxSizeInMB,
 		FileMaxAgeInDays: fileMaxAgeInDays,
 	}
-	opt := slog.HandlerOptions{}
+
+	logLevel := slog.LevelInfo
+	if config.C().Destination.DebugMode {
+		logLevel = slog.LevelDebug
+	}
+
+	opt := slog.HandlerOptions{
+		// todo should level debug be read from config?
+		Level: logLevel,
+	}
 	l := logger.New(cfg, &opt)
 	slog.SetDefault(l)
 
