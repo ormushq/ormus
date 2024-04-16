@@ -10,7 +10,7 @@ redis:
   db: 0
   password: ""
 destination:
-
+  debug_mode: true
   consumer_topic: "pe.#"    # pe stands for processed event. and # substitute for zero or more words.
   rabbitmq_consumer_connection:
     user: guest
