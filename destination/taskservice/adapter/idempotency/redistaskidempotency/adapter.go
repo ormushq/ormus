@@ -9,7 +9,7 @@ import (
 )
 
 func (db DB) SaveTaskStatus(ctx context.Context, taskID string, status taskentity.IntegrationDeliveryStatus) error {
-	_, err := db.adapter.Client().Set(ctx, db.prefix+taskID, status.String(), db.expiration).Result()
+	_, err := db.adapter.Client().Set(ctx, db.prefix+taskID, status.ToNumericString(), db.expiration).Result()
 	if err != nil {
 		return err
 	}
@@ -26,5 +26,5 @@ func (db DB) GetTaskStatusByID(ctx context.Context, taskID string) (taskentity.I
 		return taskentity.InvalidTaskStatus, err
 	}
 
-	return taskentity.StringToIntegrationDeliveryStatus(value), nil
+	return taskentity.NumericStringToIntegrationDeliveryStatus(value), nil
 }

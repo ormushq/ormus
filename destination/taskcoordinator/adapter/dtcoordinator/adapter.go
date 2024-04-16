@@ -46,7 +46,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 			select {
 			case pe := <-processedEvents:
 
-				taskPublisher, ok := d.TaskPublishers["webhook"]
+				taskPublisher, ok := d.TaskPublishers[pe.DestinationType()]
 				if !ok {
 					slog.Error(fmt.Sprintf("Error on finding task manager for %s", pe.DestinationType()))
 
@@ -68,13 +68,13 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 	}()
 
 	webhookTaskConsumer := rabbitmqtaskmanager.NewTaskConsumer(d.RabbitMQConnectionConfig, "webhook_tasks_queue")
-	fakeWebhookHandler := fakeintegrationhandler.New()
+	webhookHandler := fakeintegrationhandler.New()
 
 	// Run workers
 	// todo we can use loop in range of slices of workers.
 	// also we can use config for number of each worker for different destination types.
 
-	webhookWorker1 := rabbitmqtaskmanager.NewWorker(webhookTaskConsumer, fakeWebhookHandler, d.TaskService)
+	webhookWorker1 := rabbitmqtaskmanager.NewWorker(webhookTaskConsumer, webhookHandler, d.TaskService)
 	err := webhookWorker1.Run(done, wg)
 	if err != nil {
 		log.Panicf("%s: %s", "Error on webhook worker", err)
