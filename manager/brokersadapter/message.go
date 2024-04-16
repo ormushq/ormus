@@ -1,4 +1,4 @@
-package brokersAdapter
+package brokersadapter
 
 import "github.com/google/uuid"
 

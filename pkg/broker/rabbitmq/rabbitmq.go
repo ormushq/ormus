@@ -2,10 +2,8 @@ package rabbitmq
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/google/uuid"
-
 	MessageBroker "github.com/ormushq/ormus/pkg/broker/messagebroker"
 	"github.com/streadway/amqp"
 )
@@ -16,7 +14,6 @@ type RabbitMQ struct {
 	ch           *amqp.Channel
 	exchangeName string
 	exchangeMode string
-	wg           sync.WaitGroup // WaitGroup for synchronization
 }
 
 // NewRabbitMQBroker creates a new instance of RabbitMQ.
@@ -49,7 +46,6 @@ func NewRabbitMQBroker(amqpCfg *AMQPConfig) (*RabbitMQ, error) {
 
 // PublishMessage publishes messages to a specified topic in RabbitMQ.
 func (rb *RabbitMQ) PublishMessage(topic string, messages ...MessageBroker.Message) error {
-
 	queue, err := rb.DeclareExchangeAndBindQueue(topic, rb.exchangeName, rb.exchangeMode, true)
 	if err != nil {
 		return err
@@ -142,7 +138,8 @@ func (rb *RabbitMQ) ConsumeMessage(topic string) (<-chan *MessageBroker.Message,
 	if err != nil {
 		return nil, fmt.Errorf("failed to register a consumer: %w", err)
 	}
-	out := make(chan *MessageBroker.Message, 10)
+	ChanSize := 10
+	out := make(chan *MessageBroker.Message, ChanSize)
 	go func() {
 		defer close(out) // Close the channel when the processing goroutine exits
 

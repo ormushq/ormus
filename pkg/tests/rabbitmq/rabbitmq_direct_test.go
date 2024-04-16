@@ -61,7 +61,7 @@ func runTest(t *testing.T, tc DirectTestCase) {
 	// Start worker goroutines
 	channels := startWorkers(t, conn, queueName, tc.NumWorkers)
 	// sleep 5 second to wait for see the published messages on ui
-	//time.Sleep(30 * time.Second)
+	// time.Sleep(30 * time.Second)
 	// Check if the correct number of messages was received
 	checkMessagesReceivedDir(t, channels, tc.ExpectedMsg)
 }
@@ -148,5 +148,4 @@ func checkMessagesReceivedDir(t *testing.T, channels []<-chan *messagebroker.Mes
 	} else {
 		fmt.Printf("Received %d messages, expected %d\n", received, expected)
 	}
-
 }

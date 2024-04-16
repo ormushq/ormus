@@ -85,7 +85,7 @@ func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 		publishMessagesFanout(t, conn[i], tc.QueueNames[i], tc.NumMessages)
 	}
 	// sleep 5 second to wait for see the published messages on ui
-	//time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 	// Consume messages from each queue and verify counts
 	checkMessagesReceivedFanout(t, conn, tc)
 }
