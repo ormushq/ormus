@@ -42,11 +42,20 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
 
+	fakeIntegration := entity.Integration{
+		ID:       "3",
+		SourceID: "1",
+		Metadata: entity.DestinationMetadata{
+			ID:   "1",
+			Name: "webhook",
+			Slug: "webhook",
+		},
+	}
 	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
 		SourceID:          "1",
-		Integration:       entity.Integration{ID: "2"},
+		Integration:       fakeIntegration,
 		MessageID:         "1",
 		EventType:         "page",
 		Name:              &pageName,

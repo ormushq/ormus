@@ -38,35 +38,35 @@ func (w *Worker) handleEvent(ctx context.Context, newEvent event.ProcessedEvent)
 		return err
 	}
 
-	if taskStatus.CanBeExecuted() {
+	if !taskStatus.CanBeExecuted() {
+		slog.Debug(fmt.Sprintf("Task [%s] has %s status and is not executable", taskID, taskStatus.String()))
 
-		if taskStatus.IsBroadcast() {
-			task, err = ts.GetTaskByID(taskID)
-			if err != nil {
-				slog.Error(fmt.Sprintf("Error on GetTaskByID : %v", err))
-			}
-		} else {
-			task = taskentity.MakeTaskUsingProcessedEvent(newEvent)
-		}
+		return nil
+	}
 
-		res, err := w.Handler.Handle(task, newEvent)
-
+	if taskStatus.IsBroadcast() {
+		// Get all task info (attempts, failed reason and...) from repository.
+		task, err = ts.GetTaskByID(taskID)
 		if err != nil {
-			task.FailedReason = res.FailedReason
-			task.Attempts = res.Attempts
-			task.IntegrationDeliveryStatus = res.DeliveryStatus
-		} else {
 			return err
 		}
-
-		err = ts.UpsertTaskAndSaveIdempotency(ctx, task)
-		if err != nil {
-			// todo what should we do if error occurs in updating task repo or idempotency ?
-			slog.Error(fmt.Sprintf("Error on UpsertTaskAndSaveIdempotency : %v", err))
-		}
-
 	} else {
-		slog.Error(fmt.Sprintf("Task [%s] is not executable", taskID))
+		task = taskentity.MakeTaskUsingProcessedEvent(newEvent)
+	}
+
+	res, err := w.Handler.Handle(task, newEvent)
+	if err != nil {
+		return err
+	}
+
+	task.IntegrationDeliveryStatus = res.DeliveryStatus
+	task.Attempts = res.Attempts
+	task.FailedReason = res.FailedReason
+
+	err = ts.UpsertTaskAndSaveIdempotency(ctx, task)
+	if err != nil {
+		// todo what should we do if error occurs in updating task repo or idempotency ?
+		return err
 	}
 
 	return nil
