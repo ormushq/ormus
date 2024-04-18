@@ -1,4 +1,4 @@
-package fakeintegrationhandler
+package fakedeliveryhandler
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/destination/entity/taskentity"
-	"github.com/ormushq/ormus/destination/integrationhandler/param"
+	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	"github.com/ormushq/ormus/event"
 )
 
@@ -18,12 +18,12 @@ func New() *FakeHandler {
 
 const fakeProcessingTimeSecond = 2
 
-func (h FakeHandler) Handle(t taskentity.Task, _ event.ProcessedEvent) (param.HandleTaskResponse, error) {
+func (h FakeHandler) Handle(t taskentity.Task, _ event.ProcessedEvent) (param.DeliveryTaskResponse, error) {
 	time.Sleep(fakeProcessingTimeSecond * time.Second)
 
 	slog.Info(fmt.Sprintf("Task [%s] handled successfully!", t.ID))
 
-	res := param.HandleTaskResponse{
+	res := param.DeliveryTaskResponse{
 		Attempts:       1,
 		FailedReason:   nil,
 		DeliveryStatus: taskentity.SuccessTaskStatus,

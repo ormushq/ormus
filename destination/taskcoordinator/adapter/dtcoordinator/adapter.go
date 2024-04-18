@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/ormushq/ormus/destination/dconfig"
-	"github.com/ormushq/ormus/destination/integrationhandler/adapters/fakeintegrationhandler"
+	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
 	"github.com/ormushq/ormus/destination/taskmanager"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
 	"github.com/ormushq/ormus/destination/taskservice"
@@ -15,7 +15,6 @@ import (
 )
 
 // DestinationTypeCoordinator is responsible for setup task managers and publish incoming processed events using suitable task publishers.
-
 type DestinationTypeCoordinator struct {
 	TaskService              taskservice.Service
 	TaskPublishers           map[string]taskmanager.Publisher
@@ -68,13 +67,15 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 	}()
 
 	webhookTaskConsumer := rabbitmqtaskmanager.NewTaskConsumer(d.RabbitMQConnectionConfig, "webhook_tasks_queue")
-	webhookHandler := fakeintegrationhandler.New()
 
 	// Run workers
 	// todo we can use loop in range of slices of workers.
 	// also we can use config for number of each worker for different destination types.
 
-	webhookWorker1 := rabbitmqtaskmanager.NewWorker(webhookTaskConsumer, webhookHandler, d.TaskService)
+	taskDeliveryHandler := fakedeliveryhandler.New()
+	taskHandler := taskservice.NewTaskHandler(d.TaskService, taskDeliveryHandler)
+
+	webhookWorker1 := rabbitmqtaskmanager.NewWorker(webhookTaskConsumer, taskHandler)
 	err := webhookWorker1.Run(done, wg)
 	if err != nil {
 		log.Panicf("%s: %s", "Error on webhook worker", err)
