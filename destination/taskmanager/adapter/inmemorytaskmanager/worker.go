@@ -1,24 +1,25 @@
 package inmemorytaskmanager
 
 import (
-	"github.com/ormushq/ormus/destination/integrationhandler"
+	"sync"
+
+	"github.com/ormushq/ormus/destination/taskmanager"
 )
 
 type Worker struct {
 	TaskManager *TaskManager
-	Handler     integrationhandler.IntegrationHandler
+	Handler     taskmanager.TaskHandler
 }
 
-func NewWorker(tm *TaskManager, h integrationhandler.IntegrationHandler) *Worker {
+func NewWorker(tm *TaskManager, h taskmanager.TaskHandler) *Worker {
 	return &Worker{
 		TaskManager: tm,
 		Handler:     h,
 	}
 }
 
-func (w *Worker) ExecuteTasks() {
-	var forever chan struct{}
+func (w *Worker) Run(_ <-chan bool, _ *sync.WaitGroup) error {
+	// todo implement in-memory worker
 
-	// for running workers independently
-	<-forever
+	return nil
 }
