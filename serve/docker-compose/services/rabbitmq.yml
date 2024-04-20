@@ -1,0 +1,23 @@
+version: "3.2"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.service=rabbitmq_${COMPOSE_PROJECT_NAME}_manager"
+      - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.rule=Host(`rabbitmq.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.entrypoints=web"
+      - "traefik.http.services.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.loadbalancer.server.port=15672"
+
+
+#Docker Networks
+networks:
+  traefik_default:
+    external: true
+
+#Volumes
+volumes:
+  rabbitmq:
+    driver: local

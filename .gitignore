@@ -26,3 +26,7 @@ logs/
 mise.log
 
 destination/logs.json
+
+temp
+.env
+ormus.iml
