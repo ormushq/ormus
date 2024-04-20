@@ -28,12 +28,17 @@ func main() {
 		rmqConsumerConnConfig.Password, rmqConsumerConnConfig.Host, rmqConsumerConnConfig.Port))
 	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
+	defer func(conn *amqp.Connection) {
+		err = conn.Close()
+		failOnError(err, "Failed to close RabbitMQ connection")
+	}(conn)
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+	defer func(ch *amqp.Channel) {
+		err = ch.Close()
+		failOnError(err, "Failed to close channel")
+	}(ch)
 
 	err = ch.ExchangeDeclare(
 		string(rmqConsumerTopic), // name
@@ -79,10 +84,10 @@ func main() {
 	}
 
 	err = ch.PublishWithContext(ctx,
-		"processed-events-exchange", // exchange
-		"pe.webhook",                // routing key
-		false,                       // mandatory
-		false,                       // immediate
+		string(rmqConsumerTopic), // exchange
+		"pe.webhook",             // routing key
+		false,                    // mandatory
+		false,                    // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        jpe,

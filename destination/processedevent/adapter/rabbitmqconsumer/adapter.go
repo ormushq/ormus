@@ -37,20 +37,26 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", c.connectionConfig.User, c.connectionConfig.Password, c.connectionConfig.Host, c.connectionConfig.Port))
 		failOnError(err, "Failed to connect to RabbitMQ")
-		defer conn.Close()
+		defer func(conn *amqp.Connection) {
+			err = conn.Close()
+			failOnError(err, "Failed to close RabbitMQ connection")
+		}(conn)
 
 		ch, err := conn.Channel()
 		failOnError(err, "Failed to open a channel")
-		defer ch.Close()
+		defer func(ch *amqp.Channel) {
+			err = ch.Close()
+			failOnError(err, "Failed to close channel")
+		}(ch)
 
 		err = ch.ExchangeDeclare(
-			"processed-events-exchange", // name
-			"topic",                     // type
-			true,                        // durable
-			false,                       // auto-deleted
-			false,                       // internal
-			false,                       // no-wait
-			nil,                         // arguments
+			string(c.topic), // name
+			"topic",         // type
+			true,            // durable
+			false,           // auto-deleted
+			false,           // internal
+			false,           // no-wait
+			nil,             // arguments
 		)
 		failOnError(err, "Failed to declare an exchange")
 
