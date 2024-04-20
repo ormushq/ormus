@@ -2,14 +2,10 @@ package projectvalidator
 
 import (
 	"errors"
-	"fmt"
-	"regexp"
-
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
-	"github.com/ormushq/ormus/pkg/regex"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
@@ -31,7 +27,7 @@ func (v Validator) ValidateCreateRequest(req param.CreateProjectRequest) *valida
 
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
-		validation.Field(&req.UserEmail, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserEmailValid)),
+		validation.Field(&req.UserID, validation.Required),
 	); err != nil {
 		fieldErr := make(map[string]string)
 
@@ -54,23 +50,4 @@ func (v Validator) ValidateCreateRequest(req param.CreateProjectRequest) *valida
 	}
 
 	return nil
-}
-
-func (v Validator) isUserEmailValid(value interface{}) error {
-	userID, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("value is not a valid string")
-	}
-
-	doesExists, err := v.userExistenceChecker.IsUserIDValid(userID)
-	if err != nil {
-		// return service error
-		return err
-	}
-
-	if doesExists {
-		return nil
-	}
-
-	return fmt.Errorf(errmsg.ErrEmailIsNotValid)
 }

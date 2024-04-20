@@ -21,8 +21,8 @@ func TestService_Create(t *testing.T) {
 		{
 			name: "happy path",
 			req: param.CreateProjectRequest{
-				Name:      "new project",
-				UserEmail: "user@example.com",
+				Name:   "new project",
+				UserID: "0000000000",
 			},
 		},
 		{
