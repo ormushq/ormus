@@ -23,7 +23,6 @@ func failOnError(err error, msg string) {
 
 func main() {
 	rmqConsumerConnConfig := config.C().Destination.RabbitMQConsumerConnection
-	rmqConsumerTopic := config.C().Destination.ConsumerTopic
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", rmqConsumerConnConfig.User,
 		rmqConsumerConnConfig.Password, rmqConsumerConnConfig.Host, rmqConsumerConnConfig.Port))
 	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
@@ -41,13 +40,13 @@ func main() {
 	}(ch)
 
 	err = ch.ExchangeDeclare(
-		string(rmqConsumerTopic), // name
-		"topic",                  // type
-		true,                     // durable
-		false,                    // auto-deleted
-		false,                    // internal
-		false,                    // no-wait
-		nil,                      // arguments
+		"processed-events-exchange", // name
+		"topic",                     // type
+		true,                        // durable
+		false,                       // auto-deleted
+		false,                       // internal
+		false,                       // no-wait
+		nil,                         // arguments
 	)
 	failOnError(err, "Failed to declare an exchange")
 
@@ -84,10 +83,10 @@ func main() {
 	}
 
 	err = ch.PublishWithContext(ctx,
-		string(rmqConsumerTopic), // exchange
-		"pe.webhook",             // routing key
-		false,                    // mandatory
-		false,                    // immediate
+		"processed-events-exchange", // exchange
+		"pe.webhook",                // routing key
+		false,                       // mandatory
+		false,                       // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        jpe,

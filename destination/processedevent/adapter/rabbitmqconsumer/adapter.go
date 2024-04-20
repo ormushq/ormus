@@ -50,13 +50,13 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 		}(ch)
 
 		err = ch.ExchangeDeclare(
-			string(c.topic), // name
-			"topic",         // type
-			true,            // durable
-			false,           // auto-deleted
-			false,           // internal
-			false,           // no-wait
-			nil,             // arguments
+			"processed-events-exchange", // name
+			"topic",                     // type
+			true,                        // durable
+			false,                       // auto-deleted
+			false,                       // internal
+			false,                       // no-wait
+			nil,                         // arguments
 		)
 		failOnError(err, "Failed to declare an exchange")
 
