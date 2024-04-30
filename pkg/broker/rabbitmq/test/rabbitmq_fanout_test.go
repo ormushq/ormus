@@ -1,4 +1,4 @@
-package rabbitmq
+package test
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func TestFanoutMessaging(t *testing.T) {
 func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 	conn := make(map[int]*rabbitmq.RabbitMQ)
 	for i := 0; i < len(tc.QueueNames); i++ {
-		cfg := rabbitmq.AMQPConfig{
+		cfg := rabbitmq.AMQPBaseConfig{
 			Username:     "guest",
 			Password:     "guest",
 			Hostname:     "localhost",
@@ -76,7 +76,7 @@ func runFanoutTest(t *testing.T, tc FanOutTestCase) {
 			ExchangeName: tc.ExchangeName[i],
 			ExchangeMode: tc.Mode,
 		}
-		conn[i] = setupRabbitMQFanout(t, &cfg)
+		conn[i] = setupRabbitMQFanout(t, cfg)
 
 	}
 	defer deferAllConnfan(conn, t)
@@ -100,8 +100,8 @@ func deferAllConnfan(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
 }
 
 // Helper function to create a RabbitMQ connection
-func setupRabbitMQFanout(t *testing.T, cfg *rabbitmq.AMQPConfig) *rabbitmq.RabbitMQ {
-	amqpCfg := rabbitmq.NEWAMQPConfig(cfg)
+func setupRabbitMQFanout(t *testing.T, cfg rabbitmq.AMQPBaseConfig) *rabbitmq.RabbitMQ {
+	amqpCfg := rabbitmq.NEWAMQPConfig(cfg, nil)
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
 	if err != nil {
 		t.Fatalf("Failed to create RabbitMQ broker: %v", err)

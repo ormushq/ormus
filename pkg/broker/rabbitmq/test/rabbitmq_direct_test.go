@@ -1,4 +1,4 @@
-package rabbitmq
+package test
 
 import (
 	"fmt"
@@ -75,7 +75,7 @@ func deferAllConn(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
 }
 
 func setupRabbitMQDir(t *testing.T, tc DirectTestCase) *rabbitmq.RabbitMQ {
-	cfg := rabbitmq.AMQPConfig{
+	cfg := rabbitmq.AMQPBaseConfig{
 		Username:     "guest",
 		Password:     "guest",
 		Hostname:     "localhost",
@@ -84,7 +84,7 @@ func setupRabbitMQDir(t *testing.T, tc DirectTestCase) *rabbitmq.RabbitMQ {
 		ExchangeName: tc.ExchangeName,
 		ExchangeMode: tc.Kind,
 	}
-	amqpCfg := rabbitmq.NEWAMQPConfig(&cfg)
+	amqpCfg := rabbitmq.NEWAMQPConfig(cfg, nil)
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
 	if err != nil {
 		t.Fatalf("Failed to create RabbitMQ broker: %v", err)
