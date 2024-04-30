@@ -14,6 +14,7 @@ test:
 
 dockerDown:
 	sudo docker-compose down
+
 format:
 	@which gofumpt || (go install mvdan.cc/gofumpt@latest)
 	@gofumpt -l -w $(ROOT)

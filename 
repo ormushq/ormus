@@ -1,0 +1,502 @@
+[33mcommit 6e834ee98980b9bde97bb2cdcfdcac3f727a1855[m[33m ([m[1;36mHEAD -> [m[1;32mPubsubAdapter[m[33m)[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Wed May 1 01:39:50 2024 +0330
+
+    fix
+
+[33mcommit 912f870f99829efc06082e670a12a484290dda6e[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Wed May 1 01:37:43 2024 +0330
+
+    More configurable
+
+[33mcommit dbe8bba24e12a94426ffa2beaaacf194337b7e43[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Apr 16 22:01:36 2024 +0330
+
+    fix format
+
+[33mcommit d4d6871f6b3922e9ec577ffda35e187abc04000a[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Apr 16 21:49:01 2024 +0330
+
+    fix unused import
+
+[33mcommit 0de6c2ed85bcc9adf0ce144759cdca40b97271ce[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Apr 16 21:46:17 2024 +0330
+
+    fix go mod
+
+[33mcommit 0d7bfe49590d0b58cc4654536f7bf1e2484df59a[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Apr 16 21:40:29 2024 +0330
+
+    fix
+
+[33mcommit 72090613c3cdf57d34aca301d50b393d662c7766[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Apr 16 21:08:32 2024 +0330
+
+    fix
+
+[33mcommit e088989a320fc4077dd1a6c0f72058a040bd9ec4[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 09:54:54 2024 +0330
+
+    fix some lint err
+
+[33mcommit 49a5cb276dbfe2d47355a42d8e8df71fd98085cb[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 09:27:49 2024 +0330
+
+    update git .ignore
+
+[33mcommit 843326e530d16fb3e89fb4b3ee21741e1384712e[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:45:48 2024 +0330
+
+    fix
+
+[33mcommit ee5158e5aa85b06e342629440a5644288cf17d7e[m
+Author: PouriaSeyfi <seyfipouria@gmail.com>
+Date:   Sat Mar 16 02:51:58 2024 +0330
+
+    feat(destination): implement task service and task coordinator and refactor task manager and consumer
+
+[33mcommit ab1bc02e4fce28c107395cbfb92a21c4cafc5ec1[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Apr 6 20:53:48 2024 +0330
+
+    fix
+
+[33mcommit 7ce53174c516d59138b8e0de18a6a5cf02cd5f5f[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 09:54:54 2024 +0330
+
+    fix some coflict
+
+[33mcommit 87c2fc04849e0e51577cb4e6b353fd1d0f50641c[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 09:27:49 2024 +0330
+
+    update git .ignore
+
+[33mcommit bdb2c872fd7af0ea11a85281759d09c689d6e7aa[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 09:19:41 2024 +0330
+
+    fix issues
+
+[33mcommit 93e47f77d04e0b4f60ed73532bf2220e8bed075b[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Mar 9 12:21:24 2024 +0330
+
+    fix issues
+
+[33mcommit 1d7acfe9ec0c82df42c13db5f0bf82ccc0a414d2[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Mar 8 00:45:25 2024 +0330
+
+    fix
+
+[33mcommit 24530918c7e39b227f7d7f53118807cd2d23b5f4[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Mar 8 00:41:33 2024 +0330
+
+    add waitGroup
+
+[33mcommit 8a940e0b9cf006eff540209f084110779fdd8e93[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Mar 8 00:40:48 2024 +0330
+
+    add wait group
+
+[33mcommit 8f66ba6416c250655c0ad1bbfc7ffc76659119cc[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 01:07:07 2024 +0330
+
+    feat(manager): #55 :green_heart: fix linter
+
+[33mcommit ed0e2348684aec1150056b782dca1ed4ebd627ce[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Mon Feb 19 23:05:53 2024 +0330
+
+    fix
+
+[33mcommit 9eefb8faa76d9e68668f5aa82ec2daebcc1c55af[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:49:58 2024 +0330
+
+    fix
+
+[33mcommit e90584d162b96123b8e2bddbe3c2d5d662b0df68[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Feb 16 22:40:47 2024 +0330
+
+    fix format
+
+[33mcommit dce0daeb3cfc47ea4a37dd4863c00fb507e7e778[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Feb 16 22:14:57 2024 +0330
+
+    fix issue
+
+[33mcommit 252fdbd1f39b298d5f895426d0352c36ff9b5d8e[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Feb 16 21:53:31 2024 +0330
+
+    fix
+
+[33mcommit 49baa4a19911f13e4fad3bacd169781eadb30aa8[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Fri Feb 16 21:12:12 2024 +0330
+
+    :adhesive_bandage: Breaking the message broker interface into two interfaces
+
+[33mcommit b6b4514bb67d5454567d94d71162ddf01edf8c84[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 09:08:34 2024 +0330
+
+    feat(manager): #55 - :triangular_flag_on_post:  remove additional things
+
+[33mcommit e313799c2cc83374305a99b5f2609c5e709ad131[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 08:50:18 2024 +0330
+
+    feat(manager): #55 - :mute: remove additional things
+
+[33mcommit 98f14fa451f61af3685cf76b6b5655e10483f983[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:49:18 2024 +0330
+
+    fix
+
+[33mcommit bd4431b11f46ef575675bff5c3cc8b999769de85[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 08:35:34 2024 +0330
+
+    feat(manager): #55 - :green_heart: fix issue
+
+[33mcommit be8f91e7e6008dda4d76bfcd537bd84f4c21025a[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 08:11:15 2024 +0330
+
+    feat(manager): #55 - :green_heart: fix issue
+
+[33mcommit 09ddfae87f3736b6acb61c6db45659534bccc296[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 03:34:31 2024 +0330
+
+    change makefile
+
+[33mcommit c062dae4ad47dadbc31852710d4bfdc236533094[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 03:27:23 2024 +0330
+
+    :white_check_mark: fix test
+
+[33mcommit aff703e12b3116e3e738be6cb0db2179326d902a[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Sat Feb 10 01:00:53 2024 +0330
+
+    :white_check_mark: add test
+
+[33mcommit 0cff28d05e17a57037cd7db22c9bbb81495aa23f[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:47:53 2024 +0330
+
+    fix mise
+
+[33mcommit ca11aac106b92e602e053f7ee39d4344472fd636[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:46:45 2024 +0330
+
+    fix rtx
+
+[33mcommit fedba5e53f20fbb8e5f16a21a06d644952cad99f[m
+Author: sina hatami <sinahatami1379@gmail.com>
+Date:   Mon Feb 5 16:43:35 2024 +0330
+
+    :green_heart: Changing the name of the broker adapter package
+
+[33mcommit 29b85952a784bbfa6a8782b04b68f9ca5cdc5966[m
+Author: sina hatami <sinahatami1379@gmail.com>
+Date:   Mon Feb 5 16:29:43 2024 +0330
+
+    :art: fix some issue
+
+[33mcommit 5a90b686dada61ce30a19d9241d2f9aacd79b242[m
+Author: sinaw369 <sinahatami1379@gmail.com>
+Date:   Tue Feb 20 00:45:48 2024 +0330
+
+    fix
+
+[33mcommit b989806b55e920ab418c7e5e8a38aba83d6defd7[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Pouria Seyfi <seyfipouria@gmail.com>
+Date:   Thu Apr 18 03:56:59 2024 +0330
+
+    refactor(destination): introduced task handler and task delivery
+
+[33mcommit 83bd58490804be5da9fc1b3d59c2882890506f6e[m
+Author: Pouria Seyfi <seyfipouria@gmail.com>
+Date:   Wed Apr 17 03:05:34 2024 +0330
+
+    fix(destination): redis task idempotency
+
+[33mcommit 84a0504240537503ce478d316af07d0973bafd92[m
+Author: Pouria Seyfi <seyfipouria@gmail.com>
+Date:   Wed Apr 17 03:04:35 2024 +0330
+
+    feat(destination): add debug mode to config
+
+[33mcommit 4a9eea000a6912731f3b0449b369d9a11e8f7b0f[m
+Author: Benyamin Mahmoudyan <benyaminmahmoudyan@gmail.com>
+Date:   Wed Apr 17 09:13:05 2024 +0330
+
+    feat(Ormus): add CONTRIBUTING guidelines #70 (#71)
+
+[33mcommit db158713d8a3697558aa5097c8c4c479c61d2829[m
+Author: Pouria Seyfi <seyfipouria@gmail.com>
+Date:   Sat Apr 6 03:43:49 2024 +0330
+
+    refactor(destination): increase channel size of consumers and add some comments for rabbitmq adapters
+
+[33mcommit e0ed24ec2a9d705c5edbcc8f37a5364e4a06cb41[m
+Author: PouriaSeyfi <seyfipouria@gmail.com>
+Date:   Sat Mar 16 02:51:58 2024 +0330
+
+    feat(destination): implement task service and task coordinator and refactor task manager and consumer
+
+[33mcommit 1a49b77828893004f99f38ce65887e99345a8e6e[m[33m ([m[1;32mdestination[m[33m)[m
+Author: Pouria Seyfi <seyfipouria@gmail.com>
+Date:   Wed Feb 28 09:39:59 2024 +0330
+
+    feat(destination): implement task manager, task idempotency and processed event consumer (#67)
+
+[33mcommit 6cce4587d5c7a64a9056e804d0b109661bc20ce9[m
+Author: sina hatami <82504735+sinaw369@users.noreply.github.com>
+Date:   Sat Feb 17 08:51:03 2024 +0330
+
+    feat(ormus): #57 - :necktie: update rtx  (#58)
+    
+    Co-authored-by: Go Casts <99625616+gocastsian@users.noreply.github.com>
+
+[33mcommit 264595930f16cfd43dc306ae93ebf0753e1cb175[m
+Author: AmirAtashghah <125047918+AmirAtashghah@users.noreply.github.com>
+Date:   Sat Feb 17 08:23:51 2024 +0330
+
+    feat(manager): add new source (#46)
+
+[33mcommit 5b2084154c75a7f8f33eb7a9f77e88b0eae73d8a[m
+Author: Benyamin Mahmoudyan <benyaminmahmoudyan@gmail.com>
+Date:   Sat Jan 20 09:10:35 2024 +0330
+
+    feat(destination): add destination contracts #35 (#50)
+
+[33mcommit f4679370668d70622440ffdd2357b6dd8cad5bf9[m
+Author: AmirAtashghah <125047918+AmirAtashghah@users.noreply.github.com>
+Date:   Sat Jan 6 22:13:08 2024 +0330
+
+    feat(manager): add write key and validation (#43)
+
+[33mcommit 798b87a6465d7666cad34a96d5ed7525b163dba3[m
+Author: Abtin Okhovat <76223666+abtinokhovat@users.noreply.github.com>
+Date:   Sun Dec 31 10:08:43 2023 +0330
+
+    feat(manager): register user with email (#37)
+    
+    Co-authored-by: sina hatami <sinahatami1379@gmail.com>
+    Co-authored-by: sina hatami <82504735+sinaw369@users.noreply.github.com>
+
+[33mcommit 23b1e41ea1e10eda63e89e3b45cd5d4074c7856d[m
+Author: Amirreza Kheradmand <42467565+j3yzz@users.noreply.github.com>
+Date:   Thu Dec 21 21:06:01 2023 +0330
+
+    feat(source): add scylladb connection (#38)
+
+[33mcommit 9ad09fc03deff752b33347504a6e369fe5f85162[m
+Author: Abtin Okhovat <76223666+abtinokhovat@users.noreply.github.com>
+Date:   Sat Dec 16 09:39:42 2023 +0330
+
+    docs(ormus): add documentation for config module (#39)
+    
+    Co-authored-by: Go Casts <99625616+gocastsian@users.noreply.github.com>
+
+[33mcommit 9b76fbf3747b00aa3bdc7f2276e5bf41440645b6[m
+Author: Mohammad Fazel <mdhesari99@gmail.com>
+Date:   Sat Dec 16 08:56:31 2023 +0330
+
+    feat(source): base http & grpc structure (#27)
+
+[33mcommit 29883cb315ddb74a7c8b138e0d90566ed8646752[m
+Author: mohammad mahdi rezaei <rezaei_21@yahoo.com>
+Date:   Mon Dec 11 21:16:03 2023 +0330
+
+    remove Close  method
+
+[33mcommit b8a57228a04afd586ad394b6fcbdb33c7070dae7[m
+Author: mohammad mahdi rezaei <rezaei_21@yahoo.com>
+Date:   Mon Dec 11 20:53:43 2023 +0330
+
+    add redis adapter & repository
+
+[33mcommit 71796c5a5901bd9f188d41ad5c6a69b2e24a4023[m
+Author: mohammad mahdi rezaei <rezaei_21@yahoo.com>
+Date:   Wed Dec 6 10:24:22 2023 +0330
+
+    write writekey service for middleware EnsureWritekeyIsValid
+
+[33mcommit 9df3ae33adabaf1b045f32752d7b1930dec9c8f7[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Wed Nov 29 12:48:28 2023 +0330
+
+    refactor: reimplement the logger
+    
+    replace return value to local function var
+
+[33mcommit c906e1bdf99c53abb4ba8772b6cc3b0950ff5984[m
+Author: sina hatami <sinahatami1379@gmail.com>
+Date:   Mon Nov 27 03:18:45 2023 +0330
+
+    feat(ormus): add RTX
+    
+    rename some file
+
+[33mcommit 5e5068522251db56d55e376b19b9b01d2133789b[m
+Author: DOO-DEV <96613482+DOO-DEV@users.noreply.github.com>
+Date:   Tue Nov 28 09:03:08 2023 +0330
+
+    feat(config): #13 - config handling using koanf package (#12)
+
+[33mcommit ea82e62225ebb326e7048a860ac77fa6fd2cec51[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Mon Nov 27 13:42:32 2023 +0330
+
+    fix: fix the diverged
+
+[33mcommit 2e97a66f7766243d91700b1ca6672a100eded68e[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Mon Nov 27 13:36:14 2023 +0330
+
+    fix: fix option struct fields
+
+[33mcommit 6d533d7bf1634fccbd74839ae1c3036151b323ea[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Sun Nov 26 20:37:26 2023 +0330
+
+    change remove magic numbers
+
+[33mcommit fa8562f71d9a467c2ec55a1fa15c5a16b2a1550a[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Sun Nov 26 20:28:27 2023 +0330
+
+    change: add default and new function for accessing logger
+
+[33mcommit a8cc64f12e74417a2a511e0836745eb2b45db3e0[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 21:02:21 2023 +0330
+
+    test: unit testing the logger functionality
+
+[33mcommit 90a4b809d91c93f617149c8423b09183589559f1[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 14:32:17 2023 +0330
+
+    change: remove useless test file
+
+[33mcommit b0236226996ae709cadf477abb5c39dfd65ddca5[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 14:30:05 2023 +0330
+
+    feat: add multiple writing for slog package both in file and standard output
+
+[33mcommit 8160ca7471e7112ed34648b027d93cff105e960f[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 01:38:04 2023 +0330
+
+    change: remove colors from logger
+
+[33mcommit 67fcc4a9b55195ac50782874b275b2f964172728[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 00:09:47 2023 +0330
+
+    change: rename the logger instance
+
+[33mcommit 799cca57eeacad7c51dd7e16851a80cf8caeaf85[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Fri Nov 24 00:07:02 2023 +0330
+
+    style: run golang ci on source codes
+
+[33mcommit a69cf67cc1d2e406a72e2089a7995f1f73cb70a5[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Thu Nov 23 22:23:55 2023 +0330
+
+    style(logger): remove useless code
+
+[33mcommit 4c9c2f40bf565f702bd99194b6601f5f4b23934f[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Thu Nov 23 22:21:08 2023 +0330
+
+    feat(ormus): implement logger with slog package
+
+[33mcommit c3b731f5ea8a941983da2d7d870ca616c8425f6b[m
+Author: abtinokhovat <abtinokhovat@gmail.com>
+Date:   Sun Nov 26 23:51:51 2023 +0330
+
+    fix(event): #3 - fix URL typo and ran make format
+
+[33mcommit 55ff4d61704e102c7f548bdd77eea82e5d1eb0e2[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Wed Nov 22 23:37:07 2023 +0330
+
+    add test command to make file
+
+[33mcommit 496e6aba6464e073207bfa7eed5fd552b1f130d5[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Wed Nov 22 23:32:10 2023 +0330
+
+    ci(ormus): add test and format and lint workflow
+
+[33mcommit d6184c9158946b52dbb5229d874872ec78b154f1[m
+Author: abtinokhovat <abtinokhovat@gmail.com>
+Date:   Thu Nov 23 20:34:31 2023 +0330
+
+    feat(event): #3 - added base structures for CoreEvent and other essential data structures
+    
+    feat(event): add types that where used frequently
+    
+    feat(event): complete CoreEvent struct and added essential data structs
+    
+    fix(event): fix context struct properties and some minor name changes
+    
+    feat(event): add user trait struct and additional classes
+
+[33mcommit abc50595c27ae3150f13ee519e0cb7cc9942a09d[m
+Author: DOO-DEV <nimo.vimo.yank@gmail.com>
+Date:   Wed Nov 1 23:00:02 2023 +0330
+
+    update README.md
+
+[33mcommit e94111dbadf89d4e13ff57ae0a388fd70d0c2b4d[m
+Author: Hossein <h.nazari1990ut@gmail.com>
+Date:   Tue Nov 21 10:11:52 2023 +0330
+
+    structure project
+
+[33mcommit 6cc0102e3f63046cff3fe132bd32caa21abe1d17[m
+Author: DOO-DEV <96613482+DOO-DEV@users.noreply.github.com>
+Date:   Sun Nov 19 10:09:41 2023 +0330
+
+    ci: workflow to check conventional commit message on pr (#10)
+    
+    * ci: workflow to check convential commit message on pr
+    
+    * change: replace validation for single commit to false
+
+[33mcommit 15d188362775260a09d0155536dc49e2c61cad0a[m
+Author: Hossein <h.nazari1990ut@gmail.com>
+Date:   Sat Oct 28 03:18:34 2023 -0700
+
+    Initial commit
