@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:latest
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./traefik:/etc/traefik/
+      - /var/run/docker.sock:/var/run/docker.sock

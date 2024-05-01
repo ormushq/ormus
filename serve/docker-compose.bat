@@ -1,0 +1,1 @@
+docker compose --env-file ./serve/docker-compose/.env -f ./serve/docker-compose/services/go.yml -f ./serve/docker-compose/services/redis.yml -f ./serve/docker-compose/services/rabbitmq.yml -f ./serve/docker-compose/services/traefik.yml %*
