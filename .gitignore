@@ -23,6 +23,7 @@ go.work
 .idea
 # logs
 logs/
+*.log
 mise.log
 
 destination/logs.json
@@ -30,3 +31,4 @@ destination/logs.json
 temp
 .env
 ormus.iml
+*.log

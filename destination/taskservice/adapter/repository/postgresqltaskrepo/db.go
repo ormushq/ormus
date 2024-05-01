@@ -5,5 +5,5 @@ package postgresqltaskrepo
 // 1. write heavy
 // 2. read heavy
 // 3. support transaction (for rolling back scenarios)
-// 4. support multi update tasks after bulk updating the delivery status.
+// 4. support multi update tasks after bulk updating the SearchLogEngine status.
 // 5. persist data.
