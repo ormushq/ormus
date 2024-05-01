@@ -5,7 +5,7 @@ MISE_USE_TOML= 1  #Set to 1 to default to using .mise.toml
 RUST_BACKTRACE=0
 #COLORBT_SHOW_HIDDEN=1
 MISE_VERBOSE=0  #This shows the installation output during rtx install and rtx plugin install.
-MISE_LOG_FILE='./mise.log' #Output logs to a file.
+#MISE_LOG_FILE='./mise.log' #Output logs to a file.
 MISE_LOG_FILE_LEVEL='debug' #This is useful if you want to store the logs but not have them litter your display.
 MISE_DEBUG=0 #show DEBUG message in console
 MISE_QUIET=1 #Equivalent to MISE_LOG_LEVEL=warn.

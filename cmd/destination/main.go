@@ -62,7 +62,6 @@ func main() {
 	taskIdempotency := redistaskidempotency.New(redisAdapter, "tasks:", 30*24*time.Hour)
 	taskRepo := inmemorytaskrepo.New()
 	taskService := taskservice.New(taskIdempotency, taskRepo)
-
 	//----- Consuming processed events -----//
 
 	// Get connection config for rabbitMQ consumer
