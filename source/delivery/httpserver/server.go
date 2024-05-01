@@ -18,7 +18,6 @@ type Server struct {
 	handlers []Handler
 }
 
-// Setup a new server object.
 // New Set up a new server object.
 // Setup a new server object.
 func New(c source.Config, handlers []Handler) Server {
