@@ -1,0 +1,5 @@
+version: '3.8'
+services:
+  #Redis Service
+  redis:
+    image: redis:alpine

@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  #Destination Service
+  destination:
+    build:
+      context: .
+      dockerfile: ./go/Dockerfile
+      args:
+        GO_IMAGE_NAME: ${GO_IMAGE_NAME}
+        GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
+    image: ormuse-destanition-build:${GO_IMAGE_VERSION}
+    entrypoint:
+      - air
+      - "-c"
+      - /home/www/serve/docker-compose/services/go/.destination.air.toml
+    restart: always
+    volumes:
+      - ../../../:/home/www
+    depends_on:
+      - redis
+      - rabbitmq
+    environment:
+      ORMUS_DESTINATION__RABBITMQ_CONSUMER_CONNECTION__HOST: rabbitmq
+      ORMUS_DESTINATION__RABBITMQ_TASK_MANAGER_CONNECTION__HOST: rabbitmq
+      ORMUS_DESTINATION__REDIS_TASK_IDEMPOTENCY__HOST: redis
+      ORMUS_REDIS__HOST: redis
+
+#Docker Networks
+networks:
+  traefik_default:
+    external: true
