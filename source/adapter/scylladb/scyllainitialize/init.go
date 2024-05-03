@@ -1,5 +1,5 @@
 /*
-Package initializedb provides functions for initializing a ScyllaDB connection and obtaining a database session.
+Package scyllainitialize provides functions for initializing a ScyllaDB connection and obtaining a database session.
 
 Usage:
 
@@ -31,7 +31,7 @@ Functions:
     It internally creates a ScyllaDB cluster configuration and session.
     func GetConnection(conn *scyllaDBConnection) (scylladb.SessionxInterface, error)
 */
-package initializedb
+package scyllainitialize
 
 import (
 	"github.com/gocql/gocql"
