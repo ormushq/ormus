@@ -10,10 +10,7 @@ type Connection struct {
 	Pipes        []Pipeline
 	Integrations []Integration
 }
-<<<<<<< HEAD
-=======
 
 
 
 
->>>>>>> fb1e3b5 (feat(manager): add new source (#46))
