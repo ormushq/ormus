@@ -7,4 +7,5 @@ type RabbitMQConsumerConnection struct {
 	Password string `koanf:"password"`
 	Host     string `koanf:"host"`
 	Port     int    `koanf:"port"`
+	Vhost    int    `koanf:"vhost"`
 }
