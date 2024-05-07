@@ -1,4 +1,4 @@
-package rbbitmqadapter
+package rbbitmqchannel
 
 import (
 	"context"
@@ -36,7 +36,9 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		rabbitmqChannelParams.config.User, rabbitmqChannelParams.config.Password, rabbitmqChannelParams.config.Host,
 		rabbitmqChannelParams.config.Port, rabbitmqChannelParams.config.Vhost))
 	failOnError(err, "Failed to connect to rabbitmq server")
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		for {
 			select {
 			case <-done:
@@ -116,8 +118,7 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		inputChannel:     make(chan []byte, rabbitmqChannelParams.bufferSize),
 		outputChannel:    make(chan []byte, rabbitmqChannelParams.bufferSize),
 	}
-	rc.startInput()
-	rc.startOutput()
+	rc.start()
 	return rc
 }
 func openChannel(conn *amqp.Connection) *amqp.Channel {
@@ -134,55 +135,7 @@ func (rc rabbitmqChannel) GetInputChannel() chan<- []byte {
 func (rc rabbitmqChannel) GetOutputChannel() <-chan []byte {
 	return rc.outputChannel
 }
-func (rc rabbitmqChannel) startInput() {
-	if !rc.mode.IsInputMode() {
-		return
-	}
-
-	for i := 0; i < rc.numberInstants; i++ {
-		rc.wg.Add(1)
-		go func() {
-			defer rc.wg.Done()
-			ch, err := rc.rabbitConnection.Channel()
-			failOnError(err, "Failed to open a channel")
-			defer func(ch *amqp.Channel) {
-				err = ch.Close()
-				failOnError(err, "Failed to close channel")
-			}(ch)
-
-			for {
-				select {
-				case <-rc.done:
-					return
-				case msg := <-rc.inputChannel:
-					fmt.Println("destination/newimplementation/channel/adapter/rabbitmq/channel.go:158",
-						string(msg))
-					go func(msg []byte) {
-						defer rc.wg.Done()
-
-						errPWC := ch.PublishWithContext(context.Background(),
-							rc.exchange, // exchange
-							"",          // routing key
-							false,       // mandatory
-							false,       // immediate
-							amqp.Publishing{
-								ContentType: "text/plain",
-								Body:        msg,
-							})
-						if errPWC != nil {
-							slog.Error(errPWC.Error())
-							return
-						}
-					}(msg)
-				}
-			}
-		}()
-	}
-}
-func (rc rabbitmqChannel) startOutput() {
-	if !rc.mode.IsOutputMode() {
-		return
-	}
+func (rc rabbitmqChannel) start() {
 	for i := 0; i < rc.numberInstants; i++ {
 		rc.wg.Add(1)
 		go func() {
@@ -208,12 +161,40 @@ func (rc rabbitmqChannel) startOutput() {
 				case <-rc.done:
 					return
 				case msg := <-msgs:
-					fmt.Println("destination/newimplementation/channel/adapter/rabbitmq/channel.go:211",
-						string(msg.Body))
-					rc.outputChannel <- msg.Body
-					msg.Ack(false)
-				}
+					rc.wg.Add(1)
+					go func() {
+						defer rc.wg.Done()
+						fmt.Println("destination/newimplementation/channel/adapter/rabbitmq/channel.go:165",
+							string(msg.Body))
+						rc.outputChannel <- msg.Body
+						err := msg.Ack(false)
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
+					}()
+				case msg := <-rc.inputChannel:
+					fmt.Println("destination/newimplementation/channel/adapter/rabbitmq/channel.go:177",
+						string(msg))
+					rc.wg.Add(1)
+					go func(msg []byte) {
+						defer rc.wg.Done()
 
+						errPWC := ch.PublishWithContext(context.Background(),
+							rc.exchange, // exchange
+							"",          // routing key
+							false,       // mandatory
+							false,       // immediate
+							amqp.Publishing{
+								ContentType: "text/plain",
+								Body:        msg,
+							})
+						if errPWC != nil {
+							slog.Error(errPWC.Error())
+							return
+						}
+					}(msg)
+				}
 			}
 		}()
 	}

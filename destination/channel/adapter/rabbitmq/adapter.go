@@ -1,4 +1,4 @@
-package rbbitmqadapter
+package rbbitmqchannel
 
 import (
 	"fmt"

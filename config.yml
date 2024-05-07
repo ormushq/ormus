@@ -17,6 +17,7 @@ destination:
     password: guest
     host: localhost
     port: 5672
+    vhost:
   rabbitmq_task_manager_connection:
       user: guest
       password: guest
