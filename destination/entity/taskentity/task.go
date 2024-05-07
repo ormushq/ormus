@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/manager/entity"
 )
 
 type IntegrationDeliveryStatus uint8
@@ -20,13 +21,13 @@ const (
 
 // Task represents a delivering processed event to corresponding third party integrations.
 type Task struct {
-	ID                        string
-	IntegrationDeliveryStatus IntegrationDeliveryStatus
-	Attempts                  uint8
-	FailedReason              *string
-	ProcessedEvent            event.ProcessedEvent
-	CreatedAt                 time.Time
-	UpdatedAt                 time.Time
+	ID             string
+	DeliveryStatus IntegrationDeliveryStatus
+	Attempts       uint8
+	FailedReason   *string
+	ProcessedEvent event.ProcessedEvent
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 func (t IntegrationDeliveryStatus) String() string {
@@ -51,15 +52,16 @@ func (t IntegrationDeliveryStatus) IsBroadcast() bool {
 
 func MakeTaskUsingProcessedEvent(pe event.ProcessedEvent) Task {
 	return Task{
-		ID:                        pe.ID(),
-		IntegrationDeliveryStatus: NotExecutedTaskStatus,
-		Attempts:                  0,
-		CreatedAt:                 time.Time{},
-		UpdatedAt:                 time.Time{},
+		ID:             pe.ID(),
+		ProcessedEvent: pe,
+		DeliveryStatus: NotExecutedTaskStatus,
+		Attempts:       0,
+		CreatedAt:      time.Time{},
+		UpdatedAt:      time.Time{},
 	}
 }
 
-func (t Task) DestinationSlug() string {
+func (t Task) DestinationSlug() entity.DestinationType {
 	return t.ProcessedEvent.Integration.Metadata.Slug
 }
 

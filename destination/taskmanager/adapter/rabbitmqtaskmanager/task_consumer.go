@@ -2,6 +2,7 @@ package rabbitmqtaskmanager
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/ormushq/ormus/destination/dconfig"
@@ -94,4 +95,14 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 	}()
 
 	return eventsChannel, nil
+}
+
+func panicOnWorkersError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
+}
+
+func printWorkersError(err error, msg string) {
+	log.Printf("%s: %s", msg, err)
 }

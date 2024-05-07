@@ -3,6 +3,7 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -25,7 +26,7 @@ func New(config Config) (Adapter, error) {
 		DialTimeout: time.Duration(config.DialTimeoutSeconds) * time.Second,
 	})
 	if err != nil {
-		fmt.Println("Error creating client:", err)
+		slog.Error("Error creating etcd client: ", err)
 
 		return Adapter{}, err
 	}

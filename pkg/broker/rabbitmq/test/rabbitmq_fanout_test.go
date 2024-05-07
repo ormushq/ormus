@@ -2,10 +2,11 @@ package test
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/pkg/broker/messagebroker"
-	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 	"testing"
 	"time"
+
+	"github.com/ormushq/ormus/pkg/broker/messagebroker"
+	"github.com/ormushq/ormus/pkg/broker/rabbitmq"
 )
 
 // Define a struct to hold parameters for the fanout test case

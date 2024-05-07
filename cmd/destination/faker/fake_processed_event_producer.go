@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/config"
 	"log"
 	"time"
 
+	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/manager/entity"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -25,7 +25,6 @@ func main() {
 	rmqConsumerConnConfig := config.C().Destination.RabbitMQConsumerConnection
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", rmqConsumerConnConfig.User,
 		rmqConsumerConnConfig.Password, rmqConsumerConnConfig.Host, rmqConsumerConnConfig.Port))
-	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 
 	defer func(conn *amqp.Connection) {
 		err = conn.Close()
@@ -54,7 +53,7 @@ func main() {
 	defer cancel()
 
 	fakeIntegration := entity.Integration{
-		ID:       "5",
+		ID:       "10",
 		SourceID: "1",
 		Metadata: entity.DestinationMetadata{
 			ID:   "1",
