@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/ormushq/ormus/destination/dconfig"
@@ -50,11 +51,10 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 		nil,    // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-
 	// Convert Processed event to json
 	jsonEvent, err := json.Marshal(pe)
 	if err != nil {
-		fmt.Println("Error:", err)
+		slog.Error("Error:", err)
 
 		return err
 	}

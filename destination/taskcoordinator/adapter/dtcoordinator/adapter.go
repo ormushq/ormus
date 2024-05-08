@@ -2,36 +2,23 @@ package dtcoordinator
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"sync"
 
-	"github.com/ormushq/ormus/destination/dconfig"
-	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
 	"github.com/ormushq/ormus/destination/taskmanager"
-	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
-	"github.com/ormushq/ormus/destination/taskservice"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/manager/entity"
 )
 
-// DestinationTypeCoordinator is responsible for setup task managers and publish incoming processed events using suitable task publishers.
+type TaskPublisherMap map[entity.DestinationType]taskmanager.Publisher
+
 type DestinationTypeCoordinator struct {
-	TaskService              taskservice.Service
-	TaskPublishers           map[string]taskmanager.Publisher
-	RabbitMQConnectionConfig dconfig.RabbitMQTaskManagerConnection
+	TaskPublishers TaskPublisherMap
 }
 
-func New(ts taskservice.Service, rmqCnf dconfig.RabbitMQTaskManagerConnection) DestinationTypeCoordinator {
-	// Create RabbitMQ task manager for webhook events
-	rmqTaskManagerForWebhooks := rabbitmqtaskmanager.NewTaskManager(rmqCnf, "webhook_tasks_queue")
-
-	taskPublishers := make(map[string]taskmanager.Publisher)
-	taskPublishers["webhook"] = rmqTaskManagerForWebhooks
-
+func New(taskPublishers TaskPublisherMap) DestinationTypeCoordinator {
 	return DestinationTypeCoordinator{
-		TaskService:              ts,
-		TaskPublishers:           taskPublishers,
-		RabbitMQConnectionConfig: rmqCnf,
+		TaskPublishers: taskPublishers,
 	}
 }
 
@@ -39,7 +26,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		slog.Info("Start task coordinator [DestinationType].")
+		slog.Info("Starting destination type task coordinator.")
 
 		for {
 			select {
@@ -54,7 +41,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 				pErr := taskPublisher.Publish(pe)
 				if pErr != nil {
-					fmt.Println(pErr)
+					slog.Error(fmt.Sprintf("Error on publishing event : %s", pErr))
 
 					break
 				}
@@ -65,23 +52,6 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 			}
 		}
 	}()
-
-	webhookTaskConsumer := rabbitmqtaskmanager.NewTaskConsumer(d.RabbitMQConnectionConfig, "webhook_tasks_queue")
-
-	// Run workers
-	// todo we can use loop in range of slices of workers.
-	// also we can use config for number of each worker for different destination types.
-
-	taskDeliveryHandler := fakedeliveryhandler.New()
-	taskHandler := taskservice.NewTaskHandler(d.TaskService, taskDeliveryHandler)
-
-	webhookWorker1 := rabbitmqtaskmanager.NewWorker(webhookTaskConsumer, taskHandler)
-	err := webhookWorker1.Run(done, wg)
-	if err != nil {
-		log.Panicf("%s: %s", "Error on webhook worker", err)
-
-		return err
-	}
 
 	return nil
 }

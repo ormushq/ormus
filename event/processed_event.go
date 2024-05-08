@@ -35,6 +35,6 @@ func (e ProcessedEvent) ID() string {
 	return e.MessageID + "-" + e.Integration.ID
 }
 
-func (e ProcessedEvent) DestinationType() string {
+func (e ProcessedEvent) DestinationType() entity.DestinationType {
 	return e.Integration.Metadata.Slug
 }

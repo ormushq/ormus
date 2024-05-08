@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -9,26 +8,25 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/processedevent/adapter/rabbitmqconsumer"
 	"github.com/ormushq/ormus/destination/taskcoordinator/adapter/dtcoordinator"
-	"github.com/ormushq/ormus/destination/taskservice"
-	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
-	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
+	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
 	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/manager/entity"
 )
 
-const waitingAfterShutdownInSeconds = 2
+const waitingAfterShutdownInSeconds = 1
 
 func main() {
 	done := make(chan bool)
 	wg := sync.WaitGroup{}
 
+	//----------------- Setup Logger -----------------//
+
 	fileMaxSizeInMB := 10
 	fileMaxAgeInDays := 30
 
-	//------ Setup logger ------
 	cfg := logger.Config{
 		FilePath:         "./destination/logs.json",
 		UseLocalTime:     false,
@@ -46,23 +44,11 @@ func main() {
 		Level: logLevel,
 	}
 	l := logger.New(cfg, &opt)
+
+	// use slog as default logger.
 	slog.SetDefault(l)
 
-	// Setup Task Service
-
-	// In-Memory task idempotency
-	// taskIdempotency := inmemorytaskidempotency.New()
-
-	// Redis task idempotency
-	// todo do we need to use separate db number for redis task idempotency or destination module?
-	redisAdapter, err := redis.New(config.C().Redis)
-	if err != nil {
-		log.Panicf("error in new redis")
-	}
-	taskIdempotency := redistaskidempotency.New(redisAdapter, "tasks:", 30*24*time.Hour)
-	taskRepo := inmemorytaskrepo.New()
-	taskService := taskservice.New(taskIdempotency, taskRepo)
-	//----- Consuming processed events -----//
+	//----------------- Consume Processed Events From Core -----------------//
 
 	// Get connection config for rabbitMQ consumer
 	rmqConsumerConnConfig := config.C().Destination.RabbitMQConsumerConnection
@@ -71,35 +57,39 @@ func main() {
 	// todo should we consider array of topics?
 	rmqConsumer := rabbitmqconsumer.New(rmqConsumerConnConfig, rmqConsumerTopic)
 
-	log.Println("Start Consuming processed events.")
+	slog.Info("Start Consuming processed events.")
 	processedEvents, err := rmqConsumer.Consume(done, &wg)
 	if err != nil {
 		log.Panicf("Error on consuming processed events.")
 	}
 
-	//----- Setup Task Coordinator -----//
-	// Task coordinator specifies which task manager should handle incoming processed events.
-	// we can have different task coordinators base on destination type, customer plans, etc.
-	// Now we just create dtcoordinator that stands for destination type coordinator.
-	// It determines which task manager should be used for processed evens considering destination type of processed events.
+	//----------------- Setup Task Coordinator -----------------//
 
-	// todo maybe it is better to having configs for setup of task coordinator.
+	// Task coordinator is responsible for considering task's characteristics
+	// and publish it to task queue using task publisher. currently we support
+	// destination type coordinator which means every task with specific destination type
+	// will be published to its corresponding task publisher.
 
-	rmqTaskManagerConnConfig := config.C().Destination.RabbitMQTaskManagerConnection
-	coordinator := dtcoordinator.New(taskService, rmqTaskManagerConnConfig)
+	taskPublisherCnf := config.C().Destination.RabbitMQTaskManagerConnection
+	webhookTaskPublisher := rabbitmqtaskmanager.NewTaskPublisher(taskPublisherCnf, "webhook_tasks_queue")
+
+	taskPublishers := make(dtcoordinator.TaskPublisherMap)
+	taskPublishers[entity.WebhookDestinationType] = webhookTaskPublisher
+
+	coordinator := dtcoordinator.New(taskPublishers)
 
 	cErr := coordinator.Start(processedEvents, done, &wg)
 	if cErr != nil {
 		log.Panicf("Error on starting destination type coordinator.")
 	}
 
-	//----- Handling graceful shutdown  -----//
+	//----------------- Handling graceful shutdown -----------------//
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	fmt.Println("Received interrupt signal, shutting down gracefully...")
+	slog.Info("Received interrupt signal, shutting down gracefully...")
 	done <- true
 
 	close(done)

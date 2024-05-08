@@ -27,6 +27,7 @@ logs/
 mise.log
 
 destination/logs.json
+destination/worker_log.json
 
 temp
 .env

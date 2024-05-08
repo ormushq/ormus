@@ -1,7 +1,7 @@
 package inmemorytaskmanager
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/ormushq/ormus/event"
 )
@@ -22,7 +22,7 @@ func (tm *TaskManager) Publish(e event.ProcessedEvent) error {
 	// send task to queue
 	err := tm.Queue.Enqueue(e)
 	if err != nil {
-		fmt.Println("enqueue Error : ", err)
+		slog.Error("enqueue Error : ", err)
 
 		return err
 	}
