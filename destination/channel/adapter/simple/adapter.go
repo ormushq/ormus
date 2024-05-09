@@ -30,7 +30,7 @@ func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 	}
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
-func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan []byte, error) {
+func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetOutputChannel(), nil
 	}
