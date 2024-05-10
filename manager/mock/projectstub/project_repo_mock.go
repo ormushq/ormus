@@ -16,7 +16,7 @@ type MockProject struct {
 	hasErr   bool
 }
 
-func (m MockProject) Create(name, email string) (entity.Project, error) {
+func (m *MockProject) Create(name, email string) (entity.Project, error) {
 	if m.hasErr {
 		return entity.Project{}, fmt.Errorf(RepoErr)
 	}

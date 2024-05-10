@@ -36,7 +36,7 @@ func TestService_Create(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
 			repo := projectstub.New(tc.repoErr)
-			svc := projectservice.New(&repo)
+			svc := projectservice.New(repo)
 
 			// 2. execution
 			newProject, err := svc.Create(tc.req)

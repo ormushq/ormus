@@ -3,6 +3,10 @@ package projecthandler_test
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/projecthandler"
@@ -14,9 +18,6 @@ import (
 	"github.com/ormushq/ormus/manager/validator/projectvalidator"
 	"github.com/ormushq/ormus/param"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestHandler_Create(t *testing.T) {
@@ -32,7 +33,7 @@ func TestHandler_Create(t *testing.T) {
 	cfg := config.C()
 	repo := projectstub.New(false)
 
-	//TODO: these better to be automated to get a user and make login token for them
+	// TODO: these better to be automated to get a user and make login token for them
 	userRepo := usermock.NewMockRepository(false)
 	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
 	userService := userservice.New(jwt, userRepo)

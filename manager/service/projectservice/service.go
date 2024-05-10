@@ -1,6 +1,9 @@
 package projectservice
 
-import "github.com/ormushq/ormus/manager/entity"
+import (
+	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/mock/projectstub"
+)
 
 type Repository interface {
 	Create(name, email string) (entity.Project, error)
@@ -10,6 +13,6 @@ type Service struct {
 	repo Repository
 }
 
-func New(repository Repository) *Service {
-	return &Service{repo: repository}
+func New(repository projectstub.MockProject) *Service {
+	return &Service{repo: &repository}
 }
