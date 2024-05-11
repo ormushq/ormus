@@ -69,6 +69,7 @@ func (ca *ChannelAdapter) connect() error {
 		for range ca.done {
 			err = conn.Close()
 			failOnError(err, "failed to close a connection")
+
 			break
 		}
 
