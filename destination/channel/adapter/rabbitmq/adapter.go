@@ -110,7 +110,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 	}
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants int) {
+func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) {
 	ca.channels[name] = newChannel(
 		ca.done,
 		ca.wg,
@@ -121,6 +121,7 @@ func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize,
 			queue:          name + "-queue",
 			bufferSize:     bufferSize,
 			numberInstants: numberInstants,
+			maxRetryPolicy: maxRetryPolicy,
 		})
 }
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
