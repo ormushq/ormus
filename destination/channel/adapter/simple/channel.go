@@ -16,6 +16,8 @@ type simpleChannel struct {
 	numberInstants int
 }
 
+const timeForCallAgainDuration = 10
+
 func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
 	bufferSize, numberInstants int) *simpleChannel {
 	sc := &simpleChannel{
@@ -69,7 +71,7 @@ func (sc simpleChannel) startDelivery(msg []byte) {
 		defer sc.wg.Done()
 		go sc.publishMessage(msg, ackChan)
 		select {
-		case <-time.After(5 * time.Second):
+		case <-time.After(time.Second * timeForCallAgainDuration):
 			sc.startDelivery(msg)
 		case <-ackChan:
 

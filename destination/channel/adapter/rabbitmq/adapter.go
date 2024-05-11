@@ -71,6 +71,7 @@ func (ca *ChannelAdapter) connect() error {
 			failOnError(err, "failed to close a connection")
 			break
 		}
+
 	}()
 	go ca.waitForConnectionClose()
 
