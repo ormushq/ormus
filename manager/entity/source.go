@@ -6,8 +6,11 @@ import (
 
 type WriteKey string // because we might change the format in future
 
+<<<<<<< HEAD
 type SourceCategory string
 
+=======
+>>>>>>> fb1e3b5 (feat(manager): add new source (#46))
 type Status string
 
 const (
@@ -24,11 +27,15 @@ type Source struct {
 	ProjectID   string
 	OwnerID     string
 	Status      Status
+<<<<<<< HEAD
 	Metadata    SourceMetadata
+=======
+>>>>>>> fb1e3b5 (feat(manager): add new source (#46))
 	CreateAt    time.Time
 	UpdateAt    time.Time
 	DeleteAt    *time.Time
 }
+<<<<<<< HEAD
 
 type SourceMetadata struct {
 	ID       string
@@ -36,3 +43,5 @@ type SourceMetadata struct {
 	Slug     string
 	Category SourceCategory
 }
+=======
+>>>>>>> fb1e3b5 (feat(manager): add new source (#46))
