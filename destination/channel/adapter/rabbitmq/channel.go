@@ -107,21 +107,26 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		outputChannel:  make(chan channel.Message, rabbitmqChannelParams.bufferSize),
 	}
 	rc.start()
+
 	return rc
 }
 func openChannel(conn *amqp.Connection) *amqp.Channel {
 	ch, err := conn.Channel()
 	failOnError(err, "failed to open a channel")
+
 	return ch
 }
 func (rc *rabbitmqChannel) GetMode() channel.Mode {
+
 	return rc.mode
 }
 func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
+
 	return rc.inputChannel
 }
 
 func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel.Message {
+
 	return rc.outputChannel
 }
 func (rc *rabbitmqChannel) start() {
@@ -159,7 +164,8 @@ func (rc *rabbitmqChannel) startOutput() {
 
 		failOnError(err, "Failed to open a channel")
 		if err != nil {
-			go rc.callMeNextTime(rc.startOutput, time.Second*timeForCallAgainDuration)
+			go rc.callMeNextTime(rc.startOutput)
+
 			return
 		}
 
@@ -179,7 +185,8 @@ func (rc *rabbitmqChannel) startOutput() {
 		)
 		failOnError(errConsume, "failed to consume")
 		if err != nil {
-			go rc.callMeNextTime(rc.startOutput, time.Second*timeForCallAgainDuration)
+			go rc.callMeNextTime(rc.startOutput)
+
 			return
 		}
 
@@ -187,11 +194,13 @@ func (rc *rabbitmqChannel) startOutput() {
 
 		for {
 			if ch.IsClosed() {
-				go rc.callMeNextTime(rc.startOutput, time.Second*timeForCallAgainDuration)
+				go rc.callMeNextTime(rc.startOutput)
+
 				return
 			}
 			select {
 			case <-rc.done:
+
 				return
 			case msg := <-msgs:
 				rc.wg.Add(1)
@@ -221,7 +230,8 @@ func (rc *rabbitmqChannel) startInput() {
 		ch, err := rc.rabbitmq.connection.Channel()
 		failOnError(err, "Failed to open a channel")
 		if err != nil {
-			go rc.callMeNextTime(rc.startInput, time.Second*timeForCallAgainDuration)
+			go rc.callMeNextTime(rc.startInput)
+
 			return
 		}
 		defer func(ch *amqp.Channel) {
@@ -232,11 +242,13 @@ func (rc *rabbitmqChannel) startInput() {
 
 		for {
 			if ch.IsClosed() {
-				go rc.callMeNextTime(rc.startInput, time.Second*timeForCallAgainDuration)
+				go rc.callMeNextTime(rc.startInput)
+
 				return
 			}
 			select {
 			case <-rc.done:
+
 				return
 			case msg := <-rc.inputChannel:
 				rc.wg.Add(1)
@@ -259,8 +271,8 @@ func (rc *rabbitmqChannel) startInput() {
 
 }
 
-func (rc *rabbitmqChannel) callMeNextTime(f func(), t time.Duration) {
-	time.Sleep(t)
+func (rc *rabbitmqChannel) callMeNextTime(f func()) {
+	time.Sleep(time.Second * timeForCallAgainDuration)
 	rc.wg.Add(1)
 	go func() {
 		defer rc.wg.Done()

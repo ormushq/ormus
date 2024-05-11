@@ -34,17 +34,18 @@ func NewConverter(done <-chan bool, wg *sync.WaitGroup) *Converter {
 	}
 }
 
-func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan []byte) <-chan event2.ProcessedEvent {
+func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan []byte, bufferSize int) <-chan event2.ProcessedEvent {
 	if outputChannel, ok := c.processedEventOutputChannels[originalChannel]; ok {
 		return outputChannel
 	}
-	outputChannel := make(chan event2.ProcessedEvent, 100)
+	outputChannel := make(chan event2.ProcessedEvent, bufferSize)
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		for {
 			select {
 			case <-c.done:
+
 				return
 			case msg := <-originalChannel:
 				c.wg.Add(1)
@@ -54,6 +55,7 @@ func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan 
 					if uErr != nil {
 						fmt.Println(msg)
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
+
 						return
 					}
 					outputChannel <- e
@@ -63,20 +65,23 @@ func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan 
 		}
 	}()
 	c.processedEventOutputChannels[originalChannel] = outputChannel
+
 	return outputChannel
 }
 
-func (c *Converter) ConvertToOutputTaskChannel(originalChannel <-chan []byte) <-chan taskentity.Task {
+func (c *Converter) ConvertToOutputTaskChannel(originalChannel <-chan []byte, bufferSize int) <-chan taskentity.Task {
 	if outputChannel, ok := c.taskOutputChannels[originalChannel]; ok {
+
 		return outputChannel
 	}
-	outputChannel := make(chan taskentity.Task, 100)
+	outputChannel := make(chan taskentity.Task, bufferSize)
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		for {
 			select {
 			case <-c.done:
+
 				return
 			case msg := <-originalChannel:
 				c.wg.Add(1)
@@ -85,6 +90,7 @@ func (c *Converter) ConvertToOutputTaskChannel(originalChannel <-chan []byte) <-
 					e, uErr := taskentity.UnmarshalBytesToTask(msg)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
+
 						return
 					}
 					outputChannel <- e
@@ -94,20 +100,22 @@ func (c *Converter) ConvertToOutputTaskChannel(originalChannel <-chan []byte) <-
 		}
 	}()
 	c.taskOutputChannels[originalChannel] = outputChannel
+
 	return outputChannel
 }
 
-func (c *Converter) ConvertToInputTaskChannel(originalChannel chan<- []byte) chan<- taskentity.Task {
+func (c *Converter) ConvertToInputTaskChannel(originalChannel chan<- []byte, bufferSize int) chan<- taskentity.Task {
 	if inputChannel, ok := c.taskInputChannels[originalChannel]; ok {
 		return inputChannel
 	}
-	inputChannel := make(chan taskentity.Task, 100)
+	inputChannel := make(chan taskentity.Task, bufferSize)
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		for {
 			select {
 			case <-c.done:
+
 				return
 			case task := <-inputChannel:
 				c.wg.Add(1)
@@ -116,6 +124,7 @@ func (c *Converter) ConvertToInputTaskChannel(originalChannel chan<- []byte) cha
 					e, uErr := json.Marshal(task)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert task tp bytes : %v", uErr))
+
 						return
 					}
 					originalChannel <- e
@@ -125,20 +134,22 @@ func (c *Converter) ConvertToInputTaskChannel(originalChannel chan<- []byte) cha
 		}
 	}()
 	c.taskInputChannels[originalChannel] = inputChannel
+
 	return inputChannel
 }
 
-func (c *Converter) ConvertToInputDeliveryTaskChannel(originalChannel chan<- []byte) chan<- param.DeliveryTaskResponse {
+func (c *Converter) ConvertToInputDeliveryTaskChannel(originalChannel chan<- []byte, bufferSize int) chan<- param.DeliveryTaskResponse {
 	if inputChannel, ok := c.deliveryTaskInputChannels[originalChannel]; ok {
 		return inputChannel
 	}
-	inputChannel := make(chan param.DeliveryTaskResponse, 100)
+	inputChannel := make(chan param.DeliveryTaskResponse, bufferSize)
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		for {
 			select {
 			case <-c.done:
+
 				return
 			case deliveryTask := <-inputChannel:
 				c.wg.Add(1)
@@ -147,6 +158,7 @@ func (c *Converter) ConvertToInputDeliveryTaskChannel(originalChannel chan<- []b
 					e, uErr := json.Marshal(deliveryTask)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert deliverytask to byte: %v", uErr))
+
 						return
 					}
 					originalChannel <- e
@@ -156,5 +168,6 @@ func (c *Converter) ConvertToInputDeliveryTaskChannel(originalChannel chan<- []b
 		}
 	}()
 	c.deliveryTaskInputChannels[originalChannel] = inputChannel
+
 	return inputChannel
 }

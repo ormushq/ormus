@@ -16,7 +16,8 @@ type simpleChannel struct {
 	numberInstants int
 }
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode, bufferSize int, numberInstants int) *simpleChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
+	bufferSize, numberInstants int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
@@ -26,15 +27,19 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode, bufferS
 		outputChannel:  make(chan channel.Message, bufferSize),
 	}
 	sc.startConsume()
+
 	return sc
 }
 func (sc simpleChannel) GetMode() channel.Mode {
+
 	return sc.mode
 }
 func (sc simpleChannel) GetInputChannel() chan<- []byte {
+
 	return sc.inputChannel
 }
 func (sc simpleChannel) GetOutputChannel() <-chan channel.Message {
+
 	return sc.outputChannel
 }
 func (sc simpleChannel) startConsume() {
@@ -45,6 +50,7 @@ func (sc simpleChannel) startConsume() {
 			for {
 				select {
 				case <-sc.done:
+
 					return
 				case msg := <-sc.inputChannel:
 					fmt.Println("New message received in simple/adapter.go ca.inputChannel", msg)
@@ -66,6 +72,7 @@ func (sc simpleChannel) startDelivery(msg []byte) {
 		case <-time.After(5 * time.Second):
 			sc.startDelivery(msg)
 		case <-ackChan:
+
 			return
 		}
 	}()
@@ -78,6 +85,7 @@ func (sc simpleChannel) publishMessage(msg []byte, c chan<- bool) {
 			Body: msg,
 			Ack: func(multiple bool) error {
 				c <- true
+
 				return nil
 			},
 		}

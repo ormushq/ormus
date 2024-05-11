@@ -36,11 +36,16 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 		rabbitmq: &rabbitmq,
 		channels: make(map[string]*rabbitmqChannel),
 	}
-	err := c.connect()
-	for err != nil {
-		err = c.connect()
-		time.Sleep(time.Second * 5)
+
+	for {
+		err := c.connect()
+		time.Sleep(time.Second * time.Duration(config.ReconnectSecond))
+		failOnError(err, "rabbitmq connection failed")
+		if err == nil {
+			break
+		}
 	}
+
 	return c
 }
 func (ca *ChannelAdapter) connect() error {
@@ -61,15 +66,14 @@ func (ca *ChannelAdapter) connect() error {
 	ca.wg.Add(1)
 	go func() {
 		defer ca.wg.Done()
-		for {
-			select {
-			case <-ca.done:
-				err := conn.Close()
-				failOnError(err, "failed to close a connection")
-			}
+		for range ca.done {
+			err = conn.Close()
+			failOnError(err, "failed to close a connection")
+			break
 		}
 	}()
 	go ca.waitForConnectionClose()
+
 	return nil
 }
 func (ca *ChannelAdapter) waitForConnectionClose() {
@@ -83,17 +87,21 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 		case err := <-connectionClosedChannel:
 			fmt.Println("Connection closed")
 			fmt.Println(err)
-			e := ca.connect()
-			for e != nil {
-				e = ca.connect()
-				time.Sleep(time.Second * 5)
+			for {
+				e := ca.connect()
+				time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
+				failOnError(e, "Connection failed to rabbitmq")
+				if e == nil {
+					break
+				}
 			}
+
 			return
 		}
 	}
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize int, numberInstants int) {
+func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants int) {
 	ca.channels[name] = newChannel(
 		ca.done,
 		ca.wg,
@@ -110,19 +118,23 @@ func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetInputChannel(), nil
 	}
+
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
 
 func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel.Message, error) {
 	if c, ok := ca.channels[name]; ok {
+
 		return c.GetOutputChannel(), nil
 	}
+
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
 func (ca *ChannelAdapter) GetMode(name string) (channel.Mode, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetMode(), nil
 	}
+
 	return "", fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
 
@@ -138,13 +150,4 @@ func WaitForConnection(rabbitmq *Rabbitmq) {
 		fmt.Println("After wait for connection")
 
 	}
-}
-
-func (ca *ChannelAdapter) callMeNextTime(f func(), t time.Duration) {
-	time.Sleep(t)
-	ca.wg.Add(1)
-	go func() {
-		defer ca.wg.Done()
-		f()
-	}()
 }

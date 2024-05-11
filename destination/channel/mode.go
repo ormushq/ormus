@@ -4,8 +4,8 @@ type Mode string
 
 const (
 	InputOnlyMode Mode = "input-only"
-	OutputOnly         = "output-only"
-	BothMode           = "both"
+	OutputOnly    Mode = "output-only"
+	BothMode      Mode = "both"
 )
 
 func (m Mode) IsOutputMode() bool {
