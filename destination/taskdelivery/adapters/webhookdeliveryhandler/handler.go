@@ -3,17 +3,13 @@ package webhookdeliveryhandler
 import (
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
-	"github.com/ormushq/ormus/event"
 )
 
 type WebhookHandler struct{}
 
-func (h WebhookHandler) Handle(t taskentity.Task, pe event.ProcessedEvent) (param.DeliveryTaskResponse, error) {
+func (h WebhookHandler) Handle(t taskentity.Task) (param.DeliveryTaskResponse, error) {
 	// todo webhook handler is responsible for sending processed event to url of webhook and making DeliveryTaskResponse
 	// todo webhook handler should consider max_retry_exceeded and other necessary policies in e.Integration.Config
-
-	// get configs from processed event
-	println(pe.Integration.Config)
 
 	res := param.DeliveryTaskResponse{
 		FailedReason:   nil,

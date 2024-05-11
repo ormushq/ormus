@@ -28,7 +28,7 @@ func (db DB) UpsertTask(taskID string, request param.UpsertTaskRequest) error {
 		}
 		db.tasks[taskID] = task
 	}
-	task.IntegrationDeliveryStatus = request.IntegrationDeliveryStatus
+	task.DeliveryStatus = request.IntegrationDeliveryStatus
 	task.Attempts = request.Attempts
 	task.FailedReason = request.FailedReason
 

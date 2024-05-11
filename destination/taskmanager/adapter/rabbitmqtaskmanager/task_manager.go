@@ -5,19 +5,19 @@ import (
 	"github.com/ormushq/ormus/event"
 )
 
-type TaskManager struct {
+type TaskPublisher struct {
 	queue *Queue
 }
 
-func NewTaskManager(c dconfig.RabbitMQTaskManagerConnection, queueName string) *TaskManager {
+func NewTaskPublisher(c dconfig.RabbitMQTaskManagerConnection, queueName string) *TaskPublisher {
 	q := newQueue(c, queueName)
 
-	return &TaskManager{
+	return &TaskPublisher{
 		queue: q,
 	}
 }
 
-func (tm *TaskManager) Publish(pe event.ProcessedEvent) error {
+func (tm *TaskPublisher) Publish(pe event.ProcessedEvent) error {
 	err := tm.queue.Enqueue(pe)
 	if err != nil {
 		return err

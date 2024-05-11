@@ -6,6 +6,12 @@ type IntegrationConfig map[string]any
 
 type DestinationCategory string
 
+type DestinationType string
+
+const (
+	WebhookDestinationType DestinationType = "webhook"
+)
+
 const (
 	Analytics      DestinationCategory = "analytics"
 	Advertising    DestinationCategory = "advertising"
@@ -41,7 +47,7 @@ type Integration struct {
 
 type DestinationMetadata struct {
 	ID         string
-	Name       string // Javascript, Google Universal Analytics
-	Slug       string // javascript, google-analytics
+	Name       string          // webhook, Google Universal Analytics
+	Slug       DestinationType // webhook, google-analytics
 	Categories []DestinationCategory
 }

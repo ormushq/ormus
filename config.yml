@@ -9,6 +9,10 @@ redis:
   host: localhost
   db: 0
   password: ""
+etcd:
+  port: 2379
+  host: localhost
+  dial_timeout: 5
 destination:
   debug_mode: true
   consumer_topic: "pe.#"    # pe stands for processed event. and # substitute for zero or more words.

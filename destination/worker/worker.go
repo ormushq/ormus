@@ -1,37 +1,35 @@
-package rabbitmqtaskmanager
+package worker
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"sync"
 	"time"
 
 	"github.com/ormushq/ormus/destination/taskmanager"
+	"github.com/ormushq/ormus/event"
 )
 
 const timeoutInSeconds = 5
 
 type Worker struct {
-	TaskConsumer taskmanager.Consumer
-	TaskHandler  taskmanager.TaskHandler
+	TaskHandler   TaskHandler
+	EventsChannel <-chan event.ProcessedEvent
+}
+
+type TaskHandler interface {
+	HandleTask(ctx context.Context, newEvent event.ProcessedEvent) error
 }
 
 func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
-	processedEventsChannel, err := w.TaskConsumer.Consume(done, wg)
-	if err != nil {
-		return err
-	}
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		slog.Info("Start rabbitmq worker for handling tasks.")
-
 		for {
 			select {
-			case newEvent := <-processedEventsChannel:
+			case newEvent := <-w.EventsChannel:
 				go func() {
 					ctx, cancel := context.WithTimeout(context.Background(), timeoutInSeconds*time.Second)
 					defer cancel()
@@ -50,19 +48,9 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
 	return nil
 }
 
-func NewWorker(c taskmanager.Consumer, th taskmanager.TaskHandler) *Worker {
+func NewWorker(events <-chan event.ProcessedEvent, th taskmanager.TaskHandler) *Worker {
 	return &Worker{
-		TaskConsumer: c,
-		TaskHandler:  th,
+		EventsChannel: events,
+		TaskHandler:   th,
 	}
-}
-
-func panicOnWorkersError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
-
-func printWorkersError(err error, msg string) {
-	log.Printf("%s: %s", msg, err)
 }
