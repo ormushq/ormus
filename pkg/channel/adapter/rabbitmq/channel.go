@@ -3,8 +3,8 @@ package rbbitmqchannel
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/destination/channel"
 	"github.com/ormushq/ormus/logger"
+	channel2 "github.com/ormushq/ormus/pkg/channel"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
 	"time"
@@ -13,10 +13,10 @@ import (
 type rabbitmqChannel struct {
 	wg            *sync.WaitGroup
 	done          <-chan bool
-	mode          channel.Mode
+	mode          channel2.Mode
 	rabbitmq      *Rabbitmq
 	inputChannel  chan []byte
-	outputChannel chan channel.Message
+	outputChannel chan channel2.Message
 	//outputChannel  chan []byte
 	exchange       string
 	queue          string
@@ -24,7 +24,7 @@ type rabbitmqChannel struct {
 	maxRetryPolicy int
 }
 type rabbitmqChannelParams struct {
-	mode           channel.Mode
+	mode           channel2.Mode
 	rabbitmq       *Rabbitmq
 	exchange       string
 	queue          string
@@ -107,7 +107,7 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		numberInstants: rabbitmqChannelParams.numberInstants,
 		maxRetryPolicy: rabbitmqChannelParams.maxRetryPolicy,
 		inputChannel:   make(chan []byte, rabbitmqChannelParams.bufferSize),
-		outputChannel:  make(chan channel.Message, rabbitmqChannelParams.bufferSize),
+		outputChannel:  make(chan channel2.Message, rabbitmqChannelParams.bufferSize),
 	}
 	rc.start()
 
@@ -119,7 +119,7 @@ func openChannel(conn *amqp.Connection) *amqp.Channel {
 
 	return ch
 }
-func (rc *rabbitmqChannel) GetMode() channel.Mode {
+func (rc *rabbitmqChannel) GetMode() channel2.Mode {
 
 	return rc.mode
 }
@@ -128,7 +128,7 @@ func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
 	return rc.inputChannel
 }
 
-func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel.Message {
+func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel2.Message {
 
 	return rc.outputChannel
 }
@@ -210,7 +210,7 @@ func (rc *rabbitmqChannel) startOutput() {
 				go func() {
 					defer rc.wg.Done()
 
-					rc.outputChannel <- channel.Message{
+					rc.outputChannel <- channel2.Message{
 						Body: msg.Body,
 						Ack:  msg.Ack,
 					}

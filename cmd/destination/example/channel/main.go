@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/destination/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/destination/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"sync"
 	"time"
 )
@@ -16,10 +16,10 @@ func main() {
 	channelName := "test"
 
 	inputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, 0, 1)
+	inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, 0, 1, 5)
 
 	outputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, 0, 1)
+	outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, 0, 1, 5)
 
 	inputChannel, _ := inputChannelAdapter.GetInputChannel(channelName)
 	outputChannel, _ := outputChannelAdapter.GetOutputChannel(channelName)
