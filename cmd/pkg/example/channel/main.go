@@ -15,24 +15,28 @@ func main() {
 
 	channelName := "test"
 
+	maxRetryPolicy := 5
+
 	inputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, 0, 1, 5)
+	inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, 0, 1, maxRetryPolicy)
 
 	outputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, 0, 1, 5)
+	outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, 0, 1, maxRetryPolicy)
 
-	inputChannel, _ := inputChannelAdapter.GetInputChannel(channelName)
-	outputChannel, _ := outputChannelAdapter.GetOutputChannel(channelName)
-
+	inputChannel, err := inputChannelAdapter.GetInputChannel(channelName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	outputChannel, err := outputChannelAdapter.GetOutputChannel(channelName)
+	if err != nil {
+		fmt.Println(err)
+	}
 	wg.Add(1)
 	go func() {
-		for {
-			select {
-			case msg := <-outputChannel:
-				err := msg.Ack()
-				if err != nil {
-					fmt.Println(err)
-				}
+		for msg := range outputChannel {
+			err := msg.Ack()
+			if err != nil {
+				fmt.Println(err)
 			}
 		}
 	}()
@@ -41,7 +45,6 @@ func main() {
 	wg.Add(1)
 	go func() {
 		for {
-			//fmt.Println("Send date to input channel")
 			inputChannel <- []byte("Hello form input channel" + time.Now().UTC().String())
 			time.Sleep(time.Second)
 		}
