@@ -18,8 +18,7 @@ type simpleChannel struct {
 
 const timeForCallAgainDuration = 10
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode,
-	bufferSize, numberInstants int) *simpleChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode, bufferSize, numberInstants int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
@@ -32,18 +31,19 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode,
 
 	return sc
 }
-func (sc simpleChannel) GetMode() channel2.Mode {
 
+func (sc simpleChannel) GetMode() channel2.Mode {
 	return sc.mode
 }
-func (sc simpleChannel) GetInputChannel() chan<- []byte {
 
+func (sc simpleChannel) GetInputChannel() chan<- []byte {
 	return sc.inputChannel
 }
-func (sc simpleChannel) GetOutputChannel() <-chan channel2.Message {
 
+func (sc simpleChannel) GetOutputChannel() <-chan channel2.Message {
 	return sc.outputChannel
 }
+
 func (sc simpleChannel) startConsume() {
 	for i := 0; i < sc.numberInstants; i++ {
 		sc.wg.Add(1)
@@ -61,7 +61,6 @@ func (sc simpleChannel) startConsume() {
 			}
 		}()
 	}
-
 }
 
 func (sc simpleChannel) startDelivery(msg []byte) {
@@ -79,13 +78,14 @@ func (sc simpleChannel) startDelivery(msg []byte) {
 		}
 	}()
 }
+
 func (sc simpleChannel) publishMessage(msg []byte, c chan<- bool) {
 	sc.wg.Add(1)
 	go func(msg []byte, c chan<- bool) {
 		defer sc.wg.Done()
 		sc.outputChannel <- channel2.Message{
 			Body: msg,
-			Ack: func(multiple bool) error {
+			Ack: func() error {
 				c <- true
 
 				return nil

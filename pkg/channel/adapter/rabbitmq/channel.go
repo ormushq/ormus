@@ -11,13 +11,12 @@ import (
 )
 
 type rabbitmqChannel struct {
-	wg            *sync.WaitGroup
-	done          <-chan bool
-	mode          channel2.Mode
-	rabbitmq      *Rabbitmq
-	inputChannel  chan []byte
-	outputChannel chan channel2.Message
-	//outputChannel  chan []byte
+	wg             *sync.WaitGroup
+	done           <-chan bool
+	mode           channel2.Mode
+	rabbitmq       *Rabbitmq
+	inputChannel   chan []byte
+	outputChannel  chan channel2.Message
 	exchange       string
 	queue          string
 	numberInstants int
@@ -33,7 +32,10 @@ type rabbitmqChannelParams struct {
 	maxRetryPolicy int
 }
 
-const timeForCallAgainDuration = 10
+const (
+	timeForCallAgainDuration = 10
+	retriesToTimeRatio       = 2
+)
 
 func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) *rabbitmqChannel {
 	conn := rabbitmqChannelParams.rabbitmq.connection
@@ -53,7 +55,6 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		false,                          // no-wait
 		nil,                            // arguments
 	)
-
 	if err != nil {
 		ch := openChannel(conn)
 		err = ch.ExchangeDeclarePassive(
@@ -113,25 +114,26 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 
 	return rc
 }
+
 func openChannel(conn *amqp.Connection) *amqp.Channel {
 	ch, err := conn.Channel()
 	failOnError(err, "failed to open a channel")
 
 	return ch
 }
-func (rc *rabbitmqChannel) GetMode() channel2.Mode {
 
+func (rc *rabbitmqChannel) GetMode() channel2.Mode {
 	return rc.mode
 }
-func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
 
+func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
 	return rc.inputChannel
 }
 
 func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel2.Message {
-
 	return rc.outputChannel
 }
+
 func (rc *rabbitmqChannel) start() {
 	for i := 0; i < rc.numberInstants; i++ {
 		if rc.mode.IsInputMode() {
@@ -155,7 +157,7 @@ func (rc *rabbitmqChannel) startOutput() {
 	rc.wg.Add(1)
 	fmt.Println("startOutput: before waiting for connection")
 	WaitForConnection(rc.rabbitmq)
-	fmt.Printf("the adress in start output %p \n", rc.rabbitmq)
+	fmt.Printf("the address in start output %p \n", rc.rabbitmq)
 
 	fmt.Println("startOutput: after waiting for connection")
 
@@ -212,7 +214,9 @@ func (rc *rabbitmqChannel) startOutput() {
 
 					rc.outputChannel <- channel2.Message{
 						Body: msg.Body,
-						Ack:  msg.Ack,
+						Ack: func() error {
+							return msg.Ack(false)
+						},
 					}
 				}()
 			}
@@ -258,19 +262,18 @@ func (rc *rabbitmqChannel) startInput() {
 			}
 		}
 	}()
-
 }
 
 func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries int) {
 	if tries > rc.maxRetryPolicy {
-		logger.L().Error("job failed after %d tries", tries)
+		logger.L().Error(fmt.Sprintf("job failed after %d tries", tries))
 
 		return
 	}
 	rc.wg.Add(1)
 	go func() {
 		defer rc.wg.Done()
-		time.Sleep(time.Second * time.Duration(tries*2))
+		time.Sleep(time.Second * time.Duration(tries*retriesToTimeRatio))
 		errPWC := ch.PublishWithContext(context.Background(),
 			rc.exchange, // exchange
 			"",          // routing key
@@ -286,6 +289,7 @@ func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries
 		}
 	}()
 }
+
 func (rc *rabbitmqChannel) callMeNextTime(f func()) {
 	rc.wg.Add(1)
 	go func() {
@@ -294,6 +298,7 @@ func (rc *rabbitmqChannel) callMeNextTime(f func()) {
 		f()
 	}()
 }
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		logger.L().Error(err.Error())

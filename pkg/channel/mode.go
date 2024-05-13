@@ -11,6 +11,7 @@ const (
 func (m Mode) IsOutputMode() bool {
 	return m == OutputOnly || m == BothMode
 }
+
 func (m Mode) IsInputMode() bool {
 	return m == InputOnlyMode || m == BothMode
 }

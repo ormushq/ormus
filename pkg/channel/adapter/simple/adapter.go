@@ -24,6 +24,7 @@ func New(done <-chan bool, wg *sync.WaitGroup) *ChannelAdapter {
 func (ca *ChannelAdapter) NewChannel(name string, mode channel2.Mode, bufferSize, numberInstants int) {
 	ca.channels[name] = newChannel(ca.done, ca.wg, mode, bufferSize, numberInstants)
 }
+
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetInputChannel(), nil
@@ -31,6 +32,7 @@ func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
+
 func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel2.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetOutputChannel(), nil
@@ -38,6 +40,7 @@ func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel2.Message
 
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
+
 func (ca *ChannelAdapter) GetMode(name string) (channel2.Mode, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetMode(), nil

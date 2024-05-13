@@ -29,7 +29,8 @@ func main() {
 		for {
 			select {
 			case msg := <-outputChannel:
-				err := msg.Ack()
+				//fmt.Println(string(msg.Body))
+				err := msg.Ack(false)
 				if err != nil {
 					fmt.Println(err)
 				}
