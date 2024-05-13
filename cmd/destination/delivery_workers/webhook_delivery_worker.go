@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
 	"log"
 	"log/slog"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/taskdelivery"
 	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
-	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
 	"github.com/ormushq/ormus/destination/taskservice"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
@@ -76,8 +76,13 @@ func main() {
 
 	//----------------- Consume ProcessEvents -----------------//
 
+	channelSize := 100
+	reconnectSecond := 10
+	numberInstant := 10
+	maxRetryPolicy := 5
 	taskConsumerConf := config.C().Destination.RabbitMQTaskManagerConnection
-	webhookTaskConsumer := rabbitmqtaskmanager.NewTaskConsumer(taskConsumerConf, "webhook_tasks_queue")
+	webhookTaskConsumer := rabbitmqchanneltaskmanager.NewTaskConsumer(taskConsumerConf, "webhook_tasks_queue",
+		channelSize, reconnectSecond, numberInstant, maxRetryPolicy)
 
 	processedEvents, err := webhookTaskConsumer.Consume(done, &wg)
 	if err != nil {

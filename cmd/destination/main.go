@@ -11,7 +11,7 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/processedevent/adapter/rabbitmqconsumer"
 	"github.com/ormushq/ormus/destination/taskcoordinator/adapter/dtcoordinator"
-	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
+	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 )
@@ -70,8 +70,10 @@ func main() {
 	// destination type coordinator which means every task with specific destination type
 	// will be published to its corresponding task publisher.
 
+	reconnectSecond := 5
 	taskPublisherCnf := config.C().Destination.RabbitMQTaskManagerConnection
-	webhookTaskPublisher := rabbitmqtaskmanager.NewTaskPublisher(taskPublisherCnf, "webhook_tasks_queue")
+	webhookTaskPublisher := rabbitmqchanneltaskmanager.NewTaskPublisher(done, &wg,
+		taskPublisherCnf, "webhook_tasks_queue", reconnectSecond)
 
 	taskPublishers := make(dtcoordinator.TaskPublisherMap)
 	taskPublishers[entity.WebhookDestinationType] = webhookTaskPublisher
