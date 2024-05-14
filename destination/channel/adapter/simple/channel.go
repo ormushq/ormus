@@ -14,17 +14,19 @@ type simpleChannel struct {
 	inputChannel   chan []byte
 	outputChannel  chan channel.Message
 	numberInstants int
+	maxRetryPolicy int
 }
 
 const timeForCallAgainDuration = 10
 
 func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
-	bufferSize, numberInstants int) *simpleChannel {
+	bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
 		mode:           mode,
 		numberInstants: numberInstants,
+		maxRetryPolicy: maxRetryPolicy,
 		inputChannel:   make(chan []byte, bufferSize),
 		outputChannel:  make(chan channel.Message, bufferSize),
 	}
