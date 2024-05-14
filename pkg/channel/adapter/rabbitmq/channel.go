@@ -155,16 +155,10 @@ func (rc *rabbitmqChannel) start() {
 
 func (rc *rabbitmqChannel) startOutput() {
 	rc.wg.Add(1)
-	fmt.Println("startOutput: before waiting for connection")
 	WaitForConnection(rc.rabbitmq)
-	fmt.Printf("the address in start output %p \n", rc.rabbitmq)
-
-	fmt.Println("startOutput: after waiting for connection")
 
 	go func() {
 		defer rc.wg.Done()
-		fmt.Println("startOutput: in goroutine")
-
 		ch, err := rc.rabbitmq.connection.Channel()
 
 		failOnError(err, "Failed to open a channel")
@@ -195,8 +189,6 @@ func (rc *rabbitmqChannel) startOutput() {
 			return
 		}
 
-		fmt.Println("startOutput: before listening loop")
-
 		for {
 			if ch.IsClosed() {
 				rc.callMeNextTime(rc.startOutput)
@@ -226,13 +218,10 @@ func (rc *rabbitmqChannel) startOutput() {
 
 func (rc *rabbitmqChannel) startInput() {
 	rc.wg.Add(1)
-	fmt.Println("startInput: before waiting for connection")
 	WaitForConnection(rc.rabbitmq)
-	fmt.Println("startInput: after waiting for connection")
 
 	go func() {
 		defer rc.wg.Done()
-		fmt.Println("startInput: in goroutine")
 
 		ch, err := rc.rabbitmq.connection.Channel()
 		failOnError(err, "Failed to open a channel")
@@ -245,7 +234,6 @@ func (rc *rabbitmqChannel) startInput() {
 			err = ch.Close()
 			failOnError(err, "Failed to close channel")
 		}(ch)
-		fmt.Println("startInput: before listening loop")
 
 		for {
 			if ch.IsClosed() {

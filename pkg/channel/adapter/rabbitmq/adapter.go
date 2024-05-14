@@ -29,7 +29,6 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 		cond:       cond,
 		connection: &amqp.Connection{},
 	}
-	fmt.Printf("Main rabbitmq object address %p \n", &rabbitmq)
 	c := &ChannelAdapter{
 		done:                     done,
 		wg:                       wg,
@@ -65,7 +64,6 @@ func (ca *ChannelAdapter) connect() error {
 		return err
 	}
 	ca.rabbitmq.connection = conn
-	fmt.Println("Connected to rabbitmq server")
 	ca.rabbitmq.cond.Broadcast()
 
 	ca.wg.Add(1)
@@ -96,7 +94,6 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 		case <-ca.done:
 			return
 		case err := <-connectionClosedChannel:
-			fmt.Println("Connection closed")
 			fmt.Println(err)
 			for {
 				e := ca.connect()
@@ -152,15 +149,11 @@ func (ca *ChannelAdapter) GetMode(name string) (channel2.Mode, error) {
 }
 
 func WaitForConnection(rabbitmq *Rabbitmq) {
-	fmt.Printf("the address in wait for connection %p \n", rabbitmq)
-
 	rabbitmq.cond.L.Lock()
 	defer rabbitmq.cond.L.Unlock()
 	for rabbitmq.connection.IsClosed() {
 		fmt.Println(rabbitmq.connection.IsClosed())
-		fmt.Println("Before wait for connection")
 		rabbitmq.cond.Wait()
-		fmt.Println("After wait for connection")
 
 	}
 }
