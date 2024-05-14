@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/ormushq/ormus/destination/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/destination/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
 	"log"
 	"log/slog"
@@ -78,11 +81,26 @@ func main() {
 
 	channelSize := 100
 	reconnectSecond := 10
-	numberInstant := 10
+	numberInstant := 5
 	maxRetryPolicy := 5
 	taskConsumerConf := config.C().Destination.RabbitMQTaskManagerConnection
-	webhookTaskConsumer := rabbitmqchanneltaskmanager.NewTaskConsumer(taskConsumerConf, "webhook_tasks_queue",
-		channelSize, reconnectSecond, numberInstant, maxRetryPolicy)
+	queueName := "webhook_tasks"
+	outputChannelAdapter := rbbitmqchannel.New(done, &wg, dconfig.RabbitMQConsumerConnection{
+		User:            taskConsumerConf.User,
+		Password:        taskConsumerConf.Password,
+		Host:            taskConsumerConf.Host,
+		Port:            taskConsumerConf.Port,
+		Vhost:           "/",
+		ReconnectSecond: reconnectSecond,
+	})
+
+	outputChannelAdapter.NewChannel(queueName, channel.OutputOnly, channelSize, numberInstant, maxRetryPolicy)
+
+	outputChannel, err := outputChannelAdapter.GetOutputChannel(queueName)
+	if err != nil {
+		log.Panicf("Error on get output channel: %s", err)
+	}
+	webhookTaskConsumer := rabbitmqchanneltaskmanager.NewTaskConsumer(outputChannel, channelSize)
 
 	processedEvents, err := webhookTaskConsumer.Consume(done, &wg)
 	if err != nil {

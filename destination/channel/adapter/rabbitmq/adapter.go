@@ -140,6 +140,7 @@ func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel.Message,
 
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
+
 func (ca *ChannelAdapter) GetMode(name string) (channel.Mode, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetMode(), nil

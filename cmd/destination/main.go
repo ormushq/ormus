@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/ormushq/ormus/destination/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/destination/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/destination/dconfig"
 	"log"
 	"log/slog"
 	"os"
@@ -71,9 +74,31 @@ func main() {
 	// will be published to its corresponding task publisher.
 
 	reconnectSecond := 5
+	channelSize := 100
+	numberInstant := 5
+	maxRetryPolicy := 5
+
 	taskPublisherCnf := config.C().Destination.RabbitMQTaskManagerConnection
-	webhookTaskPublisher := rabbitmqchanneltaskmanager.NewTaskPublisher(done, &wg,
-		taskPublisherCnf, "webhook_tasks_queue", reconnectSecond)
+
+	inputChannelAdapter := rbbitmqchannel.New(done, &wg, dconfig.RabbitMQConsumerConnection{
+		User:            taskPublisherCnf.User,
+		Password:        taskPublisherCnf.Password,
+		Host:            taskPublisherCnf.Host,
+		Port:            taskPublisherCnf.Port,
+		Vhost:           "/",
+		ReconnectSecond: reconnectSecond,
+	})
+
+	webHookQueueName := "webhook_tasks"
+
+	inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
+
+	inputChannel, err := inputChannelAdapter.GetInputChannel(webHookQueueName)
+	if err != nil {
+		log.Fatalf("Couldn't get input channel for %s: %s", webHookQueueName, err)
+	}
+
+	webhookTaskPublisher := rabbitmqchanneltaskmanager.NewTaskPublisher(inputChannel)
 
 	taskPublishers := make(dtcoordinator.TaskPublisherMap)
 	taskPublishers[entity.WebhookDestinationType] = webhookTaskPublisher
