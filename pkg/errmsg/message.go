@@ -11,4 +11,5 @@ const (
 	ErrorMsgInvalidInput  = "invalid input"
 	ErrBadRequest         = "Bad request"
 	ErrUserNotFound       = "user not found"
+	ErrChannelNotFound    = "channel not found: %v"
 )
