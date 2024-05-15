@@ -15,7 +15,7 @@ const (
 
 type RichError struct {
 	operation string
-	warpError error
+	wrapError error
 	message   string
 	kind      Kind
 	meta      map[string]interface{}
@@ -25,20 +25,14 @@ func New(operation string) RichError {
 	return RichError{operation: operation}
 }
 
-func (r RichError) WhitWarpError(err error) RichError {
-	r.warpError = err
-
-	return r
-}
-
 func (r RichError) WhitMessage(message string) RichError {
 	r.message = message
 
 	return r
 }
 
-func (r RichError) WithWrappedError(kind Kind) RichError {
-	r.kind = kind
+func (r RichError) WithWrappedError(err error) RichError {
+	r.wrapError = err
 
 	return r
 }
@@ -68,7 +62,7 @@ func (r RichError) Kind() Kind {
 
 	var re RichError
 
-	ok := errors.As(r.warpError, &re)
+	ok := errors.As(r.wrapError, &re)
 	if !ok {
 		return 0
 	}
@@ -83,9 +77,9 @@ func (r RichError) Message() string {
 
 	var re RichError
 
-	ok := errors.As(r.warpError, &re)
+	ok := errors.As(r.wrapError, &re)
 	if !ok {
-		return r.warpError.Error()
+		return r.wrapError.Error()
 	}
 
 	return re.Message()

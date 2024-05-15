@@ -40,7 +40,7 @@ func (v Validator) ValidateCreateSourceForm(req param.AddSourceRequest) *Validat
 		return &ValidatorError{
 			Fields: fieldErr,
 			Err: richerror.New("sourcevalidator.ValidateCreateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -77,7 +77,7 @@ func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *Vali
 		return &ValidatorError{
 			Fields: fieldErr,
 			Err: richerror.New("sourcevalidator.ValidateUpdateSourceForm").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -105,7 +105,7 @@ func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
 		return &ValidatorError{
 			Fields: fieldErr,
 			Err: richerror.New("sourcevalidator.ValidateIDToDelete").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": id}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": id}).WithWrappedError(err),
 		}
 	}
 
