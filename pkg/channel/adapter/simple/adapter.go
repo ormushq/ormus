@@ -2,7 +2,7 @@ package simple
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/destination/channel"
+	channel2 "github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"sync"
 )
@@ -21,9 +21,10 @@ func New(done <-chan bool, wg *sync.WaitGroup) *ChannelAdapter {
 	}
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants int) {
-	ca.channels[name] = newChannel(ca.done, ca.wg, mode, bufferSize, numberInstants)
+func (ca *ChannelAdapter) NewChannel(name string, mode channel2.Mode, bufferSize, numberInstants, maxRetryPolicy int) {
+	ca.channels[name] = newChannel(ca.done, ca.wg, mode, bufferSize, numberInstants, maxRetryPolicy)
 }
+
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetInputChannel(), nil
@@ -31,14 +32,16 @@ func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
-func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel.Message, error) {
+
+func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel2.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetOutputChannel(), nil
 	}
 
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
-func (ca *ChannelAdapter) GetMode(name string) (channel.Mode, error) {
+
+func (ca *ChannelAdapter) GetMode(name string) (channel2.Mode, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetMode(), nil
 	}

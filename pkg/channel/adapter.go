@@ -8,6 +8,6 @@ type Adapter interface {
 }
 
 type Message struct {
-	Ack  func(multiple bool) error
+	Ack  func() error
 	Body []byte
 }
