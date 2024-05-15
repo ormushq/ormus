@@ -71,7 +71,6 @@ func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan 
 
 func (c *Converter) ConvertToOutputTaskChannel(originalChannel <-chan []byte, bufferSize int) <-chan taskentity.Task {
 	if outputChannel, ok := c.taskOutputChannels[originalChannel]; ok {
-
 		return outputChannel
 	}
 	outputChannel := make(chan taskentity.Task, bufferSize)
