@@ -2,7 +2,7 @@ package simple
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/destination/channel"
+	channel2 "github.com/ormushq/ormus/pkg/channel"
 	"sync"
 	"time"
 )
@@ -10,40 +10,42 @@ import (
 type simpleChannel struct {
 	wg             *sync.WaitGroup
 	done           <-chan bool
-	mode           channel.Mode
+	mode           channel2.Mode
 	inputChannel   chan []byte
-	outputChannel  chan channel.Message
+	outputChannel  chan channel2.Message
 	numberInstants int
+	maxRetryPolicy int
 }
 
 const timeForCallAgainDuration = 10
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
-	bufferSize, numberInstants int) *simpleChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode, bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
 		mode:           mode,
 		numberInstants: numberInstants,
+		maxRetryPolicy: maxRetryPolicy,
 		inputChannel:   make(chan []byte, bufferSize),
-		outputChannel:  make(chan channel.Message, bufferSize),
+		outputChannel:  make(chan channel2.Message, bufferSize),
 	}
 	sc.startConsume()
 
 	return sc
 }
-func (sc simpleChannel) GetMode() channel.Mode {
 
+func (sc simpleChannel) GetMode() channel2.Mode {
 	return sc.mode
 }
-func (sc simpleChannel) GetInputChannel() chan<- []byte {
 
+func (sc simpleChannel) GetInputChannel() chan<- []byte {
 	return sc.inputChannel
 }
-func (sc simpleChannel) GetOutputChannel() <-chan channel.Message {
 
+func (sc simpleChannel) GetOutputChannel() <-chan channel2.Message {
 	return sc.outputChannel
 }
+
 func (sc simpleChannel) startConsume() {
 	for i := 0; i < sc.numberInstants; i++ {
 		sc.wg.Add(1)
@@ -61,7 +63,6 @@ func (sc simpleChannel) startConsume() {
 			}
 		}()
 	}
-
 }
 
 func (sc simpleChannel) startDelivery(msg []byte) {
@@ -79,13 +80,14 @@ func (sc simpleChannel) startDelivery(msg []byte) {
 		}
 	}()
 }
+
 func (sc simpleChannel) publishMessage(msg []byte, c chan<- bool) {
 	sc.wg.Add(1)
 	go func(msg []byte, c chan<- bool) {
 		defer sc.wg.Done()
-		sc.outputChannel <- channel.Message{
+		sc.outputChannel <- channel2.Message{
 			Body: msg,
-			Ack: func(multiple bool) error {
+			Ack: func() error {
 				c <- true
 
 				return nil
