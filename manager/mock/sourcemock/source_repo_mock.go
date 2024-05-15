@@ -57,7 +57,7 @@ func NewMockRepository(hasErr bool) *MockRepo {
 
 func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse, error) {
 	if m.hasErr {
-		return nil, richerror.New("MockRepo.InsertSource").WhitWarpError(fmt.Errorf(RepoErr))
+		return nil, richerror.New("MockRepo.InsertSource").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	m.sources = append(m.sources, source)
@@ -78,7 +78,7 @@ func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse
 
 func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.UpdateSourceResponse, error) {
 	if m.hasErr {
-		return nil, richerror.New("MockRepo.UpdateSource").WhitWarpError(fmt.Errorf(RepoErr))
+		return nil, richerror.New("MockRepo.UpdateSource").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	for i, s := range m.sources {
@@ -105,7 +105,7 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.Update
 
 func (m *MockRepo) DeleteSource(id, _ string) error {
 	if m.hasErr {
-		return richerror.New("MockRepo.DeleteSource").WhitWarpError(fmt.Errorf(RepoErr))
+		return richerror.New("MockRepo.DeleteSource").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	for i, s := range m.sources {
@@ -121,7 +121,7 @@ func (m *MockRepo) DeleteSource(id, _ string) error {
 
 func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error) {
 	if m.hasErr {
-		return nil, richerror.New("MockRepo.GetUserSourceById").WhitWarpError(fmt.Errorf(RepoErr))
+		return nil, richerror.New("MockRepo.GetUserSourceById").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	for _, s := range m.sources {
@@ -135,7 +135,7 @@ func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error)
 
 func (m *MockRepo) IsSourceAlreadyCreatedByName(name string) (bool, error) {
 	if m.hasErr {
-		return false, richerror.New("MockRepo.IsSourceAlreadyCreatedByName").WhitWarpError(fmt.Errorf(RepoErr))
+		return false, richerror.New("MockRepo.IsSourceAlreadyCreatedByName").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	for _, s := range m.sources {

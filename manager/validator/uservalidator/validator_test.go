@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ormushq/ormus/manager/mock"
+	"github.com/ormushq/ormus/manager/mock/usermock"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
