@@ -5,6 +5,7 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"log"
 	"sync"
 	"time"
 )
