@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/ormushq/ormus/destination/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/destination/channel/adapter/rabbitmq"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"log"
 	"log/slog"
 	"os"

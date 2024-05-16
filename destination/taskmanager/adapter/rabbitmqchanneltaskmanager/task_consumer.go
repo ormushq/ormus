@@ -2,7 +2,7 @@ package rabbitmqchanneltaskmanager
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/destination/channel"
+	"github.com/ormushq/ormus/pkg/channel"
 	"log"
 	"sync"
 
@@ -30,7 +30,7 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 		for {
 			select {
 			case msg := <-c.messageChannel:
-				aErr := msg.Ack(false)
+				aErr := msg.Ack()
 				if aErr != nil {
 					printWorkersError(aErr, "Failed to acknowledge message")
 

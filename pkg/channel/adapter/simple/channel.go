@@ -2,7 +2,7 @@ package simple
 
 import (
 	"fmt"
-	channel2 "github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel"
 	"sync"
 	"time"
 )
@@ -10,16 +10,16 @@ import (
 type simpleChannel struct {
 	wg             *sync.WaitGroup
 	done           <-chan bool
-	mode           channel2.Mode
+	mode           channel.Mode
 	inputChannel   chan []byte
-	outputChannel  chan channel2.Message
+	outputChannel  chan channel.Message
 	numberInstants int
 	maxRetryPolicy int
 }
 
 const timeForCallAgainDuration = 10
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode, bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
@@ -27,14 +27,14 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel2.Mode, buffer
 		numberInstants: numberInstants,
 		maxRetryPolicy: maxRetryPolicy,
 		inputChannel:   make(chan []byte, bufferSize),
-		outputChannel:  make(chan channel2.Message, bufferSize),
+		outputChannel:  make(chan channel.Message, bufferSize),
 	}
 	sc.startConsume()
 
 	return sc
 }
 
-func (sc simpleChannel) GetMode() channel2.Mode {
+func (sc simpleChannel) GetMode() channel.Mode {
 	return sc.mode
 }
 
@@ -42,7 +42,7 @@ func (sc simpleChannel) GetInputChannel() chan<- []byte {
 	return sc.inputChannel
 }
 
-func (sc simpleChannel) GetOutputChannel() <-chan channel2.Message {
+func (sc simpleChannel) GetOutputChannel() <-chan channel.Message {
 	return sc.outputChannel
 }
 
@@ -85,7 +85,7 @@ func (sc simpleChannel) publishMessage(msg []byte, c chan<- bool) {
 	sc.wg.Add(1)
 	go func(msg []byte, c chan<- bool) {
 		defer sc.wg.Done()
-		sc.outputChannel <- channel2.Message{
+		sc.outputChannel <- channel.Message{
 			Body: msg,
 			Ack: func() error {
 				c <- true
