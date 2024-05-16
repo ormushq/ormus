@@ -19,7 +19,8 @@ type simpleChannel struct {
 
 const timeForCallAgainDuration = 10
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
+	bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
