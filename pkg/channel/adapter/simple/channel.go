@@ -1,7 +1,6 @@
 package simple
 
 import (
-	"fmt"
 	channel2 "github.com/ormushq/ormus/pkg/channel"
 	"sync"
 	"time"
@@ -57,7 +56,6 @@ func (sc simpleChannel) startConsume() {
 
 					return
 				case msg := <-sc.inputChannel:
-					fmt.Println("New message received in simple/adapter.go ca.inputChannel", msg)
 					sc.startDelivery(msg)
 				}
 			}
