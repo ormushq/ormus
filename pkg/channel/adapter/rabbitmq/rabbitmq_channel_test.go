@@ -1,12 +1,7 @@
 package rbbitmqchannel
 
 import (
-	"context"
 	"encoding/json"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"github.com/docker/go-connections/nat"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
 	"sync"
@@ -27,51 +22,7 @@ type message struct {
 	MessageId int `json:"message_id"`
 }
 
-func setup(t testing.TB) {
-	cli, err := client.NewClientWithOpts()
-	if err != nil {
-		panic(err)
-	}
-
-	ctx := context.Background()
-	resp, err := cli.ContainerCreate(ctx,
-		&container.Config{
-			Image:        "rabbitmq:3-management-alpine",
-			ExposedPorts: nat.PortSet{"5672": struct{}{}, "15672": struct{}{}},
-		},
-		&container.HostConfig{
-			PortBindings: map[nat.Port][]nat.PortBinding{
-				nat.Port("5672"):  {{HostIP: "127.0.0.1", HostPort: "5672"}},
-				nat.Port("15672"): {{HostIP: "127.0.0.1", HostPort: "15672"}},
-			},
-		},
-		nil,
-		nil, "rabbitmq-test")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		panic(err)
-	}
-	t.Cleanup(func() {
-		t.Log("Under cleanup")
-		timeout := time.Second
-		err = cli.ContainerStop(ctx, resp.ID, &timeout)
-		if err != nil {
-			panic(err)
-		}
-
-		err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
-		if err != nil {
-			panic(err)
-		}
-	})
-	time.Sleep(time.Second * 30)
-}
-
 func TestRabbitmqChannel(t *testing.T) {
-	setup(t)
 	cases := []testCase{
 		{
 			name:           "small test",
