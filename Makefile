@@ -10,7 +10,10 @@ dockerUp:
 	sudo docker-compose up -d
 
 test:
-	go test -v ./...
+	go test ./...
+
+dockerDown:
+	sudo docker-compose down
 
 dockerDown:
 	sudo docker-compose down

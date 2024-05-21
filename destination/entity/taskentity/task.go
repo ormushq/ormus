@@ -65,6 +65,18 @@ func (t Task) DestinationSlug() entity.DestinationType {
 	return t.ProcessedEvent.Integration.Metadata.Slug
 }
 
+func UnmarshalBytesToTask(body []byte) (Task, error) {
+	var t Task
+	fmt.Println(string(body))
+	if err := json.Unmarshal(body, &t); err != nil {
+		fmt.Println("Error on unMarshaling task :", err)
+
+		return Task{}, err
+	}
+
+	return t, nil
+}
+
 func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	var pe event.ProcessedEvent
 	if err := json.Unmarshal(body, &pe); err != nil {

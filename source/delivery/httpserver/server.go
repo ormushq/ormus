@@ -30,7 +30,7 @@ func New(c source.Config, handlers []Handler) Server {
 	}
 }
 
-// Run server connection.
+// Serve Start server connection.
 func (s Server) Serve() {
 	for _, h := range s.handlers {
 		h.SetRoutes(s.Router)

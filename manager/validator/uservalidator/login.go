@@ -6,18 +6,20 @@ import (
 	"unicode"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/regex"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
 // ValidateLoginRequest is used to validate login request.
-func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError {
+func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error {
 	minPasswordLength := 8
 	maxPasswordLength := 32
 
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(emailRegex)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserRegistered)),
+		validation.Field(&req.Email, validation.Required, validation.Match(regexp.MustCompile(regex.Email)).Error(errmsg.ErrEmailIsNotValid), validation.By(v.isUserRegistered)),
 		validation.Field(&req.Password, validation.Required, validation.Length(minPasswordLength, maxPasswordLength), validation.By(v.isPasswordValid))); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -33,10 +35,10 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *ValidatorError 
 			}
 		}
 
-		return &ValidatorError{
+		return &validator.Error{
 			Fields: fieldErr,
 			Err: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": req}).WhitWarpError(err),
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
@@ -51,7 +53,7 @@ func (v Validator) isUserRegistered(value interface{}) error {
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isUserRegistered").WhitWarpError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isUserRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if !exists {
