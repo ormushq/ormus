@@ -30,12 +30,12 @@ func main() {
 	// Get a ScyllaDB session using the created connection
 	session, err := scyllainitialize.GetConnection(conn)
 	if err != nil {
-		log.Fatal("Failed to get ScyllaDB session:", err)
+		log.Println("Failed to get ScyllaDB session:", err)
 	}
 	defer session.Close()
 
 	err = scyllainitialize.RunMigrations(conn, "./source/repository/scylladb/")
 	if err != nil {
-		log.Fatal("Failed to run migrations:", err)
+		log.Println("Failed to run migrations:", err)
 	}
 }
