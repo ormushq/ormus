@@ -170,10 +170,10 @@ func (rc *rabbitmqChannel) startOutput() {
 	go func() {
 		defer rc.wg.Done()
 		ch, err := rc.rabbitmq.connection.Channel()
-
 		if err != nil {
 			logger.L().Error(err.Error(), err)
 			rc.callMeNextTime(rc.startOutput)
+
 			return
 		}
 
@@ -196,6 +196,7 @@ func (rc *rabbitmqChannel) startOutput() {
 		if errConsume != nil {
 			logger.L().Error(errConsume.Error(), err)
 			rc.callMeNextTime(rc.startOutput)
+
 			return
 		}
 
@@ -203,6 +204,7 @@ func (rc *rabbitmqChannel) startOutput() {
 			if ch.IsClosed() {
 				logger.L().Debug("channel is closed rerun startOutput function")
 				rc.callMeNextTime(rc.startOutput)
+
 				return
 			}
 			select {
@@ -236,6 +238,7 @@ func (rc *rabbitmqChannel) startInput() {
 		if err != nil {
 			logger.L().Error(err.Error(), err)
 			rc.callMeNextTime(rc.startInput)
+
 			return
 		}
 
@@ -250,6 +253,7 @@ func (rc *rabbitmqChannel) startInput() {
 			if ch.IsClosed() {
 				logger.L().Debug("channel is closed rerun startInput function")
 				rc.callMeNextTime(rc.startInput)
+
 				return
 			}
 			select {
@@ -266,6 +270,7 @@ func (rc *rabbitmqChannel) startInput() {
 func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries int) {
 	if tries > rc.maxRetryPolicy {
 		logger.L().Error(fmt.Sprintf("job failed after %d tries", tries))
+
 		return
 	}
 	rc.wg.Add(1)

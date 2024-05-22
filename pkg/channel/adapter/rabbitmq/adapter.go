@@ -45,9 +45,8 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 
 		if err == nil {
 			break
-		} else {
-			logger.L().Error("rabbitmq connection failed", err)
 		}
+		logger.L().Error("rabbitmq connection failed", err)
 	}
 
 	return c
@@ -93,9 +92,9 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 
 					if e == nil {
 						break
-					} else {
-						logger.L().Error("Connection failed to rabbitmq", e)
 					}
+					logger.L().Error("Connection failed to rabbitmq", e)
+
 				}
 
 				return
@@ -105,7 +104,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 }
 
 func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
-	if ch, err := newChannel(
+	ch, err := newChannel(
 		ca.done,
 		ca.wg,
 		rabbitmqChannelParams{
@@ -116,12 +115,13 @@ func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize,
 			bufferSize:     bufferSize,
 			numberInstants: numberInstants,
 			maxRetryPolicy: maxRetryPolicy,
-		}); err != nil {
+		})
+	if err != nil {
 		return err
-	} else {
-		ca.channels[name] = ch
-		return nil
 	}
+	ca.channels[name] = ch
+
+	return nil
 }
 
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
