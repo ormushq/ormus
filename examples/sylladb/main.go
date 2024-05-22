@@ -9,10 +9,9 @@ import (
 )
 
 func main() {
-	// Set up ScyllaDB configuration
+	fmt.Println("Hi")
 	cfg := config.C()
 	fmt.Println(cfg.Scylladb)
-
 	// Create a new ScyllaDB session
 	session, err := scylladb.New(cfg.Scylladb)
 	if err != nil {
