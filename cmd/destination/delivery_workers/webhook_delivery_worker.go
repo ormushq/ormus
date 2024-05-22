@@ -94,8 +94,11 @@ func main() {
 		ReconnectSecond: reconnectSecond,
 	})
 
-	outputChannelAdapter.NewChannel(queueName, channel.OutputOnly, channelSize, numberInstant, maxRetryPolicy)
-
+	errNCA := outputChannelAdapter.NewChannel(queueName, channel.OutputOnly, channelSize, numberInstant, maxRetryPolicy)
+	if errNCA != nil {
+		logger.L().Error(errNCA.Error(), err)
+		os.Exit(1)
+	}
 	outputChannel, err := outputChannelAdapter.GetOutputChannel(queueName)
 	if err != nil {
 		log.Panicf("Error on get output channel: %s", err)

@@ -22,8 +22,9 @@ func New(done <-chan bool, wg *sync.WaitGroup) *ChannelAdapter {
 	}
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) {
+func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
 	ca.channels[name] = newChannel(ca.done, ca.wg, mode, bufferSize, numberInstants, maxRetryPolicy)
+	return nil
 }
 
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {

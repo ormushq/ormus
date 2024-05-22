@@ -91,7 +91,11 @@ func main() {
 
 	webHookQueueName := "webhook_tasks"
 
-	inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
+	errNCA := inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
+	if errNCA != nil {
+		logger.L().Error(errNCA.Error(), err)
+		os.Exit(1)
+	}
 
 	inputChannel, err := inputChannelAdapter.GetInputChannel(webHookQueueName)
 	if err != nil {
