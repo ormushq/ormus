@@ -12,11 +12,6 @@ services:
       - "traefik.http.services.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.loadbalancer.server.port=15672"
 
 
-#Docker Networks
-networks:
-  traefik_default:
-    external: true
-
 #Volumes
 volumes:
   rabbitmq:
