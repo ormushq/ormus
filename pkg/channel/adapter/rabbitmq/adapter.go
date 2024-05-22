@@ -2,14 +2,13 @@ package rbbitmqchannel
 
 import (
 	"fmt"
-	"sync"
-	"time"
-
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"sync"
+	"time"
 )
 
 type ChannelAdapter struct {
@@ -46,8 +45,9 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 
 		if err == nil {
 			break
+		} else {
+			logger.L().Error("rabbitmq connection failed", err)
 		}
-		logger.L().Error("rabbitmq connection failed", "error", err.Error())
 	}
 
 	return c
@@ -56,8 +56,6 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 func (ca *ChannelAdapter) connect() error {
 	ca.rabbitmq.cond.L.Lock()
 	defer ca.rabbitmq.cond.L.Unlock()
-	close(ca.rabbitmqConnectionClosed)
-	ca.rabbitmqConnectionClosed = make(chan bool)
 
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
 		ca.config.User, ca.config.Password, ca.config.Host,
@@ -87,16 +85,17 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 			case <-ca.done:
 				return
 			case err := <-connectionClosedChannel:
-				logger.L().Error("connection closed", "error", err.Error())
+				fmt.Println("Connection closed")
+				fmt.Println(err)
 				for {
 					e := ca.connect()
 					time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
 
 					if e == nil {
 						break
+					} else {
+						logger.L().Error("Connection failed to rabbitmq", e)
 					}
-					logger.L().Error("Connection failed to rabbitmq", "error", e.Error())
-
 				}
 
 				return
@@ -106,7 +105,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 }
 
 func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
-	ch, err := newChannel(
+	if ch, err := newChannel(
 		ca.done,
 		ca.wg,
 		rabbitmqChannelParams{
@@ -117,13 +116,12 @@ func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize,
 			bufferSize:     bufferSize,
 			numberInstants: numberInstants,
 			maxRetryPolicy: maxRetryPolicy,
-		})
-	if err != nil {
+		}); err != nil {
 		return err
+	} else {
+		ca.channels[name] = ch
+		return nil
 	}
-	ca.channels[name] = ch
-
-	return nil
 }
 
 func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {

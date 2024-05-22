@@ -2,10 +2,9 @@ package simple
 
 import (
 	"fmt"
-	"sync"
-
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
+	"sync"
 )
 
 type ChannelAdapter struct {
@@ -24,7 +23,6 @@ func New(done <-chan bool, wg *sync.WaitGroup) *ChannelAdapter {
 
 func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
 	ca.channels[name] = newChannel(ca.done, ca.wg, mode, bufferSize, numberInstants, maxRetryPolicy)
-
 	return nil
 }
 
