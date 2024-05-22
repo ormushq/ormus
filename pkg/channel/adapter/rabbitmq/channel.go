@@ -37,16 +37,22 @@ const (
 	retriesToTimeRatio       = 2
 )
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) *rabbitmqChannel {
+func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) (*rabbitmqChannel, error) {
 	conn := rabbitmqChannelParams.rabbitmq.connection
 	WaitForConnection(rabbitmqChannelParams.rabbitmq)
-	ch := openChannel(conn)
-	defer func(ch *amqp.Channel) {
-		err := ch.Close()
-		failOnError(err, "failed to close a channel")
-	}(ch)
+	ch, errChO := conn.Channel()
+	if errChO != nil {
+		return nil, errChO
+	}
 
-	err := ch.ExchangeDeclare(
+	defer func() {
+		err := ch.Close()
+		if err != nil {
+			logger.L().Error("failed to close rabbitmq channel", err)
+		}
+	}()
+
+	errDE := ch.ExchangeDeclare(
 		rabbitmqChannelParams.exchange, // name
 		"topic",                        // type
 		true,                           // durable
@@ -55,9 +61,12 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		false,                          // no-wait
 		nil,                            // arguments
 	)
-	if err != nil {
-		ch := openChannel(conn)
-		err = ch.ExchangeDeclarePassive(
+	if errDE != nil {
+		ch, errChO = conn.Channel()
+		if errChO != nil {
+			return nil, errChO
+		}
+		errDE = ch.ExchangeDeclarePassive(
 			rabbitmqChannelParams.exchange, // name
 			"topic",                        // type
 			true,                           // durable
@@ -66,9 +75,11 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 			false,                          // no-wait
 			nil,                            // arguments
 		)
-		failOnError(err, "Failed to declare an exchange")
+		if errDE != nil {
+			return nil, errDE
+		}
 	}
-	_, errQueueDeclare := ch.QueueDeclare(
+	_, errQD := ch.QueueDeclare(
 		rabbitmqChannelParams.queue, // name
 		true,                        // durable
 		false,                       // delete when unused
@@ -77,9 +88,12 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		nil,                         // arguments
 	)
 
-	if errQueueDeclare != nil {
-		ch := openChannel(conn)
-		_, errQueueDeclare := ch.QueueDeclarePassive(
+	if errQD != nil {
+		ch, errChO = conn.Channel()
+		if errChO != nil {
+			return nil, errChO
+		}
+		_, errQD = ch.QueueDeclarePassive(
 			rabbitmqChannelParams.queue, // name
 			true,                        // durable
 			false,                       // delete when unused
@@ -87,16 +101,20 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 			false,                       // no-wait
 			nil,                         // arguments
 		)
-		failOnError(errQueueDeclare, "Failed to declare a queue")
+		if errQD != nil {
+			return nil, errQD
+		}
 	}
 
-	errQueueBind := ch.QueueBind(
+	errQB := ch.QueueBind(
 		rabbitmqChannelParams.queue,    // queue name
 		"",                             // routing key
 		rabbitmqChannelParams.exchange, // exchange
 		false,
 		nil)
-	failOnError(errQueueBind, "Failed to bind a queue")
+	if errQB != nil {
+		return nil, errQB
+	}
 
 	rc := &rabbitmqChannel{
 		done:           done,
@@ -112,14 +130,7 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 	}
 	rc.start()
 
-	return rc
-}
-
-func openChannel(conn *amqp.Connection) *amqp.Channel {
-	ch, err := conn.Channel()
-	failOnError(err, "failed to open a channel")
-
-	return ch
+	return rc, nil
 }
 
 func (rc *rabbitmqChannel) GetMode() channel.Mode {
@@ -156,21 +167,21 @@ func (rc *rabbitmqChannel) start() {
 func (rc *rabbitmqChannel) startOutput() {
 	rc.wg.Add(1)
 	WaitForConnection(rc.rabbitmq)
-
 	go func() {
 		defer rc.wg.Done()
 		ch, err := rc.rabbitmq.connection.Channel()
 
-		failOnError(err, "Failed to open a channel")
 		if err != nil {
+			logger.L().Error(err.Error(), err)
 			rc.callMeNextTime(rc.startOutput)
-
 			return
 		}
 
 		defer func(ch *amqp.Channel) {
 			err = ch.Close()
-			failOnError(err, "Failed to close channel")
+			if err != nil {
+				logger.L().Error(err.Error(), err)
+			}
 		}(ch)
 
 		msgs, errConsume := ch.Consume(
@@ -182,17 +193,16 @@ func (rc *rabbitmqChannel) startOutput() {
 			false,    // no-wait
 			nil,      // arguments
 		)
-		failOnError(errConsume, "failed to consume")
-		if err != nil {
+		if errConsume != nil {
+			logger.L().Error(errConsume.Error(), err)
 			rc.callMeNextTime(rc.startOutput)
-
 			return
 		}
 
 		for {
 			if ch.IsClosed() {
+				logger.L().Debug("channel is closed rerun startOutput function")
 				rc.callMeNextTime(rc.startOutput)
-
 				return
 			}
 			select {
@@ -222,23 +232,24 @@ func (rc *rabbitmqChannel) startInput() {
 
 	go func() {
 		defer rc.wg.Done()
-
 		ch, err := rc.rabbitmq.connection.Channel()
-		failOnError(err, "Failed to open a channel")
 		if err != nil {
+			logger.L().Error(err.Error(), err)
 			rc.callMeNextTime(rc.startInput)
-
 			return
 		}
-		defer func(ch *amqp.Channel) {
+
+		defer func() {
 			err = ch.Close()
-			failOnError(err, "Failed to close channel")
-		}(ch)
+			if err != nil {
+				logger.L().Error(err.Error(), err)
+			}
+		}()
 
 		for {
 			if ch.IsClosed() {
+				logger.L().Debug("channel is closed rerun startInput function")
 				rc.callMeNextTime(rc.startInput)
-
 				return
 			}
 			select {
@@ -255,7 +266,6 @@ func (rc *rabbitmqChannel) startInput() {
 func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries int) {
 	if tries > rc.maxRetryPolicy {
 		logger.L().Error(fmt.Sprintf("job failed after %d tries", tries))
-
 		return
 	}
 	rc.wg.Add(1)
@@ -271,8 +281,9 @@ func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries
 				ContentType: "text/plain",
 				Body:        msg,
 			})
-		failOnError(errPWC, "failed on ACK")
 		if errPWC != nil {
+			logger.L().Error("error on publish to rabbitmq", errPWC)
+
 			rc.publishToRabbitmq(ch, msg, tries+1)
 		}
 	}()
@@ -285,11 +296,4 @@ func (rc *rabbitmqChannel) callMeNextTime(f func()) {
 		defer rc.wg.Done()
 		f()
 	}()
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		logger.L().Error(err.Error())
-		fmt.Println(err, msg)
-	}
 }
