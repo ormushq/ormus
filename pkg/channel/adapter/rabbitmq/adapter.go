@@ -3,7 +3,7 @@ package rbbitmqchannel
 import (
 	"fmt"
 	"github.com/ormushq/ormus/destination/dconfig"
-	channel2 "github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
@@ -112,7 +112,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 	}
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel2.Mode, bufferSize, numberInstants, maxRetryPolicy int) {
+func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) {
 	ca.channels[name] = newChannel(
 		ca.done,
 		ca.wg,
@@ -135,7 +135,7 @@ func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
 
-func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel2.Message, error) {
+func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetOutputChannel(), nil
 	}
@@ -143,7 +143,7 @@ func (ca *ChannelAdapter) GetOutputChannel(name string) (<-chan channel2.Message
 	return nil, fmt.Errorf(errmsg.ErrChannelNotFound, name)
 }
 
-func (ca *ChannelAdapter) GetMode(name string) (channel2.Mode, error) {
+func (ca *ChannelAdapter) GetMode(name string) (channel.Mode, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetMode(), nil
 	}

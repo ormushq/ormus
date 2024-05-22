@@ -1,6 +1,10 @@
 package main
 
 import (
+	"github.com/ormushq/ormus/destination/dconfig"
+	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"log"
 	"log/slog"
 	"os"
@@ -13,7 +17,6 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/taskdelivery"
 	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
-	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqtaskmanager"
 	"github.com/ormushq/ormus/destination/taskservice"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
@@ -76,8 +79,28 @@ func main() {
 
 	//----------------- Consume ProcessEvents -----------------//
 
+	channelSize := 100
+	reconnectSecond := 10
+	numberInstant := 5
+	maxRetryPolicy := 5
 	taskConsumerConf := config.C().Destination.RabbitMQTaskManagerConnection
-	webhookTaskConsumer := rabbitmqtaskmanager.NewTaskConsumer(taskConsumerConf, "webhook_tasks_queue")
+	queueName := "webhook_tasks"
+	outputChannelAdapter := rbbitmqchannel.New(done, &wg, dconfig.RabbitMQConsumerConnection{
+		User:            taskConsumerConf.User,
+		Password:        taskConsumerConf.Password,
+		Host:            taskConsumerConf.Host,
+		Port:            taskConsumerConf.Port,
+		Vhost:           "/",
+		ReconnectSecond: reconnectSecond,
+	})
+
+	outputChannelAdapter.NewChannel(queueName, channel.OutputOnly, channelSize, numberInstant, maxRetryPolicy)
+
+	outputChannel, err := outputChannelAdapter.GetOutputChannel(queueName)
+	if err != nil {
+		log.Panicf("Error on get output channel: %s", err)
+	}
+	webhookTaskConsumer := rabbitmqchanneltaskmanager.NewTaskConsumer(outputChannel, channelSize)
 
 	processedEvents, err := webhookTaskConsumer.Consume(done, &wg)
 	if err != nil {
