@@ -9,6 +9,19 @@ import (
 	"github.com/ormushq/ormus/manager/service/authservice"
 )
 
+const (
+	TimeoutCluster = 5 * time.Second
+
+	// NumRetries represents the number of retries in the ExponentialBackoffRetryPolicy.
+	NumRetries = 5
+
+	// MinRetryDelay represents the minimum delay duration in the ExponentialBackoffRetryPolicy.
+	MinRetryDelay = time.Second
+
+	// MaxRetryDelay represents the maximum delay duration in the ExponentialBackoffRetryPolicy.
+	MaxRetryDelay = 10 * time.Second
+)
+
 func Default() Config {
 	var accessExpirationTimeInDay time.Duration = 7
 	var refreshExpirationTimeInDay time.Duration = 28
@@ -18,10 +31,10 @@ func Default() Config {
 			Hosts:          []string{"127.0.0.1:9042"},
 			Consistency:    gocql.One,
 			Keyspace:       "default",
-			TimeoutCluster: 5 * time.Second,
-			NumRetries:     5,
-			MinRetryDelay:  time.Second,
-			MaxRetryDelay:  10 * time.Second,
+			TimeoutCluster: TimeoutCluster,
+			NumRetries:     NumRetries,
+			MinRetryDelay:  MinRetryDelay,
+			MaxRetryDelay:  MaxRetryDelay,
 		},
 		Manager: manager.Config{
 			JWTConfig: authservice.JwtConfig{

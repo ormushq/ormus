@@ -10,7 +10,7 @@ import (
 
 func main() {
 	cfg := config.C().Scylladb
-fmt.Println(cfg)
+	fmt.Println(cfg)
 	// Create a new ScyllaDB connection instance
 	conn := scyllainitialize.NewScyllaDBConnection(
 		cfg.Consistency,
@@ -32,8 +32,6 @@ fmt.Println(cfg)
 	if err != nil {
 		log.Fatal("Failed to get ScyllaDB session:", err)
 	}
-
-	// Close the session when done
 	defer session.Close()
 
 	err = scyllainitialize.RunMigrations(conn, "./source/repository/scylladb/")
