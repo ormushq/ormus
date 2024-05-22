@@ -13,7 +13,7 @@ func main() {
 	config := scylladb.Config{
 		Hosts:          []string{"127.0.0.1:9042"},
 		Consistency:    gocql.One,
-		Keyspace:       "your_keyspace",
+		Keyspace:       "teset",
 		TimeoutCluster: 5 * time.Second,
 		NumRetries:     5,
 		MinRetryDelay:  time.Second,

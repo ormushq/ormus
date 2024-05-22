@@ -2,6 +2,8 @@ module github.com/ormushq/ormus
 
 go 1.21.0
 
+replace github.com/gocql/gocql => github.com/scylladb/gocql v1.13.0
+
 require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
