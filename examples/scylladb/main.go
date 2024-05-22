@@ -4,22 +4,40 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ormushq/ormus/adapter/scylladb"
+	"github.com/ormushq/ormus/adapter/scylladb/scyllainitialize"
 	"github.com/ormushq/ormus/config"
 )
 
 func main() {
-	// Set up ScyllaDB configuration
-	cfg := config.C()
-	fmt.Println(cfg.Scylladb)
+	cfg := config.C().Scylladb
+fmt.Println(cfg)
+	// Create a new ScyllaDB connection instance
+	conn := scyllainitialize.NewScyllaDBConnection(
+		cfg.Consistency,
+		cfg.Keyspace,
+		cfg.Hosts...,
+	)
 
-	// Create a new ScyllaDB session
-	session, err := scylladb.New(cfg.Scylladb)
+	err := scyllainitialize.CreateKeySpace(
+		cfg.Consistency,
+		cfg.Keyspace,
+		cfg.Hosts...,
+	)
 	if err != nil {
-		log.Fatal("Error creating ScyllaDB session:", err)
+		log.Fatal("Failed to create ScyllaDB keyspace:", err)
 	}
+
+	// Get a ScyllaDB session using the created connection
+	session, err := scyllainitialize.GetConnection(conn)
+	if err != nil {
+		log.Fatal("Failed to get ScyllaDB session:", err)
+	}
+
+	// Close the session when done
 	defer session.Close()
 
-	// Use the session to interact with ScyllaDB
-
+	err = scyllainitialize.RunMigrations(conn, "./source/repository/scylladb/")
+	if err != nil {
+		log.Fatal("Failed to run migrations:", err)
+	}
 }

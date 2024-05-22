@@ -7,7 +7,7 @@ source:
 scylladb:
   hosts:
     - 127.0.0.1:9042
-  keyspace: test
+  keyspace: ormus
 redis:
   port: 6379
   host: localhost

@@ -14,11 +14,11 @@ import (
 type Config struct {
 	Hosts          []string          `koanf:"hosts"`
 	Consistency    gocql.Consistency `koanf:"consistency"`
-	Keyspace       string            `kaonf:"keyspace"`
+	Keyspace       string            `koanf:"keyspace"`
 	TimeoutCluster time.Duration     `koanf:"timeout_cluster"`
 	NumRetries     int               `koanf:"num_retries"`
-	MinRetryDelay  time.Duration     `kaonf:"min_retry_delay"`
-	MaxRetryDelay  time.Duration     `kaonf:"max_retry_delay"`
+	MinRetryDelay  time.Duration     `koanf:"min_retry_delay"`
+	MaxRetryDelay  time.Duration     `koanf:"max_retry_delay"`
 }
 
 const (
