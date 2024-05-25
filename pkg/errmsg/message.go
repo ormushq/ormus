@@ -12,6 +12,5 @@ const (
 	ErrBadRequest           = "Bad request"
 	ErrUserNotFound         = "user not found"
 	ErrChannelNotFound      = "channel not found: %v"
-	ErrFailedToOpenChannel  = "failed to open rabbitmq channel"
 	ErrFailedToCloseChannel = "failed to close rabbitmq channel"
 )
