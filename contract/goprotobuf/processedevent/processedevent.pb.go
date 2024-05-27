@@ -403,8 +403,6 @@ type Integration struct {
 	Metadata       *DestinationMetadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	ConnectionType ConnectionType       `protobuf:"varint,5,opt,name=connection_type,json=connectionType,proto3,enum=event.ConnectionType" json:"connection_type,omitempty"`
 	Enabled        bool                 `protobuf:"varint,6,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	//	Config config = 7;
-	//
 	// Types that are assignable to Config:
 	//
 	//	*Integration_Fake
