@@ -25,13 +25,15 @@ func New() *WebhookHandler {
 func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
+	_ = fmt.Sprintf("I am here in %s ------------------------ \n", op)
+
 	// TODO: use oneof
 	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
 		logger.L().Info("invalid configuration for webhook")
 
 		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindInvalid).
-			WhitMessage("invalid configuration for webhook")
+			WithMessage("invalid configuration for webhook")
 	}
 
 	_, err := MakeHTTPRequest(config)
@@ -39,7 +41,7 @@ func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse
 		logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
 
 		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
-			WhitMessage("unexpected error when try to do GET webhook request")
+			WithMessage("unexpected error when try to do GET webhook request")
 	}
 
 	return param.DeliveryTaskResponse{
@@ -62,6 +64,7 @@ func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, e
 		return nil, err
 	}
 
+	// TODO: read timeout from config
 	client := &http.Client{}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

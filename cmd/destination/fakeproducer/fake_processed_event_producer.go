@@ -104,36 +104,33 @@ func main() {
 	failOnError(err, "Failed to declare an exchange")
 	span.AddEvent("exchange-declared")
 
-	_ = entity.Integration{
-		ID:       "10",
-		SourceID: "1",
-		Metadata: entity.DestinationMetadata{
-			ID:   "1",
-			Name: "webhook",
-			Slug: "webhook",
-		},
-	}
-
 	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
-		SourceID: "2",
+		SourceID: "1",
 		Integration: entity.Integration{
+			ID:       "2",
+			SourceID: "1",
+			Metadata: entity.DestinationMetadata{
+				ID:   "1",
+				Name: "webhook",
+				Slug: "webhook",
+			},
 			Config: webhookintegration.WebhookConfig{
-				Headers: []webhookintegration.Header{
-					{Key: "Authorization", Value: "Basic MY_BASIC_AUTH_TOKEN"},
-					{Key: "Content-Type", Value: "MY_CONTENT_TYPE"},
+				Headers: map[string]string{
+					"Authorization": "Basic MY_BASIC_AUTH_TOKEN",
+					"Content-Type":  "MY_CONTENT_TYPE",
 				},
-				Payload: []webhookintegration.Payload{
-					{Key: "name", Value: "ali"},
-					{Key: "birth_day", Value: "2020-12-12"},
-					{Key: "mail", Value: "ali@mail.com"},
+				Payload: map[string]string{
+					"name":      "ali",
+					"birth_day": "2020-12-12",
+					"mail":      "ali@mail.com",
 				},
 				Method: webhookintegration.POSTWebhookMethod,
 				URL:    "https://eoc0z7vqfxu6io.m.pipedream.net",
 			},
 		},
-		MessageID:         "14",
+		MessageID:         "16",
 		EventType:         "page",
 		Name:              &pageName,
 		Version:           1,
