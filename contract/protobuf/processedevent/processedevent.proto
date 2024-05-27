@@ -26,7 +26,6 @@ message Integration {
   ConnectionType connection_type = 5;
   bool enabled = 6;
 
-  //  Config config = 7;
   oneof config {
     FakeConfig fake = 100;
     WebhookConfig webhook = 101;
@@ -41,14 +40,6 @@ message DestinationMetadata {
   DestinationType slug = 3;
   repeated DestinationCategory categories = 4;
 }
-
-// I have config in golang with name Config and type interface{}
-// and I will pass my type like webhookintegration.WebhookConfig to it
-// QUESTION ?? how to use Oneof for this superpose
-// message Config {}
-//    oneof Config {
-//
-//    }
 
 enum ConnectionType {
   EVENT_STREAM = 0;
@@ -83,7 +74,6 @@ enum DestinationCategory {
 message FakeConfig{
   string name = 1;
 }
-
 
 message WebhookConfig {
   map<string, string> headers = 1;

@@ -2,14 +2,18 @@ package webhookdeliveryhandler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+
 	"github.com/ormushq/ormus/destination/entity/taskentity"
-	"github.com/ormushq/ormus/destination/integrationhandler/param"
-	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"net/http"
 )
 
 type WebhookHandler struct{}
@@ -18,16 +22,15 @@ func New() *WebhookHandler {
 	return &WebhookHandler{}
 }
 
-// Handle TODO: why we have processedEvent here?! since we have processedEvent in task
-// Handle TODO: why we should have error and fail reason on HandleTaskResponse
-func (h WebhookHandler) Handle(task taskentity.Task, processedEvent event.ProcessedEvent) (param.HandleTaskResponse, error) {
+func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
+	// TODO: use oneof
 	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
 		logger.L().Info("invalid configuration for webhook")
 
-		return param.HandleTaskResponse{}, richerror.New(op).WithKind(richerror.KindInvalid).
+		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindInvalid).
 			WhitMessage("invalid configuration for webhook")
 	}
 
@@ -35,11 +38,11 @@ func (h WebhookHandler) Handle(task taskentity.Task, processedEvent event.Proces
 	if err != nil {
 		logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
 
-		return param.HandleTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
+		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
 			WhitMessage("unexpected error when try to do GET webhook request")
 	}
 
-	return param.HandleTaskResponse{
+	return param.DeliveryTaskResponse{
 		FailedReason:   nil,
 		Attempts:       0,
 		DeliveryStatus: taskentity.SuccessTaskStatus,
@@ -47,9 +50,11 @@ func (h WebhookHandler) Handle(task taskentity.Task, processedEvent event.Proces
 }
 
 func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, error) {
+	const op = "webhookdeliveryhandler.MakeHTTPRequest"
+
 	payloadMap := make(map[string]string)
-	for _, item := range config.Payload {
-		payloadMap[item.Key] = item.Value
+	for k, v := range config.Payload {
+		payloadMap[k] = v
 	}
 
 	payloadJSON, err := json.Marshal(payloadMap)
@@ -58,14 +63,17 @@ func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, e
 	}
 
 	client := &http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	req, err := http.NewRequest(string(config.Method), config.URL, bytes.NewBuffer(payloadJSON))
+	req, err := http.NewRequestWithContext(ctx, string(config.Method), config.URL, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		return nil, err
 	}
 
-	for _, header := range config.Headers {
-		req.Header.Set(header.Key, header.Value)
+	// TODO: check headers in segment again
+	for k, v := range config.Headers {
+		req.Header.Set(k, v)
 	}
 
 	response, err := client.Do(req)
@@ -73,7 +81,12 @@ func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, e
 		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logger.L().Info(fmt.Sprintf("failed to close http response body in %s", op))
+		}
+	}(response.Body)
 
 	return response, nil
 }
