@@ -25,6 +25,8 @@ func New() *WebhookHandler {
 func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
+	_ = fmt.Sprintf("I am here in %s ------------------------ \n", op)
+
 	// TODO: use oneof
 	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
@@ -62,6 +64,7 @@ func MakeHTTPRequest(config webhookintegration.WebhookConfig) (*http.Response, e
 		return nil, err
 	}
 
+	// TODO: read timeout from config
 	client := &http.Client{}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
