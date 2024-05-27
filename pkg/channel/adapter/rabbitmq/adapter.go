@@ -84,8 +84,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 			case <-ca.done:
 				return
 			case err := <-connectionClosedChannel:
-				fmt.Println("Connection closed")
-				fmt.Println(err)
+				logger.L().Error("connection closed", err)
 				for {
 					e := ca.connect()
 					time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
