@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package event;
+option go_package = "contract/goprotobuf/processedevent";
+
+import "google/protobuf/timestamp.proto";
+
+message ProcessedEvent {
+  string source_id = 1;
+  Integration integration = 2;
+  string message_id = 3;
+  Type event_type = 4;
+  uint32 version = 5;
+
+  google.protobuf.Timestamp sent_at = 6;
+  google.protobuf.Timestamp received_at = 7;
+  google.protobuf.Timestamp original_timestamp = 8;
+  google.protobuf.Timestamp timestamp = 9;
+}
+
+message Integration {
+  string id = 1;
+  string source_id = 2;
+  string name = 3;
+  DestinationMetadata metadata = 4;
+  ConnectionType connection_type = 5;
+  bool enabled = 6;
+
+  //  Config config = 7;
+  oneof config {
+    FakeConfig fake = 100;
+    WebhookConfig webhook = 101;
+  }
+
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message DestinationMetadata {
+  string id = 1;
+  string name = 2;
+  DestinationType slug = 3;
+  repeated DestinationCategory categories = 4;
+}
+
+// I have config in golang with name Config and type interface{}
+// and I will pass my type like webhookintegration.WebhookConfig to it
+// QUESTION ?? how to use Oneof for this superpose
+// message Config {}
+//    oneof Config {
+//
+//    }
+
+enum ConnectionType {
+  EVENT_STREAM = 0;
+  STORAGE = 1;
+  REVERSE_ETL = 2;
+}
+
+enum Type {
+  TRACK = 0;
+  PAGE = 1;
+  IDENTITY = 2;
+  GROUP = 3;
+  ALIAS = 4;
+  SCREEN = 5;
+}
+
+enum DestinationType {
+  WEBHOOK = 0;
+}
+
+enum DestinationCategory {
+  ANALYTICS = 0;
+  ADVERTISING = 1;
+  CRM = 2;
+  EMAIL_MARKETING = 3;
+  LIVECHAT = 4;
+  PAYMENTS = 5;
+  SURVEYS = 6;
+}
+
+// integration's protobuf
+message FakeConfig{
+  string name = 1;
+}
+
+
+message WebhookConfig {
+  map<string, string> headers = 1;
+  map<string, string> payload = 2;
+  WebhookMethod method = 3;
+  string url = 4;
+}
+
+enum WebhookMethod {
+  POST = 0;
+  PUT = 1;
+  PATCH = 2;
+}

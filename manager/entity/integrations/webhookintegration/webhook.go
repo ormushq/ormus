@@ -8,19 +8,9 @@ const (
 	PATCHWebhookMethod WebhookMethod = "PATCH"
 )
 
-type Header struct {
-	Key   string
-	Value string
-}
-
-type Payload struct {
-	Key   string
-	Value string
-}
-
 type WebhookConfig struct {
-	Headers []Header
-	Payload []Payload
+	Headers map[string]string
+	Payload map[string]string
 	Method  WebhookMethod
 	URL     string
 }
