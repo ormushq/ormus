@@ -47,7 +47,7 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 		if err == nil {
 			break
 		}
-		logger.L().Error("rabbitmq connection failed", err)
+		logger.L().Error("rabbitmq connection failed", "error", err.Error())
 	}
 
 	return c
@@ -87,7 +87,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 			case <-ca.done:
 				return
 			case err := <-connectionClosedChannel:
-				logger.L().Error("connection closed", err)
+				logger.L().Error("connection closed", "error", err.Error())
 				for {
 					e := ca.connect()
 					time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
@@ -95,7 +95,7 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 					if e == nil {
 						break
 					}
-					logger.L().Error("Connection failed to rabbitmq", e)
+					logger.L().Error("Connection failed to rabbitmq", "error", e.Error())
 
 				}
 
