@@ -1,8 +1,9 @@
 package rabbitmqchanneltaskmanager
 
 import (
+	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	"log"
 	"sync"
 
 	"github.com/ormushq/ormus/destination/entity/taskentity"
@@ -54,5 +55,5 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 }
 
 func printWorkersError(err error, msg string) {
-	log.Printf("%s: %s", msg, err)
+	logger.L().Error(fmt.Sprintf("%s: %s", msg, err))
 }
