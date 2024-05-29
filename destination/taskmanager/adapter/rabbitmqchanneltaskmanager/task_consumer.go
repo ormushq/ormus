@@ -1,7 +1,6 @@
 package rabbitmqchanneltaskmanager
 
 import (
-	"fmt"
 	"github.com/ormushq/ormus/pkg/channel"
 	"log"
 	"sync"
@@ -30,7 +29,6 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 		for {
 			select {
 			case msg := <-c.messageChannel:
-				fmt.Println(string(msg.Body))
 				e, err := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
 				if err != nil {
 					printWorkersError(err, "Failed to unmarshall message")
