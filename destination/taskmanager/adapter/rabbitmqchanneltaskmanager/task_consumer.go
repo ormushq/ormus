@@ -30,12 +30,6 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 		for {
 			select {
 			case msg := <-c.messageChannel:
-				aErr := msg.Ack()
-				if aErr != nil {
-					printWorkersError(aErr, "Failed to acknowledge message")
-
-					break
-				}
 				fmt.Println(string(msg.Body))
 				e, err := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
 				if err != nil {
@@ -45,6 +39,12 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 				}
 
 				eventsChannel <- e
+				aErr := msg.Ack()
+				if aErr != nil {
+					printWorkersError(aErr, "Failed to acknowledge message")
+
+					break
+				}
 			case <-done:
 
 				return
