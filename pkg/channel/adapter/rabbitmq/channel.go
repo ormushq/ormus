@@ -224,6 +224,8 @@ func (rc *rabbitmqChannel) start() {
 func (rc *rabbitmqChannel) startOutput() {
 	rc.wg.Add(1)
 	WaitForConnection(rc.rabbitmq)
+
+
 	go func() {
 		defer rc.wg.Done()
 		ch, err := rc.rabbitmq.connection.Channel()
@@ -291,6 +293,8 @@ func (rc *rabbitmqChannel) startInput() {
 
 	go func() {
 		defer rc.wg.Done()
+
+
 		ch, err := rc.rabbitmq.connection.Channel()
 		if err != nil {
 			logger.L().Error(errmsg.ErrFailedToOpenChannel, "error", err.Error())
@@ -305,6 +309,7 @@ func (rc *rabbitmqChannel) startInput() {
 				logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
 			}
 		}()
+
 
 		for {
 			if ch.IsClosed() {

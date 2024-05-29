@@ -30,6 +30,12 @@ services:
     volumes:
       - etcd_data:/etcd-data
 
+  scylladb:
+    image: scylladb/scylla:latest
+    container_name: scylladb
+    restart: always
+    ports:
+      - "9042:9042"
 volumes:
   redis_data:
   etcd_data:

@@ -63,6 +63,7 @@ func (ca *ChannelAdapter) connect() error {
 		return err
 	}
 	ca.rabbitmq.connection = conn
+
 	logger.L().Debug("connected to rabbitmq server")
 	ca.rabbitmq.cond.Broadcast()
 
@@ -94,6 +95,22 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 					}
 					logger.L().Error("Connection failed to rabbitmq", "error", e.Error())
 
+func (ca *ChannelAdapter) waitForConnectionClose() {
+	connectionClosedChannel := make(chan *amqp.Error)
+	ca.rabbitmq.connection.NotifyClose(connectionClosedChannel)
+
+	for {
+		select {
+		case <-ca.done:
+			return
+		case err := <-connectionClosedChannel:
+			fmt.Println(err)
+			for {
+				e := ca.connect()
+				time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
+				failOnError(e, "Connection failed to rabbitmq")
+				if e == nil {
+					break
 				}
 
 				return
@@ -152,5 +169,5 @@ func WaitForConnection(rabbitmq *Rabbitmq) {
 	defer rabbitmq.cond.L.Unlock()
 	for rabbitmq.connection.IsClosed() {
 		rabbitmq.cond.Wait()
-	}
+  }
 }

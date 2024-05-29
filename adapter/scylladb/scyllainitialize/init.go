@@ -31,11 +31,11 @@ Functions:
     It internally creates a ScyllaDB cluster configuration and session.
     func GetConnection(conn *scyllaDBConnection) (scylladb.SessionxInterface, error)
 */
-package initializedb
+package scyllainitialize
 
 import (
 	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/adapter/scylladb"
+	"github.com/ormushq/ormus/adapter/scylladb"
 	scyllaMigrate "github.com/ormushq/ormus/source/repository/scylladb/migrate"
 )
 
