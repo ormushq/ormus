@@ -1,9 +1,9 @@
 /*
-Package initializedb provides functionality for initializing a connection to ScyllaDB database using to gocql library.
+Package scyllainitialize provides functionality for initializing a connection to ScyllaDB database using to gocql library.
 
 Note: Make sure to handle errors appropriately when using this package.
 */
-package initializedb
+package scyllainitialize
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gocql/gocql"
-	"github.com/ormushq/ormus/source/adapter/scylladb"
+	"github.com/ormushq/ormus/adapter/scylladb"
 )
 
 type ScyllaDBConnection struct {

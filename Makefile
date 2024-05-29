@@ -6,14 +6,18 @@ ROOT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 lint:
 	which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
 	golangci-lint run --config=$(ROOT)/.golangci.yml $(ROOT)/...
-dockerUp:
-	sudo docker-compose up -d
 
 test:
 	go test ./...
 
-dockerDown:
-	sudo docker-compose down
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+logs:
+	docker-compose logs
 
 format:
 	@which gofumpt || (go install mvdan.cc/gofumpt@latest)

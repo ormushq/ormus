@@ -2,8 +2,6 @@ module github.com/ormushq/ormus
 
 go 1.21.0
 
-require github.com/rabbitmq/amqp091-go v1.9.0
-
 require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
@@ -62,11 +60,13 @@ require (
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require gopkg.in/yaml.v3 v3.0.1 // indirect
 
 require (
 	github.com/google/uuid v1.3.1
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/streadway/amqp v1.1.0
 	go.etcd.io/etcd/client/v3 v3.5.13
 )
