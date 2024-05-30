@@ -27,6 +27,12 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 
 	// TODO: we have to trigger an event of registration in this phase of function
 	// return create new user
+	inOutChan, err := s.internalBroker.GetInputChannel("CreateDefaultProject")
+	if err != nil {
+		return nil, richerror.New("register.broker").WithWrappedError(err)
+	}
+	inOutChan <- []byte(createdUser.ID)
+
 	return &param.RegisterResponse{
 		ID:    createdUser.ID,
 		Email: createdUser.Email,

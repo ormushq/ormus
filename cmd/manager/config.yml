@@ -4,10 +4,6 @@ source:
   http_server:
     port: 8090
     network: "tcp"
-scylladb:
-  hosts:
-    - 127.0.0.1:9042
-  keyspace: ormus
 redis:
   port: 6379
   host: localhost
@@ -28,10 +24,10 @@ destination:
     vhost:
     reconnect_second: 5
   rabbitmq_task_manager_connection:
-    user: guest
-    password: guest
-    host: localhost
-    port: 5672
+      user: guest
+      password: guest
+      host: localhost
+      port: 5672
   redis_task_idempotency:
     port: 6379
     host: localhost
@@ -51,6 +47,5 @@ manager:
     refresh_expiration_time_in_day: 28
     access_subject: "ac"
     refresh_subject: "rt"
-
 
 

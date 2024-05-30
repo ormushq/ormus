@@ -1,21 +1,36 @@
 package projectservice
 
 import (
-	"github.com/ormushq/ormus/param"
-	"github.com/ormushq/ormus/pkg/errmsg"
-	"github.com/ormushq/ormus/pkg/richerror"
+	"fmt"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
-func (s Service) Create(req param.CreateProjectRequest) (*param.CreateProjectResponse, error) {
-	const op = "projectservice.Create"
-
-	newProject, err := s.repo.Create(req.Name, req.UserID)
+func (s Service) Create() error {
+	//const op = "projectservice.Create"
+	inOutChan, err := s.internalBroker.GetOutputChannel("CreateDefaultProject")
 	if err != nil {
-		return nil, richerror.New(op).WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return err
 	}
+	// Seed the random number generator
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	return &param.CreateProjectResponse{
-		ID:   newProject.ID,
-		Name: newProject.Name,
-	}, nil
+	// Generate a random integer between 0 and 99
+	for {
+		select {
+		case msg := <-inOutChan:
+			_, err := s.repo.Create("Default"+strconv.Itoa(rand.Intn(100)), string(msg.Body))
+			if err != nil {
+				return err
+			}
+			fmt.Println(msg.Body)
+			err = msg.Ack()
+			if err != nil {
+				return err
+			}
+			fmt.Println("created")
+		}
+
+	}
 }

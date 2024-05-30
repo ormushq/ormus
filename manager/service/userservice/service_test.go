@@ -2,10 +2,10 @@ package userservice_test
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/mock/usermock"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"

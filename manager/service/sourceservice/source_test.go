@@ -2,9 +2,9 @@ package sourceservice_test
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
-	"github.com/ormushq/ormus/manager/mock/sourcemock"
 	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/manager/service/sourceservice"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -22,7 +22,7 @@ func TestDeleteSource(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("MockRepo.DeleteSource").WithWrappedError(fmt.Errorf(sourcemock.RepoErr)),
+			expectedErr: richerror.New("MockRepo.DeleteSource").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			req:         "source_id",
 		},
 		{
@@ -34,7 +34,7 @@ func TestDeleteSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
+			mockRepo := usermock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
@@ -64,7 +64,7 @@ func TestUpdateSource(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("MockRepo.GetUserSourceById").WithWrappedError(fmt.Errorf(sourcemock.RepoErr)),
+			expectedErr: richerror.New("MockRepo.GetUserSourceById").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			sourceID:    "source_id",
 			ownerID:     "owner_id",
 			req1: param.UpdateSourceRequest{
@@ -101,7 +101,7 @@ func TestUpdateSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
+			mockRepo := usermock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
@@ -131,7 +131,7 @@ func TestCreateSource(t *testing.T) {
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("MockRepo.InsertSource").WithWrappedError(fmt.Errorf(sourcemock.RepoErr)),
+			expectedErr: richerror.New("MockRepo.InsertSource").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			ownerID:     "owner_id",
 			req: param.AddSourceRequest{
 				Name:        "name",
@@ -154,7 +154,7 @@ func TestCreateSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
+			mockRepo := usermock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution

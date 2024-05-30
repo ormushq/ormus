@@ -2,7 +2,7 @@ package httpserver
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/manager"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/sourcehandler"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 )
@@ -12,13 +12,13 @@ type SetupServicesResponse struct {
 }
 
 type Server struct {
-	config        config.Config
+	config        manager.Config
 	userHandler   userhandler.Handler
 	sourceHandler sourcehandler.Handler
 	Router        *echo.Echo
 }
 
-func New(cfg config.Config, setupSvc SetupServicesResponse) *Server {
+func New(cfg manager.Config, setupSvc SetupServicesResponse) *Server {
 	return &Server{
 		config:      cfg,
 		userHandler: *setupSvc.UserHandler,

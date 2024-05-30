@@ -44,6 +44,11 @@ func Default() Config {
 				AccessSubject:              "ac",
 				RefreshSubject:             "rt",
 			},
+			InternalBrokerConfig: manager.InternalBrokerConfig{
+				ChannelSize:    100,
+				NumberInstant:  100,
+				MaxRetryPolicy: 10,
+			},
 		},
 	}
 }
