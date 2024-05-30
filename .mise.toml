@@ -11,9 +11,11 @@ MISE_DEBUG=0 #show DEBUG message in console
 MISE_QUIET=1 #Equivalent to MISE_LOG_LEVEL=warn.
 MISE_ERORR=1
 MISE_TRACE=0
+
 [tools]
-golang = '1.21.4'
+golang = '1.22.3'
 protoc = '25.1'
+go = "1.22.3"
 
 [plugins]
 protoc = 'https://github.com/paxosglobal/asdf-protoc.git'

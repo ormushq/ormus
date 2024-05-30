@@ -2,31 +2,54 @@ package main
 
 import (
 	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/manager"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	"github.com/ormushq/ormus/manager/mock/usermock"
+	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
+	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"sync"
+	"time"
 )
 
 func main() {
-	cfg := config.C()
+	cfg := config.C().Manager
 
-	setupSvc := setupServices(cfg)
+	done := make(chan bool)
+	wg := sync.WaitGroup{}
 
+	internalBroker := simple.New(done, &wg)
+	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+
+	setupSvc := setupServices(cfg, internalBroker)
 	server := httpserver.New(cfg, setupSvc)
 
 	server.Server()
+
 }
 
-func setupServices(cfg config.Config) httpserver.SetupServicesResponse {
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+func setupServices(cfg manager.Config, internalBroker *simple.ChannelAdapter) httpserver.SetupServicesResponse {
+	cfg.JWTConfig.AccessExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
+	cfg.JWTConfig.RefreshExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
+
+	jwt := authservice.NewJWT(cfg.JWTConfig)
+
 	unknownRepo := usermock.NewMockRepository(false)
-	userSvc := userservice.New(jwt, unknownRepo)
+	unknownRepo1 := projectstub.New(false)
+
+	ProjectSvc := projectservice.New(&unknownRepo1, internalBroker)
+
+	userSvc := userservice.New(jwt, unknownRepo, internalBroker)
+
 	validateUserSvc := uservalidator.New(unknownRepo)
 
-	userHand := userhandler.New(userSvc, validateUserSvc)
+	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
 
 	return httpserver.SetupServicesResponse{
 		UserHandler: userHand,

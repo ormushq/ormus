@@ -3,7 +3,6 @@ jobs = 4     # number of plugins or runtimes to install in parallel. The default
 log_level= 'error'
 
 experimental = true # enable experimental features
-
 # configure messages displayed when entering directories with config files
 [settings.status]
 missing_tools = true # warn if tools are not installed

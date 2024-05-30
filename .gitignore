@@ -23,6 +23,7 @@ go.work
 .idea
 # logs
 logs/
+manager/
 *.log
 mise.log
 
