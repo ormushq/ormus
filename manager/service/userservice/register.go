@@ -29,7 +29,7 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 	// return create new user
 	inOutChan, err := s.internalBroker.GetInputChannel("CreateDefaultProject")
 	if err != nil {
-		return nil, richerror.New("register.broker").WithWrappedError(err)
+		return nil, richerror.New("register.internalBroker").WithWrappedError(err)
 	}
 	inOutChan <- []byte(createdUser.ID)
 

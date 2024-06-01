@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/manager"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
@@ -11,6 +10,7 @@ import (
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
+	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 	"sync"
@@ -27,14 +27,6 @@ func main() {
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 
-	setupSvc := setupServices(cfg, internalBroker)
-	server := httpserver.New(cfg, setupSvc)
-
-	server.Server()
-
-}
-
-func setupServices(cfg manager.Config, internalBroker *simple.ChannelAdapter) httpserver.SetupServicesResponse {
 	cfg.JWTConfig.AccessExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
 	cfg.JWTConfig.RefreshExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
 
@@ -50,8 +42,13 @@ func setupServices(cfg manager.Config, internalBroker *simple.ChannelAdapter) ht
 	validateUserSvc := uservalidator.New(unknownRepo)
 
 	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
+	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
-	return httpserver.SetupServicesResponse{
+	//setupSvc := setupServices(cfg, internalBroker)
+	server := httpserver.New(cfg, httpserver.SetupServicesResponse{
 		UserHandler: userHand,
-	}
+	})
+
+	server.Server()
+
 }

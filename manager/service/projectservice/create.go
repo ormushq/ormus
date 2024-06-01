@@ -1,7 +1,7 @@
 package projectservice
 
 import (
-	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"math/rand"
 	"strconv"
 	"time"
@@ -13,10 +13,7 @@ func (s Service) Create() error {
 	if err != nil {
 		return err
 	}
-	// Seed the random number generator
 	rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	// Generate a random integer between 0 and 99
 	for {
 		select {
 		case msg := <-inOutChan:
@@ -24,12 +21,12 @@ func (s Service) Create() error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(msg.Body)
+			logger.L().Debug(string(msg.Body))
 			err = msg.Ack()
 			if err != nil {
 				return err
 			}
-			fmt.Println("created")
+			logger.L().Debug("Default project created")
 		}
 
 	}
