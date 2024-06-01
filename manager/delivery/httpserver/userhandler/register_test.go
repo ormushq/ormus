@@ -3,7 +3,6 @@ package userhandler_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"

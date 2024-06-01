@@ -37,7 +37,7 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error
 
 		return &validator.Error{
 			Fields: fieldErr,
-			Err: richerror.New("userValidation.ValidateLoginRequest").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New("userValidation.ValidateLoginRequest").WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
@@ -49,15 +49,15 @@ func (v Validator) ValidateLoginRequest(req param.LoginRequest) *validator.Error
 func (v Validator) isUserRegistered(value interface{}) error {
 	email, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.isUserRegistered").WhitMessage("wrong type")
+		return richerror.New("validator.isUserRegistered").WithMessage("wrong type")
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isUserRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isUserRegistered").WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if !exists {
-		return richerror.New("validator.isUserRegistered").WhitMessage(errmsg.ErrAuthUserNotFound)
+		return richerror.New("validator.isUserRegistered").WithMessage(errmsg.ErrAuthUserNotFound)
 	}
 
 	return nil
@@ -68,7 +68,7 @@ func (v Validator) isUserRegistered(value interface{}) error {
 func (v Validator) isPasswordValid(value interface{}) error {
 	password, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.isPasswordValid").WhitMessage("wrong type")
+		return richerror.New("validator.isPasswordValid").WithMessage("wrong type")
 	}
 
 	var lower, upper, numeric, special bool
@@ -91,5 +91,5 @@ func (v Validator) isPasswordValid(value interface{}) error {
 		return nil
 	}
 
-	return richerror.New("validator.isPasswordValid").WhitMessage(errmsg.ErrPasswordIsNotValid)
+	return richerror.New("validator.isPasswordValid").WithMessage(errmsg.ErrPasswordIsNotValid)
 }

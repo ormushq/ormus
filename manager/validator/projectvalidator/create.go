@@ -45,7 +45,7 @@ func (v Validator) ValidateCreateRequest(req param.CreateProjectRequest) *valida
 
 		return &validator.Error{
 			Fields: fieldErr,
-			Err: richerror.New(op).WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New(op).WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}

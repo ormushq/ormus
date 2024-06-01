@@ -2,10 +2,10 @@ package userservice_test
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -89,7 +89,7 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name:        "wrong password",
-			expectedErr: richerror.New("Login").WhitMessage(errmsg.ErrWrongCredentials),
+			expectedErr: richerror.New("Login").WithMessage(errmsg.ErrWrongCredentials),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "wrongpassword",

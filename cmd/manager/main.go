@@ -1,6 +1,9 @@
 package main
 
 import (
+	"sync"
+	"time"
+
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
@@ -13,8 +16,6 @@ import (
 	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
-	"sync"
-	"time"
 )
 
 func main() {
@@ -27,8 +28,9 @@ func main() {
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 
-	cfg.JWTConfig.AccessExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
-	cfg.JWTConfig.RefreshExpirationTimeInDay *= time.Duration(24 * int(time.Hour))
+	TimeOfDayByHour := 24
+	cfg.JWTConfig.AccessExpirationTimeInDay *= time.Duration(TimeOfDayByHour * int(time.Hour))
+	cfg.JWTConfig.RefreshExpirationTimeInDay *= time.Duration(TimeOfDayByHour * int(time.Hour))
 
 	jwt := authservice.NewJWT(cfg.JWTConfig)
 
@@ -44,11 +46,9 @@ func main() {
 	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
-	//setupSvc := setupServices(cfg, internalBroker)
 	server := httpserver.New(cfg, httpserver.SetupServicesResponse{
 		UserHandler: userHand,
 	})
 
 	server.Server()
-
 }
