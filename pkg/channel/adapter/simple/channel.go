@@ -1,10 +1,10 @@
 package simple
 
 import (
-	"github.com/ormushq/ormus/logger"
 	"sync"
 	"time"
 
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 )
 
