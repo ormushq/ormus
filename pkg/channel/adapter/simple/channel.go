@@ -1,7 +1,7 @@
 package simple
 
 import (
-	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"sync"
 	"time"
 
@@ -60,7 +60,7 @@ func (sc simpleChannel) startConsume() {
 
 					return
 				case msg := <-sc.inputChannel:
-					fmt.Println("New message received in simple/adapter.go ca.inputChannel", msg)
+					logger.L().Debug("New message received in simple/adapter.go ca.inputChannel", msg)
 					sc.startDelivery(msg)
 				}
 			}
