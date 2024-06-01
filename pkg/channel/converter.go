@@ -3,11 +3,12 @@ package channel
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"sync"
+
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	event2 "github.com/ormushq/ormus/event"
-	"log/slog"
-	"sync"
 )
 
 type Converter struct {

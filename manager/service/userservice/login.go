@@ -16,7 +16,7 @@ func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
 	}
 
 	if !password.CheckPasswordHash(req.Password, user.Password) {
-		return nil, richerror.New("Login").WithWrappedError(err).WhitMessage(errmsg.ErrWrongCredentials)
+		return nil, richerror.New("Login").WithWrappedError(err).WithMessage(errmsg.ErrWrongCredentials)
 	}
 
 	// jwt token

@@ -2,10 +2,10 @@ package sourcevalidator_test
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
 	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
 	"github.com/stretchr/testify/assert"

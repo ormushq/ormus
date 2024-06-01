@@ -2,10 +2,10 @@ package sourceservice_test
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
-	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
+	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/manager/service/sourceservice"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -88,7 +88,7 @@ func TestUpdateSource(t *testing.T) {
 		{
 			name:        "user not found",
 			repoErr:     false,
-			expectedErr: richerror.New("MockRepo.GetUserSourceById").WhitMessage(errmsg.ErrUserNotFound),
+			expectedErr: richerror.New("MockRepo.GetUserSourceById").WithMessage(errmsg.ErrUserNotFound),
 			sourceID:    "invalide source_id",
 			ownerID:     "owner_id",
 			req1: param.UpdateSourceRequest{

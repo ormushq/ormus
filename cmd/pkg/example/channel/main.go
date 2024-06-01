@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/pkg/channel"
-	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 func main() {

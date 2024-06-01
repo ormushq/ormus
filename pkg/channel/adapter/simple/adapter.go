@@ -2,9 +2,10 @@ package simple
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
-	"sync"
 )
 
 type ChannelAdapter struct {

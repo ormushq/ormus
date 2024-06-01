@@ -7,8 +7,9 @@ package scylladb
 
 import (
 	"fmt"
-	"github.com/gocql/gocql"
 	"time"
+
+	"github.com/gocql/gocql"
 )
 
 type Config struct {
@@ -63,7 +64,7 @@ const (
 //
 //		}
 //
-// /**
+// /**.
 func New(config Config) (SessionxInterface, error) {
 	cluster := gocql.NewCluster(config.Hosts...)
 	cluster.Consistency = config.Consistency
