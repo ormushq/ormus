@@ -55,3 +55,22 @@ func New(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
 
 	return logger
 }
+func SetDebugMode(debug bool) {
+	var logLevel slog.Level
+	if debug {
+		logLevel = slog.LevelDebug
+	} else {
+		logLevel = slog.LevelInfo
+	}
+	fileWriter := &lumberjack.Logger{
+		Filename:  defaultFilePath,
+		LocalTime: defaultUseLocalTime,
+		MaxSize:   defaultFileMaxSizeInMB,
+		MaxAge:    defaultFileAgeInDays,
+	}
+	l = slog.New(
+		slog.NewJSONHandler(io.MultiWriter(fileWriter, os.Stdout), &slog.HandlerOptions{
+			Level: logLevel,
+		}),
+	)
+}
