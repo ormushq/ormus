@@ -2,6 +2,13 @@ package userservice_test
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
+	"github.com/ormushq/ormus/manager/service/projectservice"
+	"github.com/ormushq/ormus/manager/workers"
+	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"sync"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
@@ -15,7 +22,15 @@ import (
 
 func TestService_Register(t *testing.T) {
 	// TODO: if password is longer than 72 bycrypt will fail
-
+	cfg := config.C().Manager
+	done := make(chan bool)
+	wg := sync.WaitGroup{}
+	internalBroker := simple.New(done, &wg)
+	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+	RepoPr := projectstub.New(false)
+	ProjectSvc := projectservice.New(&RepoPr, internalBroker)
+	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 	testCases := []struct {
 		name        string
 		repoErr     bool
@@ -45,7 +60,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo, nil)
+			svc := userservice.New(jwt, repo, internalBroker)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
