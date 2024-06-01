@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"log"
 	"time"
 
@@ -92,5 +93,5 @@ func main() {
 		})
 	failOnError(err, "Failed to publish a message")
 
-	log.Printf("Publish new processed event.")
+	logger.L().Debug("Publish new processed event.")
 }

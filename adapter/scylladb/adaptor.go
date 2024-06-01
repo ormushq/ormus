@@ -8,6 +8,7 @@ package scylladb
 import (
 	"fmt"
 	"github.com/gocql/gocql"
+	"github.com/ormushq/ormus/logger"
 	"time"
 )
 
@@ -78,7 +79,7 @@ func New(config Config) (SessionxInterface, error) {
 
 	session, err := WrapSession(cluster.CreateSession())
 	if err != nil {
-		fmt.Println("an error occureed while creating DB Session", err.Error())
+		logger.L().Error("an error occureed while creating DB Session", err)
 
 		return nil, err
 	}

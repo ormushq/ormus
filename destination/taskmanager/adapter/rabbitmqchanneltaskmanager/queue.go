@@ -2,8 +2,8 @@ package rabbitmqchanneltaskmanager
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"log/slog"
 )
 
@@ -25,7 +25,7 @@ func (q *Queue) Enqueue(pe event.ProcessedEvent) error {
 
 		return err
 	}
-	fmt.Println(string(jsonEvent))
+	logger.L().Debug(string(jsonEvent))
 	q.channel <- jsonEvent
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	event2 "github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"log/slog"
 	"sync"
 )
@@ -53,7 +54,7 @@ func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan 
 					defer c.wg.Done()
 					e, uErr := taskentity.UnmarshalBytesToProcessedEvent(msg)
 					if uErr != nil {
-						fmt.Println(msg)
+						logger.L().Debug(string(msg))
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
 
 						return

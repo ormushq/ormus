@@ -2,7 +2,7 @@ package taskentity
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"time"
 
 	"github.com/ormushq/ormus/event"
@@ -67,9 +67,9 @@ func (t Task) DestinationSlug() entity.DestinationType {
 
 func UnmarshalBytesToTask(body []byte) (Task, error) {
 	var t Task
-	fmt.Println(string(body))
+	logger.L().Debug(string(body))
 	if err := json.Unmarshal(body, &t); err != nil {
-		fmt.Println("Error on unMarshaling task :", err)
+		logger.L().Error("Error on unMarshaling task :", err)
 
 		return Task{}, err
 	}
@@ -80,7 +80,7 @@ func UnmarshalBytesToTask(body []byte) (Task, error) {
 func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	var pe event.ProcessedEvent
 	if err := json.Unmarshal(body, &pe); err != nil {
-		fmt.Println("Error on unMarshaling processed event :", err)
+		logger.L().Error("Error on unMarshaling processed event :", err)
 
 		return event.ProcessedEvent{}, err
 	}
