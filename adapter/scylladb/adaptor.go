@@ -6,7 +6,6 @@ Note: Make sure to handle errors appropriately when using this package.
 package scylladb
 
 import (
-	"fmt"
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/logger"
 	"time"
