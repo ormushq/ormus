@@ -2,6 +2,7 @@ package sourceservice_test
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
 	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
@@ -34,7 +35,7 @@ func TestDeleteSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := usermock.NewMockRepository(tc.repoErr)
+			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
@@ -101,7 +102,7 @@ func TestUpdateSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := usermock.NewMockRepository(tc.repoErr)
+			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
@@ -154,7 +155,7 @@ func TestCreateSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := usermock.NewMockRepository(tc.repoErr)
+			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
 			service := sourceservice.New(mockRepo)
 
 			// 2. execution
