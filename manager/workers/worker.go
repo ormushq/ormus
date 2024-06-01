@@ -21,6 +21,7 @@ func New(prSvc *projectservice.Service, internalBroker *simple.ChannelAdapter) *
 }
 
 func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
+	logger.L().Debug("workers.Run")
 	internalBroker, err := w.internalBroker.GetOutputChannel("CreateDefaultProject")
 	if err != nil {
 		logger.L().Debug("error on getting internal broker channel")
@@ -33,14 +34,14 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
 		for {
 			select {
 			case msg := <-internalBroker:
-				err := w.prSvc.Create()
-				if err != nil {
+				CreateErr := w.prSvc.Create()
+				if CreateErr != nil {
 					logger.L().Error("creating project")
 
 					break
 				}
-				err = msg.Ack()
-				if err != nil {
+				AckErr := msg.Ack()
+				if AckErr != nil {
 					logger.L().Error("message ack")
 
 					break

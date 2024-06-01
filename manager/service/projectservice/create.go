@@ -8,6 +8,7 @@ import (
 
 func (s Service) Create() error {
 	const op = "projectService.CreateDefaultProject"
+
 	inOutChan, err := s.internalBroker.GetOutputChannel("CreateDefaultProject")
 	if err != nil {
 		return err
@@ -17,7 +18,7 @@ func (s Service) Create() error {
 		if err != nil {
 			return richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
 		}
-		logger.L().Debug(string(msg.Body))
+
 		err = msg.Ack()
 		if err != nil {
 			return richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)

@@ -20,7 +20,6 @@ import (
 
 func main() {
 	cfg := config.C().Manager
-
 	done := make(chan bool)
 	wg := sync.WaitGroup{}
 
