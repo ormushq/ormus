@@ -3,7 +3,6 @@ package sourcevalidator_test
 import (
 	"fmt"
 	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
-	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"testing"
 
 	"github.com/ormushq/ormus/manager/entity"
@@ -84,7 +83,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := usermock.NewMockRepository(tc.repoErr)
+			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
 			valid := sourcevalidator.New(mockRepo)
 
 			// 2. execution
@@ -177,7 +176,7 @@ func TestValidateCreateSourceForm(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			mockRepo := usermock.NewMockRepository(tc.repoErr)
+			mockRepo := sourcemock.NewMockRepository(tc.repoErr)
 			valid := sourcevalidator.New(mockRepo)
 
 			// 2. execution
