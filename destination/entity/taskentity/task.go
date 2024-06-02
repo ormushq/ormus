@@ -2,10 +2,10 @@ package taskentity
 
 import (
 	"encoding/json"
-	"github.com/ormushq/ormus/logger"
 	"time"
 
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 )
 

@@ -2,12 +2,13 @@ package rbbitmqchannel
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"sync"
-	"time"
 )
 
 type ChannelAdapter struct {

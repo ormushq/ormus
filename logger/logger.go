@@ -55,6 +55,7 @@ func New(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
 
 	return logger
 }
+
 func SetDebugMode(debug bool) {
 	var logLevel slog.Level
 	if debug {

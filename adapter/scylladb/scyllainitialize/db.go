@@ -7,11 +7,11 @@ package scyllainitialize
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/logger"
 	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/adapter/scylladb"
+	"github.com/ormushq/ormus/logger"
 )
 
 type ScyllaDBConnection struct {
@@ -70,6 +70,7 @@ func (conn *ScyllaDBConnection) createSession(cluster *gocql.ClusterConfig) (scy
 	session, err := scylladb.WrapSession(cluster.CreateSession())
 	if err != nil {
 		logger.L().Debug("an error occurred while creating DB Session", err)
+
 		return nil, err
 	}
 

@@ -2,9 +2,10 @@ package rabbitmqchanneltaskmanager
 
 import (
 	"encoding/json"
+	"log/slog"
+
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
-	"log/slog"
 )
 
 type Queue struct {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/logger"
 	"log"
 	"time"
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
