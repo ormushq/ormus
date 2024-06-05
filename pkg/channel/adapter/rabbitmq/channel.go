@@ -7,6 +7,7 @@ import (
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"log/slog"
 	"sync"
 	"time"
 )
@@ -49,7 +50,8 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 	defer func(c *amqp.Channel) {
 		err := c.Close()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+				slog.String("error", err.Error()))
 		}
 	}(ch)
 
@@ -93,7 +95,8 @@ func declareExchange(conn *amqp.Connection, exchange string) error {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+				slog.String("error", err.Error()))
 		}
 	}(ch)
 
@@ -136,7 +139,8 @@ func declareQueue(conn *amqp.Connection, queue string) error {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+				slog.String("error", err.Error()))
 		}
 	}(ch)
 
@@ -178,7 +182,8 @@ func bindExchangeToQueue(conn *amqp.Connection, exchange, queue string) error {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+				slog.String("error", err.Error()))
 		}
 	}(ch)
 
@@ -228,7 +233,8 @@ func (rc *rabbitmqChannel) startOutput() {
 		defer rc.wg.Done()
 		ch, err := rc.rabbitmq.connection.Channel()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToOpenChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
+				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startOutput)
 
 			return
@@ -237,7 +243,8 @@ func (rc *rabbitmqChannel) startOutput() {
 		defer func(ch *amqp.Channel) {
 			err = ch.Close()
 			if err != nil {
-				logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+				logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+					slog.String("error", err.Error()))
 			}
 		}(ch)
 
@@ -251,7 +258,8 @@ func (rc *rabbitmqChannel) startOutput() {
 			nil,      // arguments
 		)
 		if errConsume != nil {
-			logger.L().Error("failed to start consume", "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error("failed to start consume",
+				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startOutput)
 
 			return
@@ -259,7 +267,8 @@ func (rc *rabbitmqChannel) startOutput() {
 
 		for {
 			if ch.IsClosed() {
-				logger.L().Debug("channel is closed rerun startOutput function")
+				logger.WithGroup(loggerGroupName).
+					Debug("channel is closed rerun startOutput function")
 				rc.callMeNextTime(rc.startOutput)
 
 				return
@@ -293,7 +302,8 @@ func (rc *rabbitmqChannel) startInput() {
 		defer rc.wg.Done()
 		ch, err := rc.rabbitmq.connection.Channel()
 		if err != nil {
-			logger.L().Error(errmsg.ErrFailedToOpenChannel, "error", err.Error())
+			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
+				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startInput)
 
 			return
@@ -302,13 +312,14 @@ func (rc *rabbitmqChannel) startInput() {
 		defer func() {
 			err = ch.Close()
 			if err != nil {
-				logger.L().Error(errmsg.ErrFailedToCloseChannel, "error", err.Error())
+				logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+					slog.String("error", err.Error()))
 			}
 		}()
 
 		for {
 			if ch.IsClosed() {
-				logger.L().Debug("channel is closed rerun startInput function")
+				logger.WithGroup(loggerGroupName).Debug("channel is closed rerun startInput function")
 				rc.callMeNextTime(rc.startInput)
 
 				return
@@ -326,7 +337,7 @@ func (rc *rabbitmqChannel) startInput() {
 
 func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries int) {
 	if tries > rc.maxRetryPolicy {
-		logger.L().Error(fmt.Sprintf("job failed after %d tries", tries))
+		logger.WithGroup(loggerGroupName).Error(fmt.Sprintf("job failed after %d tries", tries))
 
 		return
 	}
@@ -344,7 +355,8 @@ func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries
 				Body:        msg,
 			})
 		if errPWC != nil {
-			logger.L().Error("error on publish to rabbitmq", "error", errPWC)
+			logger.WithGroup(loggerGroupName).Error("error on publish to rabbitmq",
+				slog.String("error", errPWC.Error()))
 
 			rc.publishToRabbitmq(ch, msg, tries+1)
 		}

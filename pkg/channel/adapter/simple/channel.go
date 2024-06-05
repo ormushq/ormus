@@ -58,7 +58,7 @@ func (sc simpleChannel) startConsume() {
 
 					return
 				case msg := <-sc.inputChannel:
-					logger.L().Debug("New message received in simple/adapter.go ca.inputChannel")
+					logger.WithGroup(loggerGroupName).Debug("New message received in simple/adapter.go ca.inputChannel")
 					sc.startDelivery(msg)
 				}
 			}

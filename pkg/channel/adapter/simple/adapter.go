@@ -13,6 +13,8 @@ type ChannelAdapter struct {
 	channels map[string]*simpleChannel
 }
 
+const loggerGroupName = "pkg.channel.simple"
+
 func New(done <-chan bool, wg *sync.WaitGroup) *ChannelAdapter {
 	return &ChannelAdapter{
 		channels: make(map[string]*simpleChannel),
