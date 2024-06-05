@@ -56,13 +56,7 @@ func New(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
 	return logger
 }
 
-func SetDebugMode(debug bool) {
-	var logLevel slog.Level
-	if debug {
-		logLevel = slog.LevelDebug
-	} else {
-		logLevel = slog.LevelInfo
-	}
+func SetMode(modeLevel slog.Level) {
 	fileWriter := &lumberjack.Logger{
 		Filename:  defaultFilePath,
 		LocalTime: defaultUseLocalTime,
@@ -71,7 +65,7 @@ func SetDebugMode(debug bool) {
 	}
 	l = slog.New(
 		slog.NewJSONHandler(io.MultiWriter(fileWriter, os.Stdout), &slog.HandlerOptions{
-			Level: logLevel,
+			Level: modeLevel,
 		}),
 	)
 }
