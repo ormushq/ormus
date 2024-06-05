@@ -7,11 +7,11 @@ package scyllainitialize
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/adapter/scylladb"
+	"github.com/ormushq/ormus/logger"
 )
 
 type ScyllaDBConnection struct {
@@ -49,7 +49,8 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 		Max:        maxRetryDelay,
 	}
 	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
-	log.Println("cluster was created.")
+
+	logger.L().Debug("cluster was created.")
 
 	return cluster
 }
@@ -68,12 +69,12 @@ If an error occurs during the session creation, an error is returned.
 func (conn *ScyllaDBConnection) createSession(cluster *gocql.ClusterConfig) (scylladb.SessionxInterface, error) {
 	session, err := scylladb.WrapSession(cluster.CreateSession())
 	if err != nil {
-		fmt.Println("an error occureed while creating DB Session", err.Error())
+		logger.L().Debug("an error occurred while creating DB Session", err)
 
 		return nil, err
 	}
 
-	log.Println("session was created")
+	logger.L().Debug("session was created")
 
 	return session, nil
 }
