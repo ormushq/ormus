@@ -19,7 +19,6 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 		Password:  hashedPassword,
 		IsActive:  false,
 	}
-
 	createdUser, err := s.repo.Register(user)
 	if err != nil {
 		return nil, richerror.New("register.repo").WithWrappedError(err)

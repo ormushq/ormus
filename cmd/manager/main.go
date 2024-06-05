@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"sync"
-	"time"
 
 	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
-	"github.com/ormushq/ormus/manager/mockRepo/usermock"
+	"github.com/ormushq/ormus/manager/repository/scyllarepo"
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
@@ -22,25 +23,25 @@ func main() {
 	cfg := config.C().Manager
 	done := make(chan bool)
 	wg := sync.WaitGroup{}
+	fmt.Println(cfg.ScyllaDBConfig)
 
 	internalBroker := simple.New(done, &wg)
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 
-	TimeOfDayByHour := 24
-	cfg.JWTConfig.AccessExpirationTimeInDay *= time.Duration(TimeOfDayByHour * int(time.Hour))
-	cfg.JWTConfig.RefreshExpirationTimeInDay *= time.Duration(TimeOfDayByHour * int(time.Hour))
-
 	jwt := authservice.NewJWT(cfg.JWTConfig)
+	scylla, err := scyllarepo.New(cfg.ScyllaDBConfig)
+	if err != nil {
+		logger.L().Error("err msg:", err)
+	}
 
-	unknownRepo := usermock.NewMockRepository(false)
 	unknownRepo1 := projectstub.New(false)
 
 	ProjectSvc := projectservice.New(&unknownRepo1, internalBroker)
 
-	userSvc := userservice.New(jwt, unknownRepo, internalBroker)
+	userSvc := userservice.New(jwt, scylla, internalBroker)
 
-	validateUserSvc := uservalidator.New(unknownRepo)
+	validateUserSvc := uservalidator.New(scylla)
 
 	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)

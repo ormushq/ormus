@@ -37,15 +37,23 @@ destination:
     expiration: 0
 
 manager:
-  broker_config:
+  internal_broker_config:
     channel_size: 100
     number_instant: 5
     max_retry_policy: 5
   jwt_config:
     secret_key: "Ormus_jwt"
-    access_expiration_time_in_day: 7
-    refresh_expiration_time_in_day: 28
+    access_expiration_time_in_day: 604800s # 7 * 24 * 3600
+    refresh_expiration_time_in_day: 2419200s  # 28 * 24 * 3600
     access_subject: "ac"
     refresh_subject: "rt"
-
+  scylla_DB_Config:
+    hosts:
+      - 127.0.0.1:9042
+    consistency: 4  # Quorum
+    keyspace: "manager"
+    timeout_cluster: 5s
+    num_retries: 10
+    min_retry_delay: 1s
+    max_retry_delay: 10s
 
