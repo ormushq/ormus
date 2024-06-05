@@ -7,6 +7,7 @@ import (
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"log/slog"
 	"sync"
 	"time"
 )
@@ -19,10 +20,13 @@ type ChannelAdapter struct {
 	rabbitmq                 *Rabbitmq
 	rabbitmqConnectionClosed chan bool
 }
+
 type Rabbitmq struct {
 	connection *amqp.Connection
 	cond       *sync.Cond
 }
+
+const loggerGroupName = "pkg.channel.rabbit"
 
 func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerConnection) *ChannelAdapter {
 	cond := sync.NewCond(&sync.Mutex{})
@@ -46,7 +50,8 @@ func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerCo
 		if err == nil {
 			break
 		}
-		logger.L().Error("rabbitmq connection failed", "error", err.Error())
+		logger.WithGroup(loggerGroupName).Error("rabbitmq connection failed",
+			slog.String("error", err.Error()))
 	}
 
 	return c
@@ -65,7 +70,7 @@ func (ca *ChannelAdapter) connect() error {
 		return err
 	}
 	ca.rabbitmq.connection = conn
-	logger.L().Debug("connected to rabbitmq server")
+	logger.WithGroup(loggerGroupName).Debug("connected to rabbitmq server")
 	ca.rabbitmq.cond.Broadcast()
 
 	ca.waitForConnectionClose()
@@ -86,7 +91,8 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 			case <-ca.done:
 				return
 			case err := <-connectionClosedChannel:
-				logger.L().Error("connection closed", "error", err.Error())
+				logger.WithGroup(loggerGroupName).Error("connection closed",
+					slog.String("error", err.Error()))
 				for {
 					e := ca.connect()
 					time.Sleep(time.Second * time.Duration(ca.config.ReconnectSecond))
@@ -94,7 +100,8 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 					if e == nil {
 						break
 					}
-					logger.L().Error("Connection failed to rabbitmq", "error", e.Error())
+					logger.WithGroup(loggerGroupName).Error("Connection failed to rabbitmq",
+						slog.String("error", e.Error()))
 
 				}
 

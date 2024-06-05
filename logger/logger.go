@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"github.com/ormushq/ormus/pkg/trace"
 	"io"
 	"log/slog"
 	"os"
@@ -39,6 +40,14 @@ func init() {
 
 func L() *slog.Logger {
 	return l
+}
+func WithGroup(groupName string) *slog.Logger {
+	t := trace.Parse()
+	return l.With(slog.Group(groupName,
+		slog.String("path", t.File),
+		slog.Int("line", t.Line),
+		slog.String("function", t.Function),
+	))
 }
 
 func New(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
