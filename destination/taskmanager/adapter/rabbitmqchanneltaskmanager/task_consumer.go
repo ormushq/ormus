@@ -2,12 +2,12 @@ package rabbitmqchanneltaskmanager
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/logger"
-	"github.com/ormushq/ormus/pkg/channel"
 	"sync"
 
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type Consumer struct {

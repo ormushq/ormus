@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/pkg/channel"
-	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 func main() {
@@ -45,7 +46,7 @@ func main() {
 		for msg := range outputChannel {
 			err := msg.Ack()
 			if err != nil {
-				fmt.Println(err)
+				logger.L().Error(err.Error())
 			}
 		}
 	}()

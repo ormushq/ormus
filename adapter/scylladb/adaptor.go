@@ -6,9 +6,10 @@ Note: Make sure to handle errors appropriately when using this package.
 package scylladb
 
 import (
-	"fmt"
-	"github.com/gocql/gocql"
 	"time"
+
+	"github.com/gocql/gocql"
+	"github.com/ormushq/ormus/logger"
 )
 
 type Config struct {
@@ -63,7 +64,7 @@ const (
 //
 //		}
 //
-// /**
+// /**.
 func New(config Config) (SessionxInterface, error) {
 	cluster := gocql.NewCluster(config.Hosts...)
 	cluster.Consistency = config.Consistency
@@ -78,7 +79,7 @@ func New(config Config) (SessionxInterface, error) {
 
 	session, err := WrapSession(cluster.CreateSession())
 	if err != nil {
-		fmt.Println("an error occureed while creating DB Session", err.Error())
+		logger.L().Error("an error occureed while creating DB Session", err)
 
 		return nil, err
 	}

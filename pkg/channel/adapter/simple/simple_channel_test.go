@@ -2,11 +2,12 @@ package simple
 
 import (
 	"encoding/json"
-	"github.com/ormushq/ormus/pkg/channel"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type testCase struct {
@@ -22,7 +23,6 @@ type message struct {
 }
 
 func TestSimpleChannel(t *testing.T) {
-
 	cases := []testCase{
 		{
 			name:           "small test",
@@ -156,7 +156,6 @@ func TestSimpleChannel(t *testing.T) {
 				t.Fail()
 			}
 			t.Log("Done successfully")
-
 		})
 	}
 	t.Log("Before close done channel")

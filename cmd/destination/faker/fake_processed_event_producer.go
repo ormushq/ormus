@@ -9,6 +9,7 @@ import (
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -92,5 +93,5 @@ func main() {
 		})
 	failOnError(err, "Failed to publish a message")
 
-	log.Printf("Publish new processed event.")
+	logger.L().Debug("Publish new processed event.")
 }
