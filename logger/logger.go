@@ -43,7 +43,7 @@ func L() *slog.Logger {
 }
 func WithGroup(groupName string) *slog.Logger {
 	t := trace.Parse()
-	return l.With(slog.Group(groupName,
+	return l.With(slog.String("group", groupName)).With(slog.Group("trace",
 		slog.String("path", t.File),
 		slog.Int("line", t.Line),
 		slog.String("function", t.Function),
