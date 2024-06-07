@@ -96,7 +96,8 @@ func main() {
 
 	errNCA := outputChannelAdapter.NewChannel(queueName, channel.OutputOnly, channelSize, numberInstant, maxRetryPolicy)
 	if errNCA != nil {
-		logger.L().Error(errNCA.Error(), err)
+		logger.WithGroup("webhook_delivery_worker").Error(errNCA.Error(),
+			slog.String("error", errNCA.Error()))
 		os.Exit(1)
 	}
 	outputChannel, err := outputChannelAdapter.GetOutputChannel(queueName)
