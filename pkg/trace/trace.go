@@ -11,10 +11,13 @@ type Trace struct {
 }
 
 func Parse() Trace {
-	pc := make([]uintptr, 10)
-	runtime.Callers(3, pc)
+	pcSize := 10
+	runtimeCallerSkip := 3
+	pc := make([]uintptr, pcSize)
+	runtime.Callers(runtimeCallerSkip, pc)
 	f := runtime.FuncForPC(pc[0])
 	file, line := f.FileLine(pc[0])
+
 	return Trace{
 		File:     file,
 		Line:     line,
