@@ -9,7 +9,6 @@ import (
 	"net/http"
 )
 
-// ? Handler or *Handler.
 func (h Handler) TrackEvent(ctx echo.Context) error {
 	var req params.TrackEventRequest
 	if err := ctx.Bind(&req); err != nil {

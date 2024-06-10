@@ -7,6 +7,6 @@ import (
 )
 
 func (d DB) InsertEvent(ctx context.Context, e event.CoreEvent) (event.CoreEvent, error) {
-	d.adapter.Query()
+	//d.adapter.Query()
 	return event.CoreEvent{}, fmt.Errorf("dsds")
 }
