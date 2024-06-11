@@ -21,12 +21,12 @@ func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
 
 	found := query1.Iter().Scan(&id)
 	if err := query1.Iter().Close(); err != nil {
-		logger.L().Debug("Error closing iterator: %v", err)
+		logger.L().Debug("Error closing iterator", "err msg:", err)
 
 		return false, err
 	}
 
-	logger.L().Debug("Query executed successfully, found: %v", found)
+	logger.L().Debug("Query executed successfully", "is found:", found)
 
 	return found, nil
 }
