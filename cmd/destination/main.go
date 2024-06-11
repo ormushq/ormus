@@ -89,7 +89,7 @@ func main() {
 		ReconnectSecond: reconnectSecond,
 	})
 
-	webHookQueueName := "webhook_tasks"
+	webHookQueueName := "webhook"
 
 	inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
 

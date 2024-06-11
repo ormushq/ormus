@@ -45,7 +45,9 @@ func (a Adapter) Close() error {
 }
 
 func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func() error, err error) {
+	fmt.Println("what is wrong with you NewSession")
 	session, err := concurrency.NewSession(a.client, concurrency.WithTTL(int(ttl)))
+	fmt.Println(fmt.Sprintf("session -> %+v | err -> %s", session, err))
 	if err != nil {
 		return nil, err
 	}
