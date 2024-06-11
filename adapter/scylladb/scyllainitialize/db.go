@@ -48,7 +48,7 @@ func (conn *ScyllaDBConnection) createCluster() *gocql.ClusterConfig {
 		Min:        minRetryDelay,
 		Max:        maxRetryDelay,
 	}
-	logger.L().Debug("Cluster configuration created with hosts:", conn.hosts)
+	logger.L().Debug("Cluster configuration created", "with hosts", conn.hosts)
 	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
 
 	logger.L().Debug("cluster was created.")
