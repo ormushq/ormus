@@ -2,35 +2,13 @@ package scyllarepo
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/logger"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/scylladb/gocqlx/v2/qb"
 )
-
-//func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
-//	stmt := "SELECT COUNT(*) FROM users WHERE email = ? AND is_active = true"
-//	// Initialize the names of placeholders in your query
-//	names := []string{"email"}
-//
-//	query := a.ScyllaConn.Query(stmt, names)
-//
-//	query.BindMap(qb.M{
-//		"email": email,
-//	})
-//	var count int
-//	if err := query.Scan(&count); err != nil {
-//		logger.L().Error("error on scanning user count", err)
-//		return false, err
-//	}
-//
-//	// Check if count is greater than 0, indicating user exists
-//	exists := count > 0
-//
-//	return exists, nil
-//}
 
 func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
 	var id string
@@ -44,10 +22,12 @@ func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
 	found := query1.Iter().Scan(&id)
 	if err := query1.Iter().Close(); err != nil {
 		logger.L().Debug("Error closing iterator: %v", err)
+
 		return false, err
 	}
 
 	logger.L().Debug("Query executed successfully, found: %v", found)
+
 	return found, nil
 }
 

@@ -1,10 +1,10 @@
 package workers
 
 import (
-	"github.com/ormushq/ormus/manager/managerparam"
 	"sync"
 
 	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 )

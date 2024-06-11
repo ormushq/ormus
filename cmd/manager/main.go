@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/manager/managerparam"
 	"log/slog"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
+	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
 	"github.com/ormushq/ormus/manager/repository/scyllarepo"
 	"github.com/ormushq/ormus/manager/service/authservice"
