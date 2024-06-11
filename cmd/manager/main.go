@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"github.com/ormushq/ormus/config"
@@ -20,6 +21,8 @@ import (
 )
 
 func main() {
+	logger.SetLevel(slog.LevelDebug)
+	logger.L().Debug("start manger")
 	cfg := config.C().Manager
 	done := make(chan bool)
 	wg := sync.WaitGroup{}

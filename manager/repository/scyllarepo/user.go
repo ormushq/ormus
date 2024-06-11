@@ -2,6 +2,7 @@ package scyllarepo
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/logger"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,37 +10,45 @@ import (
 	"github.com/scylladb/gocqlx/v2/qb"
 )
 
+//func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
+//	stmt := "SELECT COUNT(*) FROM users WHERE email = ? AND is_active = true"
+//	// Initialize the names of placeholders in your query
+//	names := []string{"email"}
+//
+//	query := a.ScyllaConn.Query(stmt, names)
+//
+//	query.BindMap(qb.M{
+//		"email": email,
+//	})
+//	var count int
+//	if err := query.Scan(&count); err != nil {
+//		logger.L().Error("error on scanning user count", err)
+//		return false, err
+//	}
+//
+//	// Check if count is greater than 0, indicating user exists
+//	exists := count > 0
+//
+//	return exists, nil
+//}
+
 func (a StorageAdapter) DoesUserExistsByEmail(email string) (bool, error) {
-	// if i dont use ALLOW FILTERING, it will return an error:
-	// Cannot execute this query as it might involve data filtering and thus may have unpredictable performance.
-	// If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING
-	// what should do is to use a query like this:
-	// TODO : check if this is the right way to do it
-	// ALLOW FILTERING is a mechanism provided by ScyllaDB and Apache Cassandra to allow querying on non-indexed columns at the expense of performance.
-	// It's typically used as a last resort and should be avoided whenever possible,
-	// especially in production environments with large datasets,
-	// as it can lead to degraded performance and increased load on the database.
-
-	stmt := "SELECT COUNT(*) FROM users WHERE email = ? AND is_active = true ALLOW FILTERING"
-	// Initialize the names of placeholders in your query
+	var id string
+	query := "SELECT id FROM users WHERE email = ? AND is_active = true LIMIT 1"
 	names := []string{"email"}
-
-	// Execute the query
-	query := a.ScyllaConn.Query(stmt, names)
-	// Bind the parameters
-	query.BindMap(qb.M{
+	query1 := a.ScyllaConn.Query(query, names)
+	query1.BindMap(qb.M{
 		"email": email,
 	})
-	// Execute the query
-	var count int
-	if err := query.Scan(&count); err != nil {
+
+	found := query1.Iter().Scan(&id)
+	if err := query1.Iter().Close(); err != nil {
+		logger.L().Debug("Error closing iterator: %v", err)
 		return false, err
 	}
 
-	// Check if count is greater than 0, indicating user exists
-	exists := count > 0
-
-	return exists, nil
+	logger.L().Debug("Query executed successfully, found: %v", found)
+	return found, nil
 }
 
 func (a StorageAdapter) Register(u entity.User) (*entity.User, error) {
@@ -73,20 +82,16 @@ func (a StorageAdapter) Register(u entity.User) (*entity.User, error) {
 
 func (a StorageAdapter) GetUserByEmail(email string) (*entity.User, error) {
 	// TODO : check if this is the right way to do it
-	stmt := "SELECT id, created_at, updated_at, deleted_at, email, password, is_active FROM users WHERE email = ? AND is_active = true ALLOW FILTERING"
+	stmt := "SELECT * FROM users WHERE email = ? AND is_active = true"
 
-	// Initialize the names of placeholders in your query
 	names := []string{"email"}
 
-	// Execute the query
 	query := a.ScyllaConn.Query(stmt, names)
-	// Bind the parameters
+
 	query.BindMap(qb.M{
 		"email": email,
 	})
-	// Execute the query
 
-	// Execute the query
 	var user entity.User
 	if err := query.Get(&user); err != nil {
 		return nil, err

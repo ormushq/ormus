@@ -6,25 +6,13 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (s Service) Create() error {
+func (s Service) Create(msg []byte) error {
 	const op = "projectService.CreateDefaultProject"
-
-	inOutChan, err := s.internalBroker.GetOutputChannel("CreateDefaultProject")
+	_, err := s.repo.Create("Default Project", string(msg))
 	if err != nil {
-		return err
+		return richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
-	for msg := range inOutChan {
-		_, err := s.repo.Create("Default Project", string(msg.Body))
-		if err != nil {
-			return richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
-		}
-
-		err = msg.Ack()
-		if err != nil {
-			return richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
-		}
-		logger.L().Debug("Default project created")
-	}
+	logger.L().Debug("Default project created")
 
 	return nil
 }

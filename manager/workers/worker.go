@@ -34,9 +34,9 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
 		for {
 			select {
 			case msg := <-internalBroker:
-				CreateErr := w.prSvc.Create()
+				CreateErr := w.prSvc.Create(msg.Body)
 				if CreateErr != nil {
-					logger.L().Error("creating project")
+					logger.L().Error("err on creating project", CreateErr)
 
 					break
 				}

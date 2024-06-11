@@ -56,7 +56,7 @@ func New(cfg Config, opt *slog.HandlerOptions) *slog.Logger {
 	return logger
 }
 
-func SetMode(modeLevel slog.Level) {
+func SetLevel(modeLevel slog.Level) {
 	fileWriter := &lumberjack.Logger{
 		Filename:  defaultFilePath,
 		LocalTime: defaultUseLocalTime,
