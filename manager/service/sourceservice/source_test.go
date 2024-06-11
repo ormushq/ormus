@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/manager/mockRepo/sourcemock"
 	"github.com/ormushq/ormus/manager/mockRepo/usermock"
-	"github.com/ormushq/ormus/manager/param"
 	"github.com/ormushq/ormus/manager/service/sourceservice"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -60,7 +60,7 @@ func TestUpdateSource(t *testing.T) {
 		expectedErr error
 		sourceID    string
 		ownerID     string
-		req1        param.UpdateSourceRequest
+		req1        managerparam.UpdateSourceRequest
 	}{
 		{
 			name:        "repo fails",
@@ -68,7 +68,7 @@ func TestUpdateSource(t *testing.T) {
 			expectedErr: richerror.New("MockRepo.GetUserSourceById").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			sourceID:    "source_id",
 			ownerID:     "owner_id",
-			req1: param.UpdateSourceRequest{
+			req1: managerparam.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
@@ -79,7 +79,7 @@ func TestUpdateSource(t *testing.T) {
 			repoErr:  false,
 			sourceID: "source_id",
 			ownerID:  "owner_id",
-			req1: param.UpdateSourceRequest{
+			req1: managerparam.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
@@ -91,7 +91,7 @@ func TestUpdateSource(t *testing.T) {
 			expectedErr: richerror.New("MockRepo.GetUserSourceById").WithMessage(errmsg.ErrUserNotFound),
 			sourceID:    "invalide source_id",
 			ownerID:     "owner_id",
-			req1: param.UpdateSourceRequest{
+			req1: managerparam.UpdateSourceRequest{
 				Name:        "new name",
 				Description: "new description",
 				ProjectID:   "new project id",
@@ -127,14 +127,14 @@ func TestCreateSource(t *testing.T) {
 		repoErr     bool
 		expectedErr error
 		ownerID     string
-		req         param.AddSourceRequest
+		req         managerparam.AddSourceRequest
 	}{
 		{
 			name:        "repo fails",
 			repoErr:     true,
 			expectedErr: richerror.New("MockRepo.InsertSource").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
 			ownerID:     "owner_id",
-			req: param.AddSourceRequest{
+			req: managerparam.AddSourceRequest{
 				Name:        "name",
 				Description: "description",
 				ProjectID:   "project id",
@@ -144,7 +144,7 @@ func TestCreateSource(t *testing.T) {
 			name:    "ordinary",
 			repoErr: false,
 			ownerID: "owner_id",
-			req: param.AddSourceRequest{
+			req: managerparam.AddSourceRequest{
 				Name:        "un existed name",
 				Description: "description",
 				ProjectID:   "project id",

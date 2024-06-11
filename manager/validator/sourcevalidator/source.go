@@ -6,12 +6,12 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/oklog/ulid/v2"
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateCreateSourceForm(req param.AddSourceRequest) *ValidatorError {
+func (v Validator) ValidateCreateSourceForm(req managerparam.AddSourceRequest) *ValidatorError {
 	minNameLength := 5
 	maxNameLength := 30
 
@@ -47,7 +47,7 @@ func (v Validator) ValidateCreateSourceForm(req param.AddSourceRequest) *Validat
 	return nil
 }
 
-func (v Validator) ValidateUpdateSourceForm(req param.UpdateSourceRequest) *ValidatorError {
+func (v Validator) ValidateUpdateSourceForm(req managerparam.UpdateSourceRequest) *ValidatorError {
 	minNameLength := 5
 	maxNameLength := 30
 

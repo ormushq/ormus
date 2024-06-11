@@ -59,9 +59,7 @@ func (a StorageAdapter) Register(u entity.User) (*entity.User, error) {
 	} else {
 		deletedAtValue = fmt.Sprintf("'%s'", u.DeletedAt.Format(time.RFC3339))
 	}
-	// Now it's true by default until our authentication system works properly.
-	// TODO: The user is set to active when he has confirmed his email
-	u.IsActive = true
+
 	query := fmt.Sprintf("INSERT INTO users (id, created_at, updated_at, deleted_at, email, password, is_active) VALUES ('%s', '%s', '%s', %s, '%s', '%s', %t)",
 		u.ID,
 		time.Now().Format(time.RFC3339),

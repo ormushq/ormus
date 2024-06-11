@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/managerparam"
 	"log/slog"
 	"sync"
 
@@ -29,7 +30,7 @@ func main() {
 	fmt.Println(cfg.ScyllaDBConfig)
 
 	internalBroker := simple.New(done, &wg)
-	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
+	internalBroker.NewChannel(managerparam.CreateDefaultProject, channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 
 	jwt := authservice.NewJWT(cfg.JWTConfig)

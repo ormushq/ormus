@@ -1,6 +1,7 @@
 package workers
 
 import (
+	"github.com/ormushq/ormus/manager/managerparam"
 	"sync"
 
 	"github.com/ormushq/ormus/logger"
@@ -22,7 +23,7 @@ func New(prSvc *projectservice.Service, internalBroker *simple.ChannelAdapter) *
 
 func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
 	logger.L().Debug("workers.Run")
-	internalBroker, err := w.internalBroker.GetOutputChannel("CreateDefaultProject")
+	internalBroker, err := w.internalBroker.GetOutputChannel(managerparam.CreateDefaultProject)
 	if err != nil {
 		logger.L().Debug("error on getting internal broker channel")
 
@@ -34,15 +35,15 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
 		for {
 			select {
 			case msg := <-internalBroker:
-				CreateErr := w.prSvc.Create(msg.Body)
-				if CreateErr != nil {
-					logger.L().Error("err on creating project", CreateErr)
+				createErr := w.prSvc.Create(msg.Body)
+				if createErr != nil {
+					logger.L().Error("err on creating project", "err msg:", createErr)
 
 					break
 				}
-				AckErr := msg.Ack()
-				if AckErr != nil {
-					logger.L().Error("message ack")
+				ackErr := msg.Ack()
+				if ackErr != nil {
+					logger.L().Error("err on acking message", "err msg:", ackErr)
 
 					break
 				}

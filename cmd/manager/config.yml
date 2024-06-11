@@ -38,7 +38,7 @@ destination:
 
 manager:
   internal_broker_config:
-    channel_size: 100
+    channel_size: 1000000
     number_instant: 5
     max_retry_policy: 5
   jwt_config:
