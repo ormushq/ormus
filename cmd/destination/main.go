@@ -115,7 +115,7 @@ func main() {
 	})
 	span.AddEvent("input-channel-adapter-created")
 
-	webHookQueueName := "webhook_tasks"
+	webHookQueueName := "webhook"
 
 	errNCA := inputChannelAdapter.NewChannelWithContext(ctx, webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
 	if errNCA != nil {
