@@ -24,17 +24,22 @@ func NewLog(msg string) *Log {
 func (l *Log) WithTrace() *Log {
 	return l.With(loggerparam.ExtraKeyTrace, newtrace.Parse(0))
 }
+
 func (l *Log) WithCategory(cat loggerparam.Category) *Log {
 	l.cat = cat
+
 	return l
 }
 
 func (l *Log) WithSubCategory(sub loggerparam.SubCategory) *Log {
 	l.sub = sub
+
 	return l
 }
+
 func (l *Log) With(key loggerparam.ExtraKey, value interface{}) *Log {
 	l.extra[key] = value
+
 	return l
 }
 

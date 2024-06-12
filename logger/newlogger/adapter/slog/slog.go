@@ -39,6 +39,7 @@ type Config struct {
 func NewSlog(cfg Config) *Slog {
 	logger := &Slog{config: cfg}
 	logger.Init()
+
 	return logger
 }
 
@@ -67,9 +68,7 @@ func (s *Slog) Init() {
 	})
 }
 
-func (s *Slog) Debug(cat loggerparam.Category, sub loggerparam.SubCategory, msg string,
-	extra map[loggerparam.ExtraKey]interface{}) {
-
+func (s *Slog) Debug(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
 	s.logger.Debug(msg, params...)
 }
@@ -78,8 +77,7 @@ func (s *Slog) Debugf(template string, args ...interface{}) {
 	s.logger.Debug(fmt.Sprintf(template, args...))
 }
 
-func (s *Slog) Info(cat loggerparam.Category, sub loggerparam.SubCategory, msg string,
-	extra map[loggerparam.ExtraKey]interface{}) {
+func (s *Slog) Info(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
 	s.logger.Info(msg, params...)
 }
@@ -88,9 +86,7 @@ func (s *Slog) Infof(template string, args ...interface{}) {
 	s.logger.Info(fmt.Sprintf(template, args...))
 }
 
-func (s *Slog) Warn(cat loggerparam.Category, sub loggerparam.SubCategory, msg string,
-	extra map[loggerparam.ExtraKey]interface{}) {
-
+func (s *Slog) Warn(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
 	s.logger.Warn(msg, params...)
 }
@@ -99,9 +95,7 @@ func (s *Slog) Warnf(template string, args ...interface{}) {
 	s.logger.Warn(fmt.Sprintf(template, args...))
 }
 
-func (s *Slog) Error(cat loggerparam.Category, sub loggerparam.SubCategory, msg string,
-	extra map[loggerparam.ExtraKey]interface{}) {
-
+func (s *Slog) Error(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
 	s.logger.Error(msg, params...)
 }
@@ -110,18 +104,15 @@ func (s *Slog) Errorf(template string, args ...interface{}) {
 	s.logger.Error(fmt.Sprintf(template, args...))
 }
 
-func (s *Slog) Fatal(cat loggerparam.Category, sub loggerparam.SubCategory, msg string,
-	extra map[loggerparam.ExtraKey]interface{}) {
+func (s *Slog) Fatal(_ loggerparam.Category, _ loggerparam.SubCategory, _ string, _ map[loggerparam.ExtraKey]interface{}) {
 	s.logger.Error("Fatal not supported")
 }
 
-func (s *Slog) Fatalf(template string, args ...interface{}) {
+func (s *Slog) Fatalf(_ string, _ ...interface{}) {
 	s.logger.Error("Fatal not supported")
 }
 
-func prepareLogInfo(cat loggerparam.Category, sub loggerparam.SubCategory,
-	extra map[loggerparam.ExtraKey]interface{}) []any {
-
+func prepareLogInfo(cat loggerparam.Category, sub loggerparam.SubCategory, extra map[loggerparam.ExtraKey]interface{}) []any {
 	if extra == nil {
 		extra = make(map[loggerparam.ExtraKey]interface{})
 	}

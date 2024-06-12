@@ -52,6 +52,7 @@ func NewLogger(cfg Config) Logger {
 				MaxSize:    cfg.MaxSize,
 				MaxAge:     cfg.MaxAge,
 			})
+
 			return
 		}
 		panic("logger not supported")
@@ -64,5 +65,6 @@ func L() Logger {
 	if logger == nil {
 		panic("you need to init logger first")
 	}
+
 	return logger
 }
