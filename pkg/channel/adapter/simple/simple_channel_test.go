@@ -51,10 +51,15 @@ func TestSimpleChannel(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
 			adapter := New(done, wg)
-			adapter.NewChannel(tc.name, channel.BothMode, bufferSize, numberInstants, maxRetryPolicy)
+			err := adapter.NewChannel(tc.name, channel.BothMode, bufferSize, numberInstants, maxRetryPolicy)
+			if err != nil {
+				t.Error(err.Error())
+				t.Fail()
+			}
 			inputChannel, err := adapter.GetInputChannel(tc.name)
 			if err != nil {
-				panic(err)
+				t.Error(err.Error())
+				t.Fail()
 			}
 
 			for workerId := 0; workerId < tc.numWorkers; workerId++ {
@@ -68,7 +73,8 @@ func TestSimpleChannel(t *testing.T) {
 						}
 						m, err := json.Marshal(msg)
 						if err != nil {
-							panic(err)
+							t.Error(err.Error())
+							t.Fail()
 						}
 						inputChannel <- m
 					}
@@ -77,7 +83,8 @@ func TestSimpleChannel(t *testing.T) {
 
 			outputChannel, err := adapter.GetOutputChannel(tc.name)
 			if err != nil {
-				panic(err)
+				t.Error(err.Error())
+				t.Fail()
 			}
 			msgReceivedCount := atomic.Int32{}
 
@@ -99,7 +106,8 @@ func TestSimpleChannel(t *testing.T) {
 							m := message{}
 							err := json.Unmarshal(msg.Body, &m)
 							if err != nil {
-								panic(err)
+								t.Error(err.Error())
+								t.Fail()
 							}
 
 							if value, ok := receivedMessages.Load(m.WorkerId); ok {
@@ -112,7 +120,8 @@ func TestSimpleChannel(t *testing.T) {
 							}
 							err = msg.Ack()
 							if err != nil {
-								panic(err)
+								t.Error(err.Error())
+								t.Fail()
 							}
 							msgReceivedCount.Add(1)
 						}(msg)

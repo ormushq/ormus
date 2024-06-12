@@ -1,11 +1,10 @@
 package simple
 
 import (
-	"fmt"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/pkg/channel"
 	"sync"
 	"time"
-
-	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type simpleChannel struct {
@@ -21,8 +20,7 @@ type simpleChannel struct {
 const timeForCallAgainDuration = 10
 
 func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
-	bufferSize, numberInstants, maxRetryPolicy int,
-) *simpleChannel {
+	bufferSize, numberInstants, maxRetryPolicy int) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
@@ -60,7 +58,7 @@ func (sc simpleChannel) startConsume() {
 
 					return
 				case msg := <-sc.inputChannel:
-					fmt.Println("New message received in simple/adapter.go ca.inputChannel", msg)
+					logger.WithGroup(loggerGroupName).Debug("New message received in simple/adapter.go ca.inputChannel")
 					sc.startDelivery(msg)
 				}
 			}
