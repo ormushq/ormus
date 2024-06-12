@@ -7,14 +7,18 @@ import (
 )
 
 func main() {
+	MaxBackups := 10
+	MaxSize := 10
+	MaxAge := 30
+
 	newlogger.NewLogger(newlogger.Config{
 		Driver:     "slog",
 		Level:      "debug",
 		Filepath:   "logs/logs.json",
 		LocalTime:  false,
-		MaxBackups: 10,
-		MaxSize:    10,
-		MaxAge:     30,
+		MaxBackups: MaxBackups,
+		MaxSize:    MaxSize,
+		MaxAge:     MaxAge,
 	})
 
 	extraKeyValue := "extra key not defined"
