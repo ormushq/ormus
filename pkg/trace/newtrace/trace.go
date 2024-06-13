@@ -12,17 +12,14 @@ type Trace struct {
 
 func Parse(runtimeCallerSkip int) Trace {
 	pcSize := 10
-	if runtimeCallerSkip == 0 {
-		runtimeCallerSkip = 5
-	}
 	pc := make([]uintptr, pcSize)
-	runtime.Callers(runtimeCallerSkip, pc)
-	f := runtime.FuncForPC(pc[0])
-	file, line := f.FileLine(pc[0])
-
+	n := runtime.Callers(runtimeCallerSkip, pc)
+	pc = pc[:n]
+	frames := runtime.CallersFrames(pc)
+	frame, _ := frames.Next()
 	return Trace{
-		File:     file,
-		Line:     line,
-		Function: f.Name(),
+		File:     frame.File,
+		Line:     frame.Line,
+		Function: frame.Function,
 	}
 }

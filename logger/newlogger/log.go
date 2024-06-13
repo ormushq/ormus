@@ -12,6 +12,8 @@ type Log struct {
 	extra map[loggerparam.ExtraKey]interface{}
 }
 
+const runtimeCallerSkip = 3
+
 func NewLog(msg string) *Log {
 	return &Log{
 		cat:   loggerparam.CategoryNotDefined,
@@ -22,7 +24,7 @@ func NewLog(msg string) *Log {
 }
 
 func (l *Log) WithTrace() *Log {
-	return l.With(loggerparam.ExtraKeyTrace, newtrace.Parse(0))
+	return l.With(loggerparam.ExtraKeyTrace, newtrace.Parse(runtimeCallerSkip))
 }
 
 func (l *Log) WithCategory(cat loggerparam.Category) *Log {

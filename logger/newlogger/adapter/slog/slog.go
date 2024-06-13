@@ -1,6 +1,7 @@
 package slog
 
 import (
+	"context"
 	"fmt"
 	"github.com/ormushq/ormus/logger/newlogger/loggerparam"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -15,6 +16,8 @@ type Slog struct {
 	logger *slog.Logger
 }
 
+const fatalLevel = slog.Level(12)
+
 var (
 	DriverName       = "slog"
 	once             = sync.Once{}
@@ -23,6 +26,7 @@ var (
 		"info":  slog.LevelInfo,
 		"warn":  slog.LevelWarn,
 		"error": slog.LevelError,
+		"fatal": fatalLevel,
 	}
 )
 
@@ -62,15 +66,26 @@ func (s *Slog) Init() {
 			MaxAge:     s.config.MaxAge,
 		}
 		logger := slog.New(
-			slog.NewJSONHandler(io.MultiWriter(fileWriter, os.Stdout), &slog.HandlerOptions{Level: s.getLogLevel()}),
+			slog.NewJSONHandler(io.MultiWriter(fileWriter, os.Stdout), &slog.HandlerOptions{
+				Level:       s.getLogLevel(),
+				ReplaceAttr: ReplaceAttr,
+			}),
 		)
 		s.logger = logger
 	})
 }
 
+func ReplaceAttr(_ []string, a slog.Attr) slog.Attr {
+	if a.Value.String() == "ERROR+4" {
+		a.Value = slog.StringValue("FATAL")
+	}
+
+	return a
+}
+
 func (s *Slog) Debug(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
-	s.logger.Debug(msg, params...)
+	s.logger.LogAttrs(context.Background(), slog.LevelDebug, msg, params...)
 }
 
 func (s *Slog) Debugf(template string, args ...interface{}) {
@@ -79,7 +94,7 @@ func (s *Slog) Debugf(template string, args ...interface{}) {
 
 func (s *Slog) Info(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
-	s.logger.Info(msg, params...)
+	s.logger.LogAttrs(context.Background(), slog.LevelInfo, msg, params...)
 }
 
 func (s *Slog) Infof(template string, args ...interface{}) {
@@ -88,7 +103,7 @@ func (s *Slog) Infof(template string, args ...interface{}) {
 
 func (s *Slog) Warn(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
-	s.logger.Warn(msg, params...)
+	s.logger.LogAttrs(context.Background(), slog.LevelWarn, msg, params...)
 }
 
 func (s *Slog) Warnf(template string, args ...interface{}) {
@@ -97,22 +112,25 @@ func (s *Slog) Warnf(template string, args ...interface{}) {
 
 func (s *Slog) Error(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
 	params := prepareLogInfo(cat, sub, extra)
-	s.logger.Error(msg, params...)
+	s.logger.LogAttrs(context.Background(), slog.LevelError, msg, params...)
 }
 
 func (s *Slog) Errorf(template string, args ...interface{}) {
 	s.logger.Error(fmt.Sprintf(template, args...))
 }
 
-func (s *Slog) Fatal(_ loggerparam.Category, _ loggerparam.SubCategory, _ string, _ map[loggerparam.ExtraKey]interface{}) {
-	s.logger.Error("Fatal not supported")
+func (s *Slog) Fatal(cat loggerparam.Category, sub loggerparam.SubCategory, msg string, extra map[loggerparam.ExtraKey]interface{}) {
+	params := prepareLogInfo(cat, sub, extra)
+	s.logger.LogAttrs(context.Background(), fatalLevel, msg, params...)
+	os.Exit(1)
 }
 
-func (s *Slog) Fatalf(_ string, _ ...interface{}) {
-	s.logger.Error("Fatal not supported")
+func (s *Slog) Fatalf(template string, args ...interface{}) {
+	s.logger.Log(context.Background(), fatalLevel, fmt.Sprintf(template, args...))
+	os.Exit(1)
 }
 
-func prepareLogInfo(cat loggerparam.Category, sub loggerparam.SubCategory, extra map[loggerparam.ExtraKey]interface{}) []any {
+func prepareLogInfo(cat loggerparam.Category, sub loggerparam.SubCategory, extra map[loggerparam.ExtraKey]interface{}) []slog.Attr {
 	if extra == nil {
 		extra = make(map[loggerparam.ExtraKey]interface{})
 	}
