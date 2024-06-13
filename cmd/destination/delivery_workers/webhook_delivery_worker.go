@@ -1,6 +1,11 @@
 package main
 
 import (
+	"github.com/ormushq/ormus/destination/dconfig"
+	"github.com/ormushq/ormus/destination/taskdelivery/adapters/webhookdeliveryhandler"
+	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"log"
 	"log/slog"
 	"os"
@@ -11,17 +16,13 @@ import (
 	"github.com/ormushq/ormus/adapter/etcd"
 	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/taskdelivery"
-	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
-	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
+
 	"github.com/ormushq/ormus/destination/taskservice"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
 	"github.com/ormushq/ormus/destination/worker"
 	"github.com/ormushq/ormus/logger"
-	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 const waitingAfterShutdownInSeconds = 2
@@ -74,8 +75,9 @@ func main() {
 
 	// Register delivery handlers
 	// each destination type can have specific delivery handler
-	fakeTaskDeliveryHandler := fakedeliveryhandler.New()
-	taskdelivery.Register("webhook", fakeTaskDeliveryHandler)
+	//fakeTaskDeliveryHandler := fakedeliveryhandler.New()
+	webhookTaskDeliveryHandler := webhookdeliveryhandler.New()
+	taskdelivery.Register("webhook", webhookTaskDeliveryHandler)
 
 	//----------------- Consume ProcessEvents -----------------//
 
@@ -84,7 +86,7 @@ func main() {
 	numberInstant := 5
 	maxRetryPolicy := 5
 	taskConsumerConf := config.C().Destination.RabbitMQTaskManagerConnection
-	queueName := "webhook_tasks"
+	queueName := "webhook"
 	outputChannelAdapter := rbbitmqchannel.New(done, &wg, dconfig.RabbitMQConsumerConnection{
 		User:            taskConsumerConf.User,
 		Password:        taskConsumerConf.Password,

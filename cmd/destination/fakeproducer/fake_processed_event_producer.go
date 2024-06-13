@@ -11,6 +11,7 @@ import (
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -53,21 +54,33 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
 
-	fakeIntegration := entity.Integration{
-		ID:       "10",
-		SourceID: "1",
-		Metadata: entity.DestinationMetadata{
-			ID:   "1",
-			Name: "webhook",
-			Slug: "webhook",
-		},
-	}
 	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
-		SourceID:          "1",
-		Integration:       fakeIntegration,
-		MessageID:         "1",
+		SourceID: "4",
+		Integration: entity.Integration{
+			ID:       "2",
+			SourceID: "2",
+			Metadata: entity.DestinationMetadata{
+				ID:   "2",
+				Name: "webhook",
+				Slug: "webhook",
+			},
+			Config: webhookintegration.WebhookConfig{
+				Headers: map[string]string{
+					"Authorization": "Basic MY_BASIC_AUTH_TOKEN",
+					"Content-Type":  "MY_CONTENT_TYPE",
+				},
+				Payload: map[string]string{
+					"name":      "ali",
+					"birth_day": "2020-12-12",
+					"mail":      "ali@mail.com",
+				},
+				Method: webhookintegration.POSTWebhookMethod,
+				URL:    "https://eoc0z7vqfxu6io.m.pipedream.net",
+			},
+		},
+		MessageID:         "43",
 		EventType:         "page",
 		Name:              &pageName,
 		Version:           1,
@@ -79,7 +92,7 @@ func main() {
 
 	jpe, err := json.Marshal(pe)
 	if err != nil {
-		log.Panicf("Error: %e", err)
+		log.Panicf("Error: %s", err)
 	}
 
 	err = ch.PublishWithContext(ctx,

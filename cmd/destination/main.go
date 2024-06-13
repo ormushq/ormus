@@ -89,7 +89,7 @@ func main() {
 		ReconnectSecond: reconnectSecond,
 	})
 
-	webHookQueueName := "webhook_tasks"
+	webHookQueueName := "webhook"
 
 	errNCA := inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
 	if errNCA != nil {
