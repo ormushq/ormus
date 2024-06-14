@@ -17,6 +17,7 @@ func Parse(runtimeCallerSkip int) Trace {
 	pc = pc[:n]
 	frames := runtime.CallersFrames(pc)
 	frame, _ := frames.Next()
+
 	return Trace{
 		File:     frame.File,
 		Line:     frame.Line,
