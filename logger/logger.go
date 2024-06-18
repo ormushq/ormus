@@ -1,11 +1,11 @@
 package logger
 
 import (
-	"github.com/ormushq/ormus/pkg/trace"
 	"io"
 	"log/slog"
 	"os"
 
+	"github.com/ormushq/ormus/pkg/trace"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

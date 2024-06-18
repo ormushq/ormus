@@ -30,8 +30,11 @@ func main() {
 	fmt.Println(cfg.ScyllaDBConfig)
 
 	internalBroker := simple.New(done, &wg)
-	internalBroker.NewChannel(managerparam.CreateDefaultProject, channel.BothMode,
+	err := internalBroker.NewChannel(managerparam.CreateDefaultProject, channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+	if err != nil {
+		logger.L().Error("error on creating internal broker channel", err)
+	}
 
 	jwt := authservice.NewJWT(cfg.JWTConfig)
 	scylla, err := scyllarepo.New(cfg.ScyllaDBConfig)
