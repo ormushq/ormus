@@ -21,10 +21,16 @@ func main() {
 	numberInstants := 5
 	bufferSize := 5
 	inputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+	err := inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	outputChannelAdapter := rbbitmqchannel.New(done, &wg, config.C().Destination.RabbitMQConsumerConnection)
-	outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+	err = outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	inputChannel, err := inputChannelAdapter.GetInputChannel(channelName)
 	if err != nil {

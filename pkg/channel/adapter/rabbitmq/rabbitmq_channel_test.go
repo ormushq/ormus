@@ -62,7 +62,8 @@ func TestRabbitmqChannel(t *testing.T) {
 			inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
 			inputChannel, err := inputAdapter.GetInputChannel(tc.name)
 			if err != nil {
-				panic(err)
+				t.Error(err.Error())
+				t.Fail()
 			}
 
 			for workerId := 0; workerId < tc.numWorkers; workerId++ {
@@ -76,7 +77,8 @@ func TestRabbitmqChannel(t *testing.T) {
 						}
 						m, err := json.Marshal(msg)
 						if err != nil {
-							panic(err)
+							t.Error(err.Error())
+							t.Fail()
 						}
 						inputChannel <- m
 					}
@@ -84,10 +86,15 @@ func TestRabbitmqChannel(t *testing.T) {
 			}
 			time.Sleep(time.Second * tc.receiveTimeout / 2)
 			outputAdapter := New(done, wg, config)
-			outputAdapter.NewChannel(tc.name, channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+			err = outputAdapter.NewChannel(tc.name, channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+			if err != nil {
+				t.Error(err.Error())
+				t.FailNow()
+			}
 			outputChannel, err := outputAdapter.GetOutputChannel(tc.name)
 			if err != nil {
-				panic(err)
+				t.Error(err.Error())
+				t.FailNow()
 			}
 			msgReceivedCount := atomic.Int32{}
 
@@ -109,7 +116,8 @@ func TestRabbitmqChannel(t *testing.T) {
 							m := message{}
 							err := json.Unmarshal(msg.Body, &m)
 							if err != nil {
-								panic(err)
+								t.Error(err.Error())
+								t.Fail()
 							}
 
 							if value, ok := receivedMessages.Load(m.WorkerId); ok {
@@ -122,7 +130,8 @@ func TestRabbitmqChannel(t *testing.T) {
 							}
 							err = msg.Ack()
 							if err != nil {
-								panic(err)
+								t.Error(err.Error())
+								t.Fail()
 							}
 							msgReceivedCount.Add(1)
 						}(msg)
