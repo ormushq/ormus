@@ -74,7 +74,7 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (string, error) {
 	if userID == "" {
 		// it is weird to build a jwt token for no one, right?
-		return "", richerror.New("jwt.createToken").WhitMessage(errmsg.ErrJwtEmptyUser)
+		return "", richerror.New("jwt.createToken").WithMessage(errmsg.ErrJwtEmptyUser)
 	}
 	// create a signer for rsa 256
 	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go

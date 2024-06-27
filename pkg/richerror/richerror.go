@@ -25,7 +25,7 @@ func New(operation string) RichError {
 	return RichError{operation: operation}
 }
 
-func (r RichError) WhitMessage(message string) RichError {
+func (r RichError) WithMessage(message string) RichError {
 	r.message = message
 
 	return r

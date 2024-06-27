@@ -1,4 +1,4 @@
-package param
+package managerparam
 
 import (
 	"time"

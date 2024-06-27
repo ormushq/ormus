@@ -10,7 +10,7 @@ func (s Service) IsUserIDValid(email string) (bool, error) {
 
 	user, rErr := s.repo.GetUserByEmail(email)
 	if rErr != nil {
-		return false, richerror.New(op).WithWrappedError(rErr).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return false, richerror.New(op).WithWrappedError(rErr).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if user == nil {

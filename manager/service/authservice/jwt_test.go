@@ -89,11 +89,11 @@ func Test_CreateAccessToken(t *testing.T) {
 		{
 			name: "empty user",
 			user: entity.User{},
-			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrJwtEmptyUser),
+			err:  richerror.New("Test_CreateAccessToken").WithMessage(errmsg.ErrJwtEmptyUser),
 		},
 		{
 			name: "nil user",
-			err:  richerror.New("Test_CreateAccessToken").WhitMessage(errmsg.ErrJwtEmptyUser),
+			err:  richerror.New("Test_CreateAccessToken").WithMessage(errmsg.ErrJwtEmptyUser),
 		},
 	}
 

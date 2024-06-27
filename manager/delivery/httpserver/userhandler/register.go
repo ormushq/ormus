@@ -15,7 +15,6 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 	if err := ctx.Bind(&Req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, echomsg.DefaultMessage(errmsg.ErrBadRequest))
 	}
-
 	result := h.userValidator.ValidateRegisterRequest(Req)
 	if result != nil {
 		msg, code := httpmsg.Error(result.Err)
@@ -25,7 +24,6 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 			"errors":  result.Fields,
 		})
 	}
-
 	// TODO: should we return service error? or should we only return bad request error?
 	resp, err := h.userSvc.Register(Req)
 	if err != nil {

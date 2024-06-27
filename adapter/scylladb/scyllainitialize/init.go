@@ -36,6 +36,7 @@ package scyllainitialize
 import (
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/adapter/scylladb"
+	"github.com/ormushq/ormus/logger"
 	scyllaMigrate "github.com/ormushq/ormus/source/repository/scylladb/migrate"
 )
 
@@ -67,6 +68,7 @@ func CreateKeySpace(consistency gocql.Consistency, keyspace string, hosts ...str
 }
 
 func RunMigrations(dbConn *ScyllaDBConnection, dir string) error {
+	logger.L().Debug("running migrations...")
 	for _, host := range dbConn.hosts {
 		manager := scyllaMigrate.New(dir, host, dbConn.keyspace)
 		err := manager.Run()

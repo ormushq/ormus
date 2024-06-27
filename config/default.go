@@ -22,6 +22,12 @@ const (
 	MaxRetryDelay = 10 * time.Second
 )
 
+const (
+	ChannelSize    = 100
+	NumberInstant  = 100
+	MaxRetryPolicy = 10
+)
+
 func Default() Config {
 	var accessExpirationTimeInDay time.Duration = 7
 	var refreshExpirationTimeInDay time.Duration = 28
@@ -43,6 +49,11 @@ func Default() Config {
 				RefreshExpirationTimeInDay: refreshExpirationTimeInDay,
 				AccessSubject:              "ac",
 				RefreshSubject:             "rt",
+			},
+			InternalBrokerConfig: manager.InternalBrokerConfig{
+				ChannelSize:    ChannelSize,
+				NumberInstant:  NumberInstant,
+				MaxRetryPolicy: MaxRetryPolicy,
 			},
 		},
 	}

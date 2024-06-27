@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/manager/managerparam"
 )
 
 // ? Handler or *Handler.
@@ -19,7 +19,7 @@ func (h Handler) CreateSource(ctx echo.Context) error {
 	// TODO  get project id  if get from param dont forget add to route ?
 
 	// binding addsource request form
-	AddSourceReq := new(param.AddSourceRequest)
+	AddSourceReq := new(managerparam.AddSourceRequest)
 	if err := ctx.Bind(AddSourceReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}

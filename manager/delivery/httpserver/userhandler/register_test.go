@@ -6,16 +6,23 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
-	"github.com/ormushq/ormus/manager/mock/usermock"
+	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
+	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,15 +62,22 @@ func TestIntegrationHandler_Register(t *testing.T) {
 			}`,
 		},
 	}
-
-	cfg := config.C()
+	cfg := config.C().Manager
+	done := make(chan bool)
+	wg := sync.WaitGroup{}
+	internalBroker := simple.New(done, &wg)
+	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	repo := usermock.NewMockRepository(false)
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
-	service := userservice.New(jwt, repo)
+	jwt := authservice.NewJWT(cfg.JWTConfig)
+	service := userservice.New(jwt, repo, internalBroker)
 	validator := uservalidator.New(repo)
-	handler := userhandler.New(service, validator)
-
+	RepoPr := projectstub.New(false)
+	ProjectSvc := projectservice.New(&RepoPr, internalBroker)
+	handler := userhandler.New(service, validator, ProjectSvc)
 	e := echo.New()
+
+	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -76,9 +90,17 @@ func TestIntegrationHandler_Register(t *testing.T) {
 			// Execution
 			_ = handler.RegisterUser(ctx)
 
+			// Waiting for the project persist to channel and project service to create the project
+			time.Sleep(15 * time.Second)
 			// Assertion
 			assert.Equal(t, tc.expectedStatus, rec.Code)
+			if http.StatusCreated == rec.Code {
+				exist := RepoPr.IsCreated("new-id")
+				assert.True(t, exist)
+			}
 			assert.JSONEq(t, tc.expectedBody, strings.TrimSpace(rec.Body.String()))
 		})
 	}
+	outChannel, _ := internalBroker.GetInputChannel("CreateDefaultProject")
+	close(outChannel)
 }

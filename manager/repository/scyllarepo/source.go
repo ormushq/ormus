@@ -1,4 +1,4 @@
-package scylldb
+package scyllarepo
 
 // func (a StorageAdapter) InsertSource(source *entity.Source) error {
 // 	panic("implement me")

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/manager/managerparam"
 )
 
 func (h Handler) UpdateSource(ctx echo.Context) error {
@@ -21,7 +21,7 @@ func (h Handler) UpdateSource(ctx echo.Context) error {
 	sourceID := ctx.Param("sourceID")
 
 	// binding addsource request form
-	updateSourceReq := new(param.UpdateSourceRequest)
+	updateSourceReq := new(managerparam.UpdateSourceRequest)
 	if err := ctx.Bind(updateSourceReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
 	}

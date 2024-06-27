@@ -16,7 +16,7 @@ type MockProject struct {
 	hasErr   bool
 }
 
-func (m *MockProject) Create(name, email string) (entity.Project, error) {
+func (m *MockProject) Create(name, id string) (entity.Project, error) {
 	if m.hasErr {
 		return entity.Project{}, fmt.Errorf(RepoErr)
 	}
@@ -28,7 +28,7 @@ func (m *MockProject) Create(name, email string) (entity.Project, error) {
 		DeletedAt:   nil,
 		Name:        name,
 		Description: "",
-		UserID:      fmt.Sprintf("a user with this email: %s", email),
+		UserID:      fmt.Sprintf("a user with this ID: %s", id),
 	}
 
 	m.projects = append(m.projects, project)
@@ -36,8 +36,18 @@ func (m *MockProject) Create(name, email string) (entity.Project, error) {
 	return project, nil
 }
 
+func (m *MockProject) IsCreated(id string) bool {
+	for _, val := range m.projects {
+		if val.ID == id {
+			return true
+		}
+	}
+
+	return false
+}
+
 func New(hasErr bool) MockProject {
-	const projectInMemoryDBSize = 10
+	const projectInMemoryDBSize = 0
 	projects := make([]entity.Project, projectInMemoryDBSize)
 
 	return MockProject{hasErr: hasErr, projects: projects}

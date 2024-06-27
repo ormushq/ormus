@@ -2,12 +2,19 @@ package userservice_test
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
+	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/mock/usermock"
+	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
+	"github.com/ormushq/ormus/manager/mockRepo/usermock"
+	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
+	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/param"
+	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +22,15 @@ import (
 
 func TestService_Register(t *testing.T) {
 	// TODO: if password is longer than 72 bycrypt will fail
-
+	cfg := config.C().Manager
+	done := make(chan bool)
+	wg := sync.WaitGroup{}
+	internalBroker := simple.New(done, &wg)
+	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+	RepoPr := projectstub.New(false)
+	ProjectSvc := projectservice.New(&RepoPr, internalBroker)
+	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 	testCases := []struct {
 		name        string
 		repoErr     bool
@@ -45,7 +60,7 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo)
+			svc := userservice.New(jwt, repo, internalBroker)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -89,7 +104,7 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name:        "wrong password",
-			expectedErr: richerror.New("Login").WhitMessage(errmsg.ErrWrongCredentials),
+			expectedErr: richerror.New("Login").WithMessage(errmsg.ErrWrongCredentials),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
 				Password: "wrongpassword",
@@ -112,7 +127,7 @@ func TestService_Login(t *testing.T) {
 			jwt := MockJwtEngine{}
 
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo)
+			svc := userservice.New(jwt, repo, nil)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)

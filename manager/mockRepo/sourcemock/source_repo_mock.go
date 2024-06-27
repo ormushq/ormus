@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/param"
+	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
@@ -55,14 +55,14 @@ func NewMockRepository(hasErr bool) *MockRepo {
 	}
 }
 
-func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse, error) {
+func (m *MockRepo) InsertSource(source *entity.Source) (*managerparam.AddSourceResponse, error) {
 	if m.hasErr {
 		return nil, richerror.New("MockRepo.InsertSource").WithWrappedError(fmt.Errorf(RepoErr))
 	}
 
 	m.sources = append(m.sources, source)
 
-	return &param.AddSourceResponse{
+	return &managerparam.AddSourceResponse{
 		ID:          source.ID,
 		WriteKey:    string(source.WriteKey),
 		Name:        source.Name,
@@ -76,7 +76,7 @@ func (m *MockRepo) InsertSource(source *entity.Source) (*param.AddSourceResponse
 	}, nil
 }
 
-func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.UpdateSourceResponse, error) {
+func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*managerparam.UpdateSourceResponse, error) {
 	if m.hasErr {
 		return nil, richerror.New("MockRepo.UpdateSource").WithWrappedError(fmt.Errorf(RepoErr))
 	}
@@ -85,7 +85,7 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.Update
 		if s.ID == id {
 			m.sources[i] = source
 
-			return &param.UpdateSourceResponse{
+			return &managerparam.UpdateSourceResponse{
 				ID:          source.ID,
 				WriteKey:    string(source.WriteKey),
 				Name:        source.Name,
@@ -100,7 +100,7 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*param.Update
 		}
 	}
 
-	return nil, richerror.New("MockRepo.UpdateSource").WhitMessage(errmsg.ErrUserNotFound)
+	return nil, richerror.New("MockRepo.UpdateSource").WithMessage(errmsg.ErrUserNotFound)
 }
 
 func (m *MockRepo) DeleteSource(id, _ string) error {
@@ -116,7 +116,7 @@ func (m *MockRepo) DeleteSource(id, _ string) error {
 		}
 	}
 
-	return richerror.New("MockRepo.DeleteSource").WhitMessage(errmsg.ErrUserNotFound)
+	return richerror.New("MockRepo.DeleteSource").WithMessage(errmsg.ErrUserNotFound)
 }
 
 func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error) {
@@ -130,7 +130,7 @@ func (m *MockRepo) GetUserSourceByID(ownerID, id string) (*entity.Source, error)
 		}
 	}
 
-	return nil, richerror.New("MockRepo.GetUserSourceById").WhitMessage(errmsg.ErrUserNotFound)
+	return nil, richerror.New("MockRepo.GetUserSourceById").WithMessage(errmsg.ErrUserNotFound)
 }
 
 func (m *MockRepo) IsSourceAlreadyCreatedByName(name string) (bool, error) {

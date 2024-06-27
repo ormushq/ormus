@@ -42,7 +42,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator
 
 		return &validator.Error{
 			Fields: fieldErr,
-			Err: richerror.New("validation.register").WhitMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+			Err: richerror.New("validation.register").WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
@@ -56,7 +56,7 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator
 //	func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
 //		err := v.isUserRegistered(value)
 //		if err == nil {
-//			return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage(errmsg.ErrAuthUserExisting)
+//			return richerror.New("validator.isEmailAlreadyRegistered").WithMessage(errmsg.ErrAuthUserExisting)
 //		}
 //
 //		return nil
@@ -66,15 +66,15 @@ func (v Validator) ValidateRegisterRequest(req param.RegisterRequest) *validator
 func (v Validator) isEmailAlreadyRegistered(value interface{}) error {
 	email, ok := value.(string)
 	if !ok {
-		return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage("wrong type")
+		return richerror.New("validator.isEmailAlreadyRegistered").WithMessage("wrong type")
 	}
 	exists, err := v.repo.DoesUserExistsByEmail(email)
 	if err != nil {
-		return richerror.New("validator.isEmailAlreadyRegistered").WithWrappedError(err).WhitMessage(errmsg.ErrSomeThingWentWrong)
+		return richerror.New("validator.isEmailAlreadyRegistered").WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
 	if exists {
-		return richerror.New("validator.isEmailAlreadyRegistered").WhitMessage(errmsg.ErrAuthUserExisting)
+		return richerror.New("validator.isEmailAlreadyRegistered").WithMessage(errmsg.ErrAuthUserExisting)
 	}
 
 	return nil
