@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  #Grafana Service
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./grafana/dashboards/Go-Metrics-Dashboard.json:/var/lib/grafana/dashboards/Go-Metrics-Dashboard.json
+
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana_${COMPOSE_PROJECT_NAME}.service=grafana_${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.routers.grafana_${COMPOSE_PROJECT_NAME}.rule=Host(`grafana.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.grafana_${COMPOSE_PROJECT_NAME}.entrypoints=web"
+      - "traefik.http.services.grafana_${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=3000"

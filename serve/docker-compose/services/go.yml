@@ -13,7 +13,6 @@ services:
       - air
       - "-c"
       - /home/www/serve/docker-compose/services/go/.destination.air.toml
-    restart: always
     volumes:
       - ../../../:/home/www
     depends_on:

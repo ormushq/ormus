@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  #Prometheus Service
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus_${COMPOSE_PROJECT_NAME}.service=prometheus_${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.routers.prometheus_${COMPOSE_PROJECT_NAME}.rule=Host(`prometheus.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.prometheus_${COMPOSE_PROJECT_NAME}.entrypoints=web"
+      - "traefik.http.services.prometheus_${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=9090"
