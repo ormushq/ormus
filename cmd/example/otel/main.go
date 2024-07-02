@@ -113,6 +113,8 @@ func doWork(ctx context.Context, tracer trace.Tracer) {
 	defer span.End()
 
 	span.AddEvent("Starting work")
-	time.Sleep(2 * time.Second)
+	sleepTime := 2
+	time.Sleep(time.Duration(sleepTime) * time.Second)
+
 	span.AddEvent("Work completed")
 }
