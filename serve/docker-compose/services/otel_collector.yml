@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  #Otel Service
+  otel_collector:
+    image: otel/opentelemetry-collector-contrib:${OTEL_IMAGE_TAG:-0.103.1}
+    volumes:
+      - ${OTEL_CONFIG_SRC:-./otel_collector/otel-collector-config-connector.yml}:/etc/otelcol/otel-collector-config.yml
+    command: --config /etc/otelcol/otel-collector-config.yml
+    depends_on:
+      - jaeger
