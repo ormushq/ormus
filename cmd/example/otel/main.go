@@ -13,12 +13,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var cfg = otela.Config{
-	Endpoint:           "otel_collector:4317",
-	EnableMetricExpose: true,
-	MetricExposePath:   "metrics",
-	MetricExposePort:   8081,
-}
+var (
+	port = 8081
+	cfg  = otela.Config{
+		Endpoint:           "otel_collector:4317",
+		EnableMetricExpose: true,
+		MetricExposePath:   "metrics",
+		MetricExposePort:   port,
+	}
+)
 
 func main() {
 	wg := &sync.WaitGroup{}
@@ -27,7 +30,8 @@ func main() {
 	cfg.ServiceName = name
 
 	wg.Add(1)
-	c := make(chan context.Context, 10)
+	chanSize := 10
+	c := make(chan context.Context, chanSize)
 	go service2(wg, done, c)
 	err := otela.Configure(wg, done, cfg)
 	if err != nil {
@@ -56,7 +60,7 @@ func service2(wg *sync.WaitGroup, done <-chan bool, c <-chan context.Context) {
 	}
 	tracer := otela.NewTracer("test-tracer2")
 
-	ctx, span := tracer.Start(ctx, "test-span2")
+	_, span := tracer.Start(ctx, "test-span2")
 
 	defer span.End()
 
@@ -75,22 +79,37 @@ func startWOrk(c chan<- context.Context) {
 	doWork(ctx, tracer)
 
 	meter := otel.Meter("test-meter")
-	counter, _ := meter.Float64Counter("test_counter")
-	counter.Add(context.Background(), 1)
+	counter, err := meter.Float64Counter("test_counter")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		cv := 1.0
+		counter.Add(context.Background(), cv)
+	}
 
 	meter = otel.Meter("test-meter2")
-	counter1, _ := meter.Float64Histogram("test_counter2")
-	counter1.Record(context.Background(), 10)
+	counter1, err1 := meter.Float64Histogram("test_counter2")
+	if err1 != nil {
+		fmt.Println(err1)
+	} else {
+		cv := 10.0
+		counter1.Record(context.Background(), cv)
+	}
 
 	meter = otel.Meter("test-meter3")
-	counter, _ = meter.Float64Counter("test_counter3")
-	counter.Add(context.Background(), 20)
+	counter, err = meter.Float64Counter("test_counter3")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		cv := 20.0
+		counter.Add(context.Background(), cv)
+	}
 
 	c <- ctx
 }
 
 func doWork(ctx context.Context, tracer trace.Tracer) {
-	ctx, span := tracer.Start(ctx, "doWork")
+	_, span := tracer.Start(ctx, "doWork")
 	defer span.End()
 
 	span.AddEvent("Starting work")

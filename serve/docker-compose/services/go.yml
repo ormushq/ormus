@@ -12,9 +12,9 @@ services:
     entrypoint:
       - air
       - "-c"
-      - /home/www/serve/docker-compose/services/go/.destination.air.toml
+      - /home/app/serve/docker-compose/services/go/.destination.air.toml
     volumes:
-      - ../../../:/home/www
+      - ../../../:/home/app
     depends_on:
       - redis
       - rabbitmq

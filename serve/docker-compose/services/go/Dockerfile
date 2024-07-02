@@ -4,7 +4,7 @@ ARG GO_IMAGE_VERSION
 FROM ${GO_IMAGE_NAME}:${GO_IMAGE_VERSION}
 
 # Set working directory
-WORKDIR /home/www
+WORKDIR /home/app
 
 RUN go install github.com/air-verse/air@latest
 
