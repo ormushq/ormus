@@ -3,12 +3,14 @@ package worker
 import (
 	"context"
 	"fmt"
-	"log/slog"
-	"sync"
-	"time"
-
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/taskmanager"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+	"log/slog"
+	"sync"
 )
 
 const timeoutInSeconds = 5
@@ -23,6 +25,7 @@ type TaskHandler interface {
 }
 
 func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
+	tracer := otela.NewTracer("worker")
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -30,11 +33,24 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
 		for {
 			select {
 			case newEvent := <-w.EventsChannel:
+				wg.Add(1)
 				go func() {
-					ctx, cancel := context.WithTimeout(context.Background(), timeoutInSeconds*time.Second)
-					defer cancel()
+					defer wg.Done()
+					defer func() {
+						if r := recover(); r != nil {
+							logger.L().Error(fmt.Sprintf("worker recovered panic: %v", r))
+						}
+					}()
+
+					ctx := otela.GetContextFromCarrier(newEvent.TracerCarrier)
+					ctx, span := tracer.Start(ctx, "worker@Run")
+					defer span.End()
+					span.AddEvent("event-received-in-worker")
 					err := w.TaskHandler.HandleTask(ctx, newEvent)
 					if err != nil {
+						span.AddEvent("error-on-handle-task", trace.WithAttributes(
+							attribute.String("error", err.Error())))
+
 						slog.Error(fmt.Sprintf("Error on handling event using integration handler.Error : %v", err))
 					}
 				}()
