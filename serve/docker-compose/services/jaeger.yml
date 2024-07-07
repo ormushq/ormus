@@ -5,7 +5,7 @@ services:
     image: jaegertracing/all-in-one:${JAEGER_IMAGE_TAG:-latest}
     volumes:
       - "./jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"
-    command: --query.ui-config /etc/jaeger/jaeger-ui.json
+    command: --query.ui-config /etc/jaeger/jaeger-ui.json --query.max-clock-skew-adjustment 5s
     environment:
       - METRICS_STORAGE_TYPE=prometheus
       - PROMETHEUS_SERVER_URL=http://prometheus:9090
