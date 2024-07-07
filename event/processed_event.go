@@ -8,11 +8,12 @@ import (
 
 type ProcessedEvent struct {
 	// required fields
-	SourceID    string // Write key or sourceID shows that which source, events coming from
-	Integration entity.Integration
-	MessageID   string // Automatically collected by Segment, a unique identifier for each message
-	EventType   Type   // Type of message, corresponding to the API method: 'identify', 'group', 'track', 'page', 'screen' or 'alias'.
-	Version     uint8  // The version of the Tracking API
+	SourceID      string            // Write key or sourceID shows that which source, events coming from
+	TracerCarrier map[string]string //use this for trace with OTel
+	Integration   entity.Integration
+	MessageID     string // Automatically collected by Segment, a unique identifier for each message
+	EventType     Type   // Type of message, corresponding to the API method: 'identify', 'group', 'track', 'page', 'screen' or 'alias'.
+	Version       uint8  // The version of the Tracking API
 
 	SentAt            time.Time // Time on client device when call was sent or sentAt value manually passed in.
 	ReceivedAt        time.Time // Time on server clock when call was received
