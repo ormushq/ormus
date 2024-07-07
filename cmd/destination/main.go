@@ -1,6 +1,10 @@
 package main
 
 import (
+	"context"
+	"github.com/ormushq/ormus/adapter/otela"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"log"
 	"log/slog"
 	"os"
@@ -26,7 +30,6 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	//----------------- Setup Logger -----------------//
-
 	fileMaxSizeInMB := 10
 	fileMaxAgeInDays := 30
 
@@ -51,6 +54,25 @@ func main() {
 	// use slog as default logger.
 	slog.SetDefault(l)
 
+	//----------------- Setup Tracer -----------------//
+	otelcfg := otela.Config{
+		Endpoint:           config.C().Destination.Otel.Endpoint,
+		ServiceName:        config.C().Destination.Otel.ServiceName,
+		EnableMetricExpose: config.C().Destination.Otel.EnableMetricExpose,
+		MetricExposePath:   config.C().Destination.Otel.MetricExposePath,
+		MetricExposePort:   config.C().Destination.Otel.MetricExposePort,
+	}
+
+	err := otela.Configure(&wg, done, otelcfg)
+	if err != nil {
+		l.Error(err.Error())
+	}
+
+	tracer := otela.NewTracer("main")
+	ctx, span := tracer.Start(context.Background(), "main", trace.WithAttributes(
+		attribute.String("detail", "boot-application-trace"),
+	))
+
 	//----------------- Consume Processed Events From Core -----------------//
 
 	// Get connection config for rabbitMQ consumer
@@ -58,13 +80,15 @@ func main() {
 	rmqConsumerTopic := config.C().Destination.ConsumerTopic
 
 	// todo should we consider array of topics?
-	rmqConsumer := rabbitmqconsumer.New(rmqConsumerConnConfig, rmqConsumerTopic)
+	rmqConsumer := rabbitmqconsumer.New(ctx, rmqConsumerConnConfig, rmqConsumerTopic)
+	span.AddEvent("rabbitmq-consumer-created")
 
 	slog.Info("Start Consuming processed events.")
 	processedEvents, err := rmqConsumer.Consume(done, &wg)
 	if err != nil {
 		log.Panicf("Error on consuming processed events.")
 	}
+	span.AddEvent("processed-events-channel-opened")
 
 	//----------------- Setup Task Coordinator -----------------//
 
@@ -80,7 +104,7 @@ func main() {
 
 	taskPublisherCnf := config.C().Destination.RabbitMQTaskManagerConnection
 
-	inputChannelAdapter := rbbitmqchannel.New(done, &wg, dconfig.RabbitMQConsumerConnection{
+	inputChannelAdapter := rbbitmqchannel.NewWithContext(ctx, done, &wg, dconfig.RabbitMQConsumerConnection{
 		User:            taskPublisherCnf.User,
 		Password:        taskPublisherCnf.Password,
 		Host:            taskPublisherCnf.Host,
@@ -88,10 +112,11 @@ func main() {
 		Vhost:           "/",
 		ReconnectSecond: reconnectSecond,
 	})
+	span.AddEvent("input-channel-adapter-created")
 
 	webHookQueueName := "webhook_tasks"
 
-	errNCA := inputChannelAdapter.NewChannel(webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
+	errNCA := inputChannelAdapter.NewChannelWithContext(ctx, webHookQueueName, channel.InputOnlyMode, channelSize, numberInstant, maxRetryPolicy)
 	if errNCA != nil {
 		logger.L().Error(errNCA.Error(), err)
 		os.Exit(1)
@@ -101,18 +126,24 @@ func main() {
 	if err != nil {
 		log.Fatalf("Couldn't get input channel for %s: %s", webHookQueueName, err)
 	}
+	span.AddEvent("input-channel-created")
 
 	webhookTaskPublisher := rabbitmqchanneltaskmanager.NewTaskPublisher(inputChannel)
+	span.AddEvent("webhook-task-publisher-created")
 
 	taskPublishers := make(dtcoordinator.TaskPublisherMap)
 	taskPublishers[entity.WebhookDestinationType] = webhookTaskPublisher
 
 	coordinator := dtcoordinator.New(taskPublishers)
+	span.AddEvent("task-coordinator-created")
 
 	cErr := coordinator.Start(processedEvents, done, &wg)
 	if cErr != nil {
 		log.Panicf("Error on starting destination type coordinator.")
 	}
+	span.AddEvent("coordinator-started")
+
+	span.End()
 
 	//----------------- Handling graceful shutdown -----------------//
 
