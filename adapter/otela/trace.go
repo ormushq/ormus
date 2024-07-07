@@ -3,6 +3,7 @@ package otela
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/ormushq/ormus/logger"
 	"go.opentelemetry.io/otel"
@@ -54,10 +55,30 @@ func (opr *otelProvider) initTrace() error {
 	return nil
 }
 
-func NewTracer(name string) trace.Tracer {
+func NewTracer(name string, options ...trace.TracerOption) trace.Tracer {
 	if !op.isConfigure {
 		panic("You must configure adapter before calling NewTracer")
 	}
 
-	return op.tracerProvider.Tracer(name)
+	return op.tracerProvider.Tracer(name, options...)
+}
+
+func GetCarrierFromContext(ctx context.Context) map[string]string {
+	propgator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+
+	carrier := propagation.MapCarrier{}
+	propgator.Inject(ctx, carrier)
+
+	return carrier
+}
+
+func GetContextFromCarrier(carrier map[string]string) context.Context {
+	propgator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+	c := propagation.MapCarrier{}
+	for k, v := range carrier {
+		c.Set(k, v)
+	}
+	parentCtx := propgator.Extract(context.Background(), c)
+
+	return parentCtx
 }
