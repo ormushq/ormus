@@ -29,7 +29,7 @@ func New(config Config) (Adapter, error) {
 
 func NewWithContext(ctx context.Context, config Config) (Adapter, error) {
 	tracer := otela.NewTracer("etcd")
-	ctx, span := tracer.Start(ctx, "etcd@NewWithContext", trace.WithAttributes(
+	_, span := tracer.Start(ctx, "etcd@NewWithContext", trace.WithAttributes(
 		attribute.String("config", fmt.Sprintf("%+v", config))))
 	defer span.End()
 
@@ -72,8 +72,8 @@ func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func()
 	if err != nil {
 		span.AddEvent("error-on-new-session", trace.WithAttributes(
 			attribute.String("error", err.Error())))
-
 		cancel()
+
 		return nil, err
 	}
 
@@ -82,6 +82,7 @@ func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func()
 		span.AddEvent("error-on-new-mutex", trace.WithAttributes(
 			attribute.String("error", err.Error())))
 		cancel()
+
 		return nil, err
 	}
 
@@ -90,6 +91,7 @@ func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func()
 	return func() error {
 		err = mutex.Unlock(ctx)
 		cancel()
+
 		return err
 	}, nil
 }

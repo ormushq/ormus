@@ -41,11 +41,11 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					otela.IncrementFloat64Counter(context.Background(), meter, metricname.PROCESS_FLOW_INPUT_DESTINATION_WORKER, "event_received_in_worker")
+					otela.IncrementFloat64Counter(context.Background(), meter, metricname.ProcessFlowInputDestinationWorker, "event_received_in_worker")
 
 					e, err := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
 					if err != nil {
-						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DESTINATION_WORKER_INPUT_UNMARSHAL_ERROR, "process_event_unmarshal_error")
+						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DestinationWorkerInputUnmarshalError, "process_event_unmarshal_error")
 
 						printWorkersError(err, "Failed to unmarshall message")
 
@@ -60,7 +60,7 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 					eventsChannel <- e
 					aErr := msg.Ack()
 					if aErr != nil {
-						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_WORKER_INPUT_ACK_ERROR, "process_event_ack_error")
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationWorkerInputAckError, "process_event_ack_error")
 
 						printWorkersError(aErr, "Failed to acknowledge message")
 						span.AddEvent("error-on-ack", trace.WithAttributes(
@@ -69,7 +69,7 @@ func (c Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.Pr
 						return
 					}
 
-					otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_WORKER_EVENT_SEND_TO_WORKER, "process_event_publish_to_event_channel")
+					otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationWorkerEventSendToWorker, "process_event_publish_to_event_channel")
 					span.AddEvent("process-event-publish-to-event-channel")
 				}()
 			case <-done:

@@ -25,23 +25,27 @@ func main() {
 		Endpoint:           "otel_collector:4317",
 		ServiceName:        "Test-Rabbitmq-Consumer",
 		EnableMetricExpose: false,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 	err := otela.Configure(wg, done, cfg)
 	if err != nil {
 		panic(err)
 	}
 
+	port := 5672
+	reconnectSecond := 10
 	channelAdapter := rbbitmqchannel.New(done, wg, dconfig.RabbitMQConsumerConnection{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "rabbitmq",
-		Port:            5672,
+		Port:            port,
 		Vhost:           "",
-		ReconnectSecond: 10,
+		ReconnectSecond: reconnectSecond,
 	})
-
-	err = channelAdapter.NewChannel("test", channel.OutputOnly, 100, 1, 10)
+	bufferSize := 100
+	numberInstants := 1
+	maxRetryPolicy := 10
+	err = channelAdapter.NewChannel("test", channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +63,7 @@ func main() {
 				func() {
 					fmt.Printf("recived message : %s\n", msg.Body)
 					var decode MyMessage
-					err := json.Unmarshal(msg.Body, &decode)
+					err = json.Unmarshal(msg.Body, &decode)
 					if err != nil {
 						panic(err)
 					}
@@ -71,12 +75,14 @@ func main() {
 					defer span.End()
 
 					span.AddEvent("task-ended")
-					msg.Ack()
+					err = msg.Ack()
+					if err != nil {
+						panic(err)
+					}
 				}()
 
 			case <-done:
 				return
-
 			}
 		}
 	}()

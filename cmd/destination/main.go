@@ -61,7 +61,7 @@ func main() {
 		EnableMetricExpose: config.C().Destination.Otel.EnableMetricExpose,
 		MetricExposePath:   config.C().Destination.Otel.MetricExposePath,
 		MetricExposePort:   config.C().Destination.Otel.MetricExposePort,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 
 	err := otela.Configure(&wg, done, otelcfg)

@@ -19,7 +19,7 @@ var (
 		EnableMetricExpose: false,
 		MetricExposePath:   "metrics",
 		MetricExposePort:   port,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 )
 
@@ -56,7 +56,7 @@ func startService1(c chan<- context.Context) {
 
 	subService1(ctx, tracer)
 
-	sendMetric()
+	sendMetric(ctx)
 
 	c <- ctx
 }
@@ -69,7 +69,7 @@ func subService1(ctx context.Context, tracer trace.Tracer) {
 	sleepTime := 2
 	time.Sleep(time.Duration(sleepTime) * time.Second)
 
-	sendMetric()
+	sendMetric(ctx)
 
 	span.AddEvent("Work completed")
 }
@@ -89,12 +89,12 @@ func startService2(wg *sync.WaitGroup, done <-chan bool, c <-chan context.Contex
 
 	defer span.End()
 
-	sendMetric()
+	sendMetric(ctx)
 
 	span.AddEvent("test-event2")
 }
 
-func sendMetric() {
+func sendMetric(ctx context.Context) {
 	meter := otel.Meter("test.meter")
 	counter, err := meter.Float64Counter("test.counter", metric.WithDescription("test.counter"))
 	if err != nil {

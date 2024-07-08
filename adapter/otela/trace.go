@@ -17,9 +17,9 @@ import (
 
 func (opr *otelProvider) newTraceExporter(ctx context.Context) (sdktrace.SpanExporter, error) {
 	switch opr.exporter {
-	case EXPORTER_GRPC:
+	case ExporterGrpc:
 		return otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithGRPCConn(opr.conn))
-	case EXPORTER_CONSOLE:
+	case ExporterConsole:
 		return stdouttrace.New()
 	default:
 		panic("unsupported")

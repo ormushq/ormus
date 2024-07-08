@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"github.com/ormushq/ormus/adapter/otela"
@@ -11,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"log"
 	"log/slog"
-	"math/rand"
+	"math/big"
 	"os"
 	"sync"
 	"time"
@@ -63,7 +64,7 @@ func main() {
 		Endpoint:           config.C().Destination.Otel.Endpoint,
 		ServiceName:        config.C().Destination.Otel.ServiceName + "/FakerEventGenerator",
 		EnableMetricExpose: false,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 
 	err := otela.Configure(wg, done, otelcfg)
@@ -142,7 +143,7 @@ func main() {
 	span.AddEvent("message-published")
 	span.End()
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * timeoutSeconds)
 	close(done)
 	wg.Wait()
 }
@@ -152,8 +153,14 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 func randSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		nBig, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			panic(err)
+		}
+
+		b[i] = letters[nBig.Int64()]
 	}
+
 	return string(b)
 }
 
@@ -163,8 +170,9 @@ func publishEvent(pe event.ProcessedEvent, ch *amqp.Channel) {
 	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@publishEvent")
 
 	pe.TracerCarrier = otela.GetCarrierFromContext(ctx)
-	pe.MessageID = randSeq(3)
-	pe.Integration.ID = randSeq(3)
+	l := 3
+	pe.MessageID = randSeq(l)
+	pe.Integration.ID = randSeq(l)
 
 	jpe, err := json.Marshal(pe)
 	if err != nil {
@@ -189,5 +197,5 @@ func publishEvent(pe event.ProcessedEvent, ch *amqp.Channel) {
 			Body:        jpe,
 		})
 	failOnError(err, "Failed to publish a message")
-	otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_OUTPUT_CORE, "event_sent_to_destination")
+	otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputCore, "event_sent_to_destination")
 }

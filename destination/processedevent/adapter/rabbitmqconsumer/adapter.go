@@ -124,7 +124,7 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 					e, uErr := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
-						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DESTINATION_INPUT_UNMARSHAL_ERROR, "processed_event_unmarshal_error")
+						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DestinationInputUnmarshalError, "processed_event_unmarshal_error")
 
 						return
 					}
@@ -132,7 +132,7 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 					ctx, span = tracer.Start(ctx, "rabbitmqconsumer@StartProccessEvent")
 					defer span.End()
 
-					otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_INPUT_DESTINATION, "event_received_in_destination")
+					otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowInputDestination, "event_received_in_destination")
 
 					span.AddEvent("process-started")
 
@@ -142,7 +142,7 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 					// Acknowledge the message
 					err := msg.Ack(false)
 					if err != nil {
-						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_INPUT_ACK_ERROR, "processed_event_ack_error")
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationInputAckError, "processed_event_ack_error")
 
 						span.AddEvent("error-on-ack", trace.WithAttributes(
 							attribute.String("error", err.Error())))

@@ -15,8 +15,6 @@ import (
 	"sync"
 )
 
-const timeoutInSeconds = 5
-
 type Worker struct {
 	TaskHandler   TaskHandler
 	EventsChannel <-chan event.ProcessedEvent
@@ -49,22 +47,21 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
 					ctx := otela.GetContextFromCarrier(newEvent.TracerCarrier)
 					ctx, span := tracer.Start(ctx, "worker@Run")
 
-					//otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESSED_EVENT, "process_event_received_in_worker")
-
 					defer span.End()
 					span.AddEvent("event-received-in-worker")
 					err := w.TaskHandler.HandleTask(ctx, newEvent)
 					if err != nil {
-						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_WORKER_HANDLE_EVENT_ERROR, "process_event_handle_error")
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationWorkerHandleEventError, "process_event_handle_error")
 
 						span.AddEvent("error-on-handle-task", trace.WithAttributes(
 							attribute.String("error", err.Error())))
 
 						slog.Error(fmt.Sprintf("Error on handling event using integration handler.Error : %v", err))
+
 						return
 					}
 
-					otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_OUTPUT_DESTINATION_WORKER_DONE_JOB, "event_handled_publish_done_job")
+					otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputDestinationWorkerDoneJob, "event_handled_publish_done_job")
 
 				}()
 			case <-done:

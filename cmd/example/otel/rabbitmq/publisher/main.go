@@ -27,23 +27,28 @@ func main() {
 		Endpoint:           "otel_collector:4317",
 		ServiceName:        "Test-Rabbitmq-Publisher",
 		EnableMetricExpose: false,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 	err := otela.Configure(wg, done, cfg)
 	if err != nil {
 		panic(err)
 	}
 
+	port := 5672
+	reconnectSecond := 10
 	channelAdapter := rbbitmqchannel.New(done, wg, dconfig.RabbitMQConsumerConnection{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "rabbitmq",
-		Port:            5672,
+		Port:            port,
 		Vhost:           "",
-		ReconnectSecond: 10,
+		ReconnectSecond: reconnectSecond,
 	})
 
-	err = channelAdapter.NewChannel("test", channel.InputOnlyMode, 100, 1, 10)
+	bufferSize := 100
+	numberInstants := 1
+	maxRetryPolicy := 10
+	err = channelAdapter.NewChannel("test", channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
 	if err != nil {
 		panic(err)
 	}
@@ -81,8 +86,8 @@ func main() {
 					fmt.Printf("encode message %s\n", encode)
 
 					inputChannel <- encode
-
-					time.Sleep(time.Second * 5)
+					sleepTime := 5
+					time.Sleep(time.Second * time.Duration(sleepTime))
 				}()
 
 			}

@@ -95,8 +95,8 @@ func initConn(cfg Config) (*grpc.ClientConn, error) {
 type Exporter string
 
 const (
-	EXPORTER_GRPC    = Exporter("grpc")
-	EXPORTER_CONSOLE = Exporter("console")
+	ExporterGrpc    = Exporter("grpc")
+	ExporterConsole = Exporter("console")
 )
 
 type otelProvider struct {

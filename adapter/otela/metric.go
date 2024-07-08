@@ -17,9 +17,9 @@ import (
 
 func (opr *otelProvider) newMetricExporter(ctx context.Context) (sdkMetric.Exporter, error) {
 	switch opr.exporter {
-	case EXPORTER_GRPC:
+	case ExporterGrpc:
 		return otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure(), otlpmetricgrpc.WithGRPCConn(opr.conn))
-	case EXPORTER_CONSOLE:
+	case ExporterConsole:
 		return stdoutmetric.New()
 	default:
 		panic("unsupported")

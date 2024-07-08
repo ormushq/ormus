@@ -55,7 +55,7 @@ func TestRabbitmqChannel(t *testing.T) {
 	numberInstants := 10
 	maxRetryPolicy := 5
 
-	err := otela.Configure(wg, done, otela.Config{Exporter: otela.EXPORTER_CONSOLE})
+	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
 	if err != nil {
 		t.Error(err.Error())
 	}

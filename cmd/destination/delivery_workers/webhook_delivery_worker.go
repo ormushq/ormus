@@ -63,7 +63,7 @@ func main() {
 		Endpoint:           config.C().Destination.Otel.Endpoint,
 		ServiceName:        config.C().Destination.Otel.ServiceName + "/WebhookDeliveryWorker",
 		EnableMetricExpose: false,
-		Exporter:           otela.EXPORTER_GRPC,
+		Exporter:           otela.ExporterGrpc,
 	}
 
 	err := otela.Configure(&wg, done, otelcfg)

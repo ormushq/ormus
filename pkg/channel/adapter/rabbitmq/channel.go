@@ -43,10 +43,6 @@ const (
 	retriesToTimeRatio       = 2
 )
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) (*rabbitmqChannel, error) {
-	return newChannelWithContext(context.Background(), done, wg, rabbitmqChannelParams)
-}
-
 func newChannelWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) (*rabbitmqChannel, error) {
 	tracer := otela.NewTracer("rbbitmqchannel")
 	_, span := tracer.Start(ctx, "rbbitmqchannel@newChannelWithContext")
@@ -222,10 +218,6 @@ func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
 
 func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel.Message {
 	return rc.outputChannel
-}
-
-func (rc *rabbitmqChannel) start() {
-	rc.startWithContext(context.Background())
 }
 
 func (rc *rabbitmqChannel) startWithContext(ctx context.Context) {

@@ -48,7 +48,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 					taskPublisher, ok := d.TaskPublishers[pe.DestinationType()]
 					if !ok {
-						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_EVENT_PUBLISHER_NOT_FOUND, "event_publisher_not_found")
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationEventPublisherNotFound, "event_publisher_not_found")
 						span.AddEvent("error-on-get-task-publisher", trace.WithAttributes(
 							attribute.String("destination-type", string(pe.DestinationType())),
 							attribute.String("error-message", "Task manager not found"),
@@ -63,7 +63,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 					pErr := taskPublisher.Publish(pe)
 					if pErr != nil {
-						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_EVENT_PUBLISH_ERROR, "task_publish_error")
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DestinationEventPublishError, "task_publish_error")
 
 						span.AddEvent("error-on-publish-event", trace.WithAttributes(
 							attribute.String("error-message", pErr.Error()),
@@ -73,7 +73,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 						return
 					}
 					span.AddEvent("event-published")
-					otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_OUTPUT_DESTINATION, "event-send-to-destination-worker")
+					otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputDestination, "event-send-to-destination-worker")
 				}()
 
 			case <-done:
