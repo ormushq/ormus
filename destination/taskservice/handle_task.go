@@ -27,6 +27,23 @@ func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) 
 	var taskStatus taskentity.IntegrationDeliveryStatus
 	taskID := newEvent.ID()
 
+	// Get task status using idempotency in the task service.
+	if taskStatus, err = s.GetTaskStatusByID(ctx, taskID); err != nil {
+		span.AddEvent("error-on-get-task-status", trace.WithAttributes(
+			attribute.String("error", err.Error())))
+
+		// todo use richError
+		return err
+	}
+
+	// If task status is not executable, we don't need to do anything.
+	if !taskStatus.CanBeExecuted() {
+		slog.Debug(fmt.Sprintf("Task [%s] has %s status and is not executable", taskID, taskStatus.String()))
+		span.AddEvent("task-can`t-be-executed")
+
+		return nil
+	}
+
 	unlock, err := s.LockTaskByID(ctx, taskID)
 	if err != nil {
 		span.AddEvent("error-on-lock-task", trace.WithAttributes(
@@ -37,30 +54,14 @@ func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) 
 	defer func() {
 		err = unlock()
 		if err != nil {
-			logger.L().Error(fmt.Sprintf("unlock task failed %s", trace.WithAttributes()))
+			logger.L().Error(fmt.Sprintf("unlock task failed %s", err))
 		}
 	}()
-
-	// Get task status using idempotency in the task service.
-	if taskStatus, err = s.GetTaskStatusByID(ctx, taskID); err != nil {
-		span.AddEvent("error-on-get-task-status", trace.WithAttributes(
-			attribute.String("error", err.Error())))
-
-		// todo use richError
-		return err
-	}
 
 	span.AddEvent("task-status-retrieved", trace.WithAttributes(
 		attribute.String("status", taskStatus.String()),
 	))
 
-	// If task status is not executable, we don't need to do anything.
-	if !taskStatus.CanBeExecuted() {
-		slog.Debug(fmt.Sprintf("Task [%s] has %s status and is not executable", taskID, taskStatus.String()))
-		span.AddEvent("task-can`t-be-executed")
-
-		return nil
-	}
 	span.AddEvent("task-ready-to-execute")
 
 	// If task status is broadcast, we need to get task info from repository.

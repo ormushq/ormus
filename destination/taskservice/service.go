@@ -41,14 +41,16 @@ func New(idempotency Idempotency, repo Repository, l Locker) Service {
 
 func (s Service) LockTaskByID(ctx context.Context, taskID string) (unlock func() error, err error) {
 	tracer := otela.NewTracer("taskservice")
-	ctx, span := tracer.Start(ctx, "taskservice@LockTaskByID", trace.WithAttributes(
+	_, span := tracer.Start(ctx, "taskservice@LockTaskByID", trace.WithAttributes(
 		attribute.String("taskId", taskID)))
+
 	defer span.End()
 
 	lockKey := "task:" + taskID
 	const ttl = 10
 
 	return s.locker.Lock(ctx, lockKey, ttl)
+
 }
 
 func (s Service) GetTaskStatusByID(ctx context.Context, taskID string) (taskentity.IntegrationDeliveryStatus, error) {

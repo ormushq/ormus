@@ -5,10 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/pkg/metricname"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"log"
 	"log/slog"
+	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -107,12 +111,10 @@ func main() {
 		},
 	}
 
-	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@FakerEventPublisher")
 	// generate fake processedEvent
 	pageName := "Home"
 	pe := event.ProcessedEvent{
 		SourceID:          "1",
-		TracerCarrier:     otela.GetCarrierFromContext(ctx),
 		Integration:       fakeIntegration,
 		MessageID:         "1",
 		EventType:         "page",
@@ -124,6 +126,45 @@ func main() {
 		Timestamp:         time.Now(),
 	}
 
+	args := os.Args
+	if len(args) > 1 && args[1] == "bulk" {
+		for {
+			publishEvent(pe, ch)
+			l.Debug("Publish new processed event.")
+			time.Sleep(time.Second)
+		}
+	} else {
+		publishEvent(pe, ch)
+		l.Debug("Publish new processed event.")
+	}
+
+	span.AddEvent("message-published")
+	span.End()
+
+	time.Sleep(time.Second * 5)
+	close(done)
+	wg.Wait()
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func publishEvent(pe event.ProcessedEvent, ch *amqp.Channel) {
+	tracer := otela.NewTracer("FakerTracer")
+
+	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@publishEvent")
+
+	pe.TracerCarrier = otela.GetCarrierFromContext(ctx)
+	pe.MessageID = randSeq(3)
+	pe.Integration.ID = randSeq(3)
+
 	jpe, err := json.Marshal(pe)
 	if err != nil {
 		log.Panicf("Error: %e", err)
@@ -134,11 +175,9 @@ func main() {
 		attribute.String("event-type", string(pe.EventType)),
 	))
 
-	span.AddEvent("message-published")
-
 	taskSpan.End()
-	span.End()
 
+	meter := otel.Meter("FakerTracer@publishEvent")
 	err = ch.PublishWithContext(ctx,
 		"processed-events-exchange", // exchange
 		"pe.webhook",                // routing key
@@ -149,10 +188,5 @@ func main() {
 			Body:        jpe,
 		})
 	failOnError(err, "Failed to publish a message")
-
-	l.Debug("Publish new processed event.")
-
-	time.Sleep(time.Second * 5)
-	close(done)
-	wg.Wait()
+	otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_OUTPUT_CORE, "event_sent_to_destination")
 }

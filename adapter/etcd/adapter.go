@@ -61,8 +61,7 @@ func (a Adapter) Close() error {
 }
 
 func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func() error, err error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
+	ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(ttl))
 
 	tracer := otela.NewTracer("etcd")
 	ctx, span := tracer.Start(ctx, "etcd@Lock", trace.WithAttributes(
@@ -74,6 +73,7 @@ func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func()
 		span.AddEvent("error-on-new-session", trace.WithAttributes(
 			attribute.String("error", err.Error())))
 
+		cancel()
 		return nil, err
 	}
 
@@ -81,13 +81,15 @@ func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func()
 	if err := mutex.Lock(ctx); err != nil {
 		span.AddEvent("error-on-new-mutex", trace.WithAttributes(
 			attribute.String("error", err.Error())))
-
+		cancel()
 		return nil, err
 	}
 
 	span.AddEvent("key-locked")
 
 	return func() error {
-		return mutex.Unlock(ctx)
+		err = mutex.Unlock(ctx)
+		cancel()
+		return err
 	}, nil
 }

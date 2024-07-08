@@ -3,6 +3,10 @@ package rabbitmqconsumer
 import (
 	"context"
 	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/pkg/metricname"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	//"context"
 	"fmt"
@@ -105,6 +109,8 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 		span.AddEvent("consume-started")
 		span.End()
 
+		meter := otel.GetMeterProvider().Meter("rabbitmqconsumer@Consume")
+
 		for {
 			select {
 			case msg := <-msgs:
@@ -118,12 +124,15 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 					e, uErr := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
+						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DESTINATION_INPUT_UNMARSHAL_ERROR, "processed_event_unmarshal_error")
 
 						return
 					}
 					ctx := otela.GetContextFromCarrier(e.TracerCarrier)
 					ctx, span = tracer.Start(ctx, "rabbitmqconsumer@StartProccessEvent")
 					defer span.End()
+
+					otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_INPUT_DESTINATION, "event_received_in_destination")
 
 					span.AddEvent("process-started")
 
@@ -133,6 +142,11 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 					// Acknowledge the message
 					err := msg.Ack(false)
 					if err != nil {
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_INPUT_ACK_ERROR, "processed_event_ack_error")
+
+						span.AddEvent("error-on-ack", trace.WithAttributes(
+							attribute.String("error", err.Error())))
+
 						slog.Error(fmt.Sprintf("Failed to acknowledge message: %v", err))
 					}
 				}()

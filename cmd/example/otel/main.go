@@ -3,8 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
+	"go.opentelemetry.io/otel/metric"
 	"sync"
 	"time"
 
@@ -17,7 +16,7 @@ var (
 	port = 8081
 	cfg  = otela.Config{
 		Endpoint:           "otel_collector:4317",
-		EnableMetricExpose: true,
+		EnableMetricExpose: false,
 		MetricExposePath:   "metrics",
 		MetricExposePort:   port,
 	}
@@ -32,24 +31,49 @@ func main() {
 	wg.Add(1)
 	chanSize := 10
 	c := make(chan context.Context, chanSize)
-	go service2(wg, done, c)
+	go startService2(wg, done, c)
 	err := otela.Configure(wg, done, cfg)
 	if err != nil {
 		panic(err)
 	}
-	startWOrk(c)
+	startService1(c)
 
-	fmt.Println("Press Ctrl+C to stop")
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
+	sleepTime := 5
+	time.Sleep(time.Duration(sleepTime) * time.Second)
 
 	close(done)
 	wg.Wait()
 }
+func startService1(c chan<- context.Context) {
+	tracer := otela.NewTracer("test-tracer")
 
-func service2(wg *sync.WaitGroup, done <-chan bool, c <-chan context.Context) {
+	ctx, span := tracer.Start(context.Background(), "test-span")
+
+	defer span.End()
+
+	span.AddEvent("test-event")
+
+	subService1(ctx, tracer)
+
+	sendMetric()
+
+	c <- ctx
+}
+
+func subService1(ctx context.Context, tracer trace.Tracer) {
+	_, span := tracer.Start(ctx, "subService2")
+	defer span.End()
+
+	span.AddEvent("Starting work")
+	sleepTime := 2
+	time.Sleep(time.Duration(sleepTime) * time.Second)
+
+	sendMetric()
+
+	span.AddEvent("Work completed")
+}
+
+func startService2(wg *sync.WaitGroup, done <-chan bool, c <-chan context.Context) {
 	defer wg.Done()
 	ctx := <-c
 	name := "test-service2"
@@ -64,57 +88,18 @@ func service2(wg *sync.WaitGroup, done <-chan bool, c <-chan context.Context) {
 
 	defer span.End()
 
+	sendMetric()
+
 	span.AddEvent("test-event2")
 }
 
-func startWOrk(c chan<- context.Context) {
-	tracer := otela.NewTracer("test-tracer")
-
-	ctx, span := tracer.Start(context.Background(), "test-span")
-
-	defer span.End()
-
-	span.AddEvent("test-event")
-
-	doWork(ctx, tracer)
-
-	meter := otel.Meter("test-meter")
-	counter, err := meter.Float64Counter("test_counter")
+func sendMetric() {
+	meter := otel.Meter("test.meter")
+	counter, err := meter.Float64Counter("test.counter", metric.WithDescription("test.counter"))
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		cv := 1.0
 		counter.Add(context.Background(), cv)
 	}
-
-	meter = otel.Meter("test-meter2")
-	counter1, err1 := meter.Float64Histogram("test_counter2")
-	if err1 != nil {
-		fmt.Println(err1)
-	} else {
-		cv := 10.0
-		counter1.Record(context.Background(), cv)
-	}
-
-	meter = otel.Meter("test-meter3")
-	counter, err = meter.Float64Counter("test_counter3")
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		cv := 20.0
-		counter.Add(context.Background(), cv)
-	}
-
-	c <- ctx
-}
-
-func doWork(ctx context.Context, tracer trace.Tracer) {
-	_, span := tracer.Start(ctx, "doWork")
-	defer span.End()
-
-	span.AddEvent("Starting work")
-	sleepTime := 2
-	time.Sleep(time.Duration(sleepTime) * time.Second)
-
-	span.AddEvent("Work completed")
 }

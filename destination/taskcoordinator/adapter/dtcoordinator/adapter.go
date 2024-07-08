@@ -3,6 +3,8 @@ package dtcoordinator
 import (
 	"fmt"
 	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/pkg/metricname"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"log/slog"
@@ -32,6 +34,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 		tracer := otela.NewTracer("dtcoordinator")
 
 		slog.Info("Starting destination type task coordinator.")
+		meter := otel.Meter("dtcoordinator@Start")
 
 		for {
 			select {
@@ -45,6 +48,7 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 					taskPublisher, ok := d.TaskPublishers[pe.DestinationType()]
 					if !ok {
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_EVENT_PUBLISHER_NOT_FOUND, "event_publisher_not_found")
 						span.AddEvent("error-on-get-task-publisher", trace.WithAttributes(
 							attribute.String("destination-type", string(pe.DestinationType())),
 							attribute.String("error-message", "Task manager not found"),
@@ -53,12 +57,14 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 						return
 					}
-					span.AddEvent("task-publisher-founded")
+					span.AddEvent("event-publisher-founded")
 
 					pe.TracerCarrier = otela.GetCarrierFromContext(ctx)
 
 					pErr := taskPublisher.Publish(pe)
 					if pErr != nil {
+						otela.IncrementFloat64Counter(ctx, meter, metricname.DESTINATION_EVENT_PUBLISH_ERROR, "task_publish_error")
+
 						span.AddEvent("error-on-publish-event", trace.WithAttributes(
 							attribute.String("error-message", pErr.Error()),
 						))
@@ -66,7 +72,8 @@ func (d DestinationTypeCoordinator) Start(processedEvents <-chan event.Processed
 
 						return
 					}
-					span.AddEvent("task-published")
+					span.AddEvent("event-published")
+					otela.IncrementFloat64Counter(ctx, meter, metricname.PROCESS_FLOW_OUTPUT_DESTINATION, "event-send-to-destination-worker")
 				}()
 
 			case <-done:
