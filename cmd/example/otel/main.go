@@ -101,6 +101,6 @@ func sendMetric(ctx context.Context) {
 		fmt.Println(err)
 	} else {
 		cv := 1.0
-		counter.Add(context.Background(), cv)
+		counter.Add(ctx, cv)
 	}
 }
