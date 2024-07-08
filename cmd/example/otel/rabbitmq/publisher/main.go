@@ -27,6 +27,7 @@ func main() {
 		Endpoint:           "otel_collector:4317",
 		ServiceName:        "Test-Rabbitmq-Publisher",
 		EnableMetricExpose: false,
+		Exporter:           otela.EXPORTER_GRPC,
 	}
 	err := otela.Configure(wg, done, cfg)
 	if err != nil {

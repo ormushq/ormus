@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/metric"
 	sdkMetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -15,8 +16,15 @@ import (
 )
 
 func (opr *otelProvider) newMetricExporter(ctx context.Context) (sdkMetric.Exporter, error) {
-	return otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure(), otlpmetricgrpc.WithGRPCConn(opr.conn))
-	// Your preferred exporter: console, jaeger, zipkin, OTLP, etc.
+	switch opr.exporter {
+	case EXPORTER_GRPC:
+		return otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure(), otlpmetricgrpc.WithGRPCConn(opr.conn))
+	case EXPORTER_CONSOLE:
+		return stdoutmetric.New()
+	default:
+		panic("unsupported")
+	}
+
 }
 
 func (opr *otelProvider) newMetricProvider(exp sdkMetric.Exporter) *sdkMetric.MeterProvider {

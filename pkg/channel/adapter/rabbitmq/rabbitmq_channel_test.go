@@ -2,6 +2,7 @@ package rbbitmqchannel
 
 import (
 	"encoding/json"
+	"github.com/ormushq/ormus/adapter/otela"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -53,6 +54,11 @@ func TestRabbitmqChannel(t *testing.T) {
 	bufferSize := 100
 	numberInstants := 10
 	maxRetryPolicy := 5
+
+	err := otela.Configure(wg, done, otela.Config{Exporter: otela.EXPORTER_CONSOLE})
+	if err != nil {
+		t.Error(err.Error())
+	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

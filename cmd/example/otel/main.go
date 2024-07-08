@@ -19,6 +19,7 @@ var (
 		EnableMetricExpose: false,
 		MetricExposePath:   "metrics",
 		MetricExposePort:   port,
+		Exporter:           otela.EXPORTER_GRPC,
 	}
 )
 

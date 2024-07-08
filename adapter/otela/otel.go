@@ -16,24 +16,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type otelProvider struct {
-	wg             *sync.WaitGroup
-	done           <-chan bool
-	conn           *grpc.ClientConn
-	isConfigure    bool
-	tracerProvider trace.TracerProvider
-	metricProvider metric.MeterProvider
-	serviceName    string
-}
-
-type Config struct {
-	Endpoint           string
-	ServiceName        string
-	EnableMetricExpose bool
-	MetricExposePath   string
-	MetricExposePort   int
-}
-
 var op otelProvider
 
 func Configure(wg *sync.WaitGroup, done <-chan bool, cfg Config) error {
@@ -54,6 +36,7 @@ func Configure(wg *sync.WaitGroup, done <-chan bool, cfg Config) error {
 		tracerProvider: nil,
 		metricProvider: nil,
 		serviceName:    cfg.ServiceName,
+		exporter:       cfg.Exporter,
 	}
 	err = op.initTrace()
 	if err != nil {
@@ -107,4 +90,31 @@ func initConn(cfg Config) (*grpc.ClientConn, error) {
 	}
 
 	return conn, err
+}
+
+type Exporter string
+
+const (
+	EXPORTER_GRPC    = Exporter("grpc")
+	EXPORTER_CONSOLE = Exporter("console")
+)
+
+type otelProvider struct {
+	wg             *sync.WaitGroup
+	done           <-chan bool
+	conn           *grpc.ClientConn
+	isConfigure    bool
+	tracerProvider trace.TracerProvider
+	metricProvider metric.MeterProvider
+	serviceName    string
+	exporter       Exporter
+}
+
+type Config struct {
+	Endpoint           string
+	ServiceName        string
+	EnableMetricExpose bool
+	MetricExposePath   string
+	MetricExposePort   int
+	Exporter           Exporter
 }
