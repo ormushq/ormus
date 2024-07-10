@@ -3,6 +3,9 @@ package rbbitmqchannel
 import (
 	"context"
 	"fmt"
+	"github.com/ormushq/ormus/adapter/otela"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"sync"
 	"time"
@@ -40,13 +43,18 @@ const (
 	retriesToTimeRatio       = 2
 )
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) (*rabbitmqChannel, error) {
+func newChannelWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabbitmqChannelParams) (*rabbitmqChannel, error) {
+	tracer := otela.NewTracer("rbbitmqchannel")
+	_, span := tracer.Start(ctx, "rbbitmqchannel@newChannelWithContext")
+	defer span.End()
+
 	conn := rabbitmqChannelParams.rabbitmq.connection
 	WaitForConnection(rabbitmqChannelParams.rabbitmq)
 	ch, errChO := conn.Channel()
 	if errChO != nil {
 		return nil, errChO
 	}
+	span.AddEvent("connection-established")
 
 	defer func(c *amqp.Channel) {
 		err := c.Close()
@@ -60,16 +68,19 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 	if errDE != nil {
 		return nil, errDE
 	}
+	span.AddEvent("exchange-declared")
 
 	errDQ := declareQueue(conn, rabbitmqChannelParams.queue)
 	if errDQ != nil {
 		return nil, errDQ
 	}
+	span.AddEvent("queue-declared")
 
 	errBETQ := bindExchangeToQueue(conn, rabbitmqChannelParams.exchange, rabbitmqChannelParams.queue)
 	if errBETQ != nil {
 		return nil, errBETQ
 	}
+	span.AddEvent("bindings-established")
 
 	rc := &rabbitmqChannel{
 		done:           done,
@@ -83,7 +94,8 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, rabbitmqChannelParams rabb
 		inputChannel:   make(chan []byte, rabbitmqChannelParams.bufferSize),
 		outputChannel:  make(chan channel.Message, rabbitmqChannelParams.bufferSize),
 	}
-	rc.start()
+	rc.startWithContext(ctx)
+	span.AddEvent("rabbitmq-channel-started")
 
 	return rc, nil
 }
@@ -208,38 +220,59 @@ func (rc *rabbitmqChannel) GetOutputChannel() <-chan channel.Message {
 	return rc.outputChannel
 }
 
-func (rc *rabbitmqChannel) start() {
+func (rc *rabbitmqChannel) startWithContext(ctx context.Context) {
+	tracer := otela.NewTracer("rbbitmqchannel")
+	ctx, span := tracer.Start(ctx, "rbbitmqchannel@startWithContext")
+	defer span.End()
+
 	for i := 0; i < rc.numberInstants; i++ {
 		if rc.mode.IsInputMode() {
 			rc.wg.Add(1)
 			go func() {
 				defer rc.wg.Done()
-				go rc.startInput()
+				go rc.startInputWithContext(ctx)
 			}()
 		}
 		if rc.mode.IsOutputMode() {
 			rc.wg.Add(1)
 			go func() {
 				defer rc.wg.Done()
-				rc.startOutput()
+				rc.startOutputWitContext(ctx)
 			}()
 		}
 	}
+	span.AddEvent("channels-workers-started")
 }
 
 func (rc *rabbitmqChannel) startOutput() {
-	rc.wg.Add(1)
+	rc.startOutputWitContext(context.Background())
+}
+
+func (rc *rabbitmqChannel) startOutputWitContext(ctx context.Context) {
+	tracer := otela.NewTracer("rbbitmqchannel")
+	_, span := tracer.Start(ctx, "rbbitmqchannel@startOutputWitContext")
+	defer span.End()
+
 	WaitForConnection(rc.rabbitmq)
+	span.AddEvent("connection-established")
+
+	rc.wg.Add(1)
 	go func() {
 		defer rc.wg.Done()
+
 		ch, err := rc.rabbitmq.connection.Channel()
 		if err != nil {
 			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
 				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startOutput)
+			span.AddEvent("error-on-open-channel", trace.WithAttributes(
+				attribute.String("error", err.Error()),
+			))
+			span.End()
 
 			return
 		}
+		span.AddEvent("channel-opened")
 
 		defer func(ch *amqp.Channel) {
 			err = ch.Close()
@@ -263,8 +296,17 @@ func (rc *rabbitmqChannel) startOutput() {
 				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startOutput)
 
+			span.AddEvent("error-on-start-consume", trace.WithAttributes(
+				attribute.String("error", err.Error()),
+			))
+			span.End()
+
 			return
 		}
+
+		span.AddEvent("consume-started")
+
+		span.End()
 
 		for {
 			if ch.IsClosed() {
@@ -296,19 +338,34 @@ func (rc *rabbitmqChannel) startOutput() {
 }
 
 func (rc *rabbitmqChannel) startInput() {
-	rc.wg.Add(1)
-	WaitForConnection(rc.rabbitmq)
+	rc.startInputWithContext(context.Background())
+}
 
+func (rc *rabbitmqChannel) startInputWithContext(ctx context.Context) {
+	tracer := otela.NewTracer("rbbitmqchannel")
+	_, span := tracer.Start(ctx, "rbbitmqchannel@startInputWithContext")
+	defer span.End()
+
+	WaitForConnection(rc.rabbitmq)
+	span.AddEvent("connection-established")
+
+	rc.wg.Add(1)
 	go func() {
 		defer rc.wg.Done()
+
 		ch, err := rc.rabbitmq.connection.Channel()
 		if err != nil {
 			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
 				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startInput)
+			span.AddEvent("error-on-open-channel", trace.WithAttributes(
+				attribute.String("error", err.Error()),
+			))
+			span.End()
 
 			return
 		}
+		span.AddEvent("channel-opened")
 
 		defer func() {
 			err = ch.Close()
@@ -318,6 +375,7 @@ func (rc *rabbitmqChannel) startInput() {
 			}
 		}()
 
+		span.End()
 		for {
 			if ch.IsClosed() {
 				logger.WithGroup(loggerGroupName).Debug("channel is closed rerun startInput function")

@@ -3,10 +3,12 @@ package otela
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/ormushq/ormus/logger"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/semconv/v1.25.0"
@@ -14,7 +16,15 @@ import (
 )
 
 func (opr *otelProvider) newTraceExporter(ctx context.Context) (sdktrace.SpanExporter, error) {
-	return otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithGRPCConn(opr.conn))
+	switch opr.exporter {
+	case ExporterGrpc:
+		return otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithGRPCConn(opr.conn))
+	case ExporterConsole:
+		return stdouttrace.New()
+	default:
+		panic("unsupported")
+	}
+
 }
 
 func (opr *otelProvider) newTraceProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
@@ -54,10 +64,30 @@ func (opr *otelProvider) initTrace() error {
 	return nil
 }
 
-func NewTracer(name string) trace.Tracer {
+func NewTracer(name string, options ...trace.TracerOption) trace.Tracer {
 	if !op.isConfigure {
 		panic("You must configure adapter before calling NewTracer")
 	}
 
-	return op.tracerProvider.Tracer(name)
+	return op.tracerProvider.Tracer(name, options...)
+}
+
+func GetCarrierFromContext(ctx context.Context) map[string]string {
+	propgator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+
+	carrier := propagation.MapCarrier{}
+	propgator.Inject(ctx, carrier)
+
+	return carrier
+}
+
+func GetContextFromCarrier(carrier map[string]string) context.Context {
+	propgator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+	c := propagation.MapCarrier{}
+	for k, v := range carrier {
+		c.Set(k, v)
+	}
+	parentCtx := propgator.Extract(context.Background(), c)
+
+	return parentCtx
 }

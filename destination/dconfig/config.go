@@ -6,4 +6,5 @@ type Config struct {
 	RabbitMQConsumerConnection    RabbitMQConsumerConnection    `koanf:"rabbitmq_consumer_connection"`
 	ConsumerTopic                 ConsumerTopic                 `koanf:"consumer_topic"`
 	RedisTaskIdempotency          RedisTaskIdempotency          `koanf:"redis_idempotency"`
+	Otel                          Otel                          `koanf:"otel"`
 }

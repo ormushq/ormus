@@ -39,6 +39,12 @@ destination:
     password: ""
     prefix: "destination-task-status::"
     expiration: 0
+  otel:
+    endpoint: "otel_collector:4317"
+    service_name: "destination"
+    enable_metric_expose: true
+    metric_expose_port: 8081
+    metric_expose_path: "metrics"
 
 manager:
   internal_broker_config:
