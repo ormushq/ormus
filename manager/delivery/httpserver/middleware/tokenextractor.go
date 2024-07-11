@@ -8,7 +8,7 @@ import (
 	"github.com/ormushq/ormus/manager/service/authservice"
 )
 
-func GetTokenFromCookie(js authservice.JWT) echo.MiddlewareFunc {
+func GetTokenFromCookie(js *authservice.JWT) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
 			authHeader, err := ctx.Cookie("jwtToken")

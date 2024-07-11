@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/delivery/httpserver/sourcehandler"
+	"github.com/ormushq/ormus/manager/service/sourceservice"
+	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
 	"log/slog"
 	"sync"
 
@@ -51,10 +54,18 @@ func main() {
 	validateUserSvc := uservalidator.New(scylla)
 
 	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
+
+	// source service
+	sourceSvc := sourceservice.New(scylla)
+	validateSourceSvc := sourcevalidator.New(scylla)
+	authSvc := authservice.NewJWT(cfg.JWTConfig)
+	sourceHand := sourcehandler.New(sourceSvc, userSvc, validateSourceSvc, authSvc)
+
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
 	server := httpserver.New(cfg, httpserver.SetupServicesResponse{
-		UserHandler: userHand,
+		UserHandler:   userHand,
+		SourceHandler: sourceHand,
 	})
 
 	server.Server()

@@ -8,7 +8,8 @@ import (
 )
 
 type SetupServicesResponse struct {
-	UserHandler *userhandler.Handler
+	UserHandler   *userhandler.Handler
+	SourceHandler *sourcehandler.Handler
 }
 
 type Server struct {
@@ -20,9 +21,10 @@ type Server struct {
 
 func New(cfg manager.Config, setupSvc SetupServicesResponse) *Server {
 	return &Server{
-		config:      cfg,
-		userHandler: *setupSvc.UserHandler,
-		Router:      echo.New(),
+		config:        cfg,
+		userHandler:   *setupSvc.UserHandler,
+		sourceHandler: *setupSvc.SourceHandler,
+		Router:        echo.New(),
 	}
 }
 

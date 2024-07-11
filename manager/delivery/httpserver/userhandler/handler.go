@@ -9,11 +9,11 @@ import (
 type Handler struct {
 	// TODO - add configurations
 	userSvc       *userservice.Service
-	userValidator uservalidator.Validator
+	userValidator *uservalidator.Validator
 	projectSvc    *projectservice.Service
 }
 
-func New(userSvc *userservice.Service, userValidator uservalidator.Validator, projectSvc *projectservice.Service) *Handler {
+func New(userSvc *userservice.Service, userValidator *uservalidator.Validator, projectSvc *projectservice.Service) *Handler {
 	return &Handler{
 		userSvc:       userSvc,
 		userValidator: userValidator,

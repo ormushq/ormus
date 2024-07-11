@@ -25,6 +25,6 @@ type Validator struct {
 	repo sourceservice.SourceRepo
 }
 
-func New(repo sourceservice.SourceRepo) Validator {
-	return Validator{repo: repo}
+func New(repo sourceservice.SourceRepo) *Validator {
+	return &Validator{repo: repo}
 }
