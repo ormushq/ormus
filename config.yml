@@ -23,7 +23,7 @@ destination:
   rabbitmq_consumer_connection:
     user: guest
     password: guest
-    host: localhost
+    host: rabbitmq
     port: 5672
     vhost:
     reconnect_second: 5

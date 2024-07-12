@@ -1,0 +1,34 @@
+root = "."
+tmp_dir = "temp"
+
+[build]
+  bin = "./cmd/destination/temp/main"
+  cmd = "go build -o ./cmd/destination/temp/main ./cmd/destination/delivery_workers/webhook_delivery_worker.go"
+  delay = 1000
+  exclude_dir = []
+  exclude_file = []
+  exclude_regex = []
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  include_dir = []
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  kill_delay = "0s"
+  log = "build-errors.log"
+  send_interrupt = false
+  stop_on_error = true
+  poll = true
+  poll_interval = 1000
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = false

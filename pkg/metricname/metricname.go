@@ -1,12 +1,12 @@
 package metricname
 
 const (
-	//PROCESS_FLOW_INPUT_SOURCE_DONE_JOB = "process_flow_input_source_done_job"
+	// PROCESS_FLOW_INPUT_SOURCE_DONE_JOB = "process_flow_input_source_done_job".
 
-	//PROCESS_FLOW_INPUT_SOURCE  = "process_flow_input_source"
-	//PROCESS_FLOW_OUTPUT_SOURCE = "process_flow_output_source"
+	// PROCESS_FLOW_INPUT_SOURCE  = "process_flow_input_source"
+	// PROCESS_FLOW_OUTPUT_SOURCE = "process_flow_output_source".
 
-	//PROCESS_FLOW_INPUT_CORE  = "process_flow_input_core"
+	// PROCESS_FLOW_INPUT_CORE  = "process_flow_input_core".
 
 	ProcessFlowOutputCore = "process_flow_output_core"
 

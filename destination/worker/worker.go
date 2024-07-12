@@ -3,16 +3,16 @@ package worker
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"sync"
+
 	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/destination/taskmanager"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/metricname"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
-	"sync"
 )
 
 type Worker struct {
@@ -62,7 +62,6 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
 					}
 
 					otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputDestinationWorkerDoneJob, "event_handled_publish_done_job")
-
 				}()
 			case <-done:
 
@@ -74,7 +73,7 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) error {
 	return nil
 }
 
-func NewWorker(events <-chan event.ProcessedEvent, th taskmanager.TaskHandler) *Worker {
+func NewWorker(events <-chan event.ProcessedEvent, th TaskHandler) *Worker {
 	return &Worker{
 		EventsChannel: events,
 		TaskHandler:   th,

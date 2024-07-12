@@ -3,16 +3,16 @@ package taskservice
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/logger"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"strconv"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) error {

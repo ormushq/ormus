@@ -3,6 +3,7 @@ services:
   #Grafana Service
   grafana:
     image: grafana/grafana:latest
+    container_name: "ormus-grafana"
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml

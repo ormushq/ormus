@@ -3,17 +3,17 @@ package rabbitmqchanneltaskmanager
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/pkg/metricname"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"sync"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/metricname"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Consumer struct {

@@ -9,7 +9,7 @@ import (
 type ProcessedEvent struct {
 	// required fields
 	SourceID      string            // Write key or sourceID shows that which source, events coming from
-	TracerCarrier map[string]string //use this for trace with OTel
+	TracerCarrier map[string]string // use this for trace with OTel
 	Integration   entity.Integration
 	MessageID     string // Automatically collected by Segment, a unique identifier for each message
 	EventType     Type   // Type of message, corresponding to the API method: 'identify', 'group', 'track', 'page', 'screen' or 'alias'.

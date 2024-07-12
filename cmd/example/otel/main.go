@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel/metric"
 	"sync"
 	"time"
 
 	"github.com/ormushq/ormus/adapter/otela"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -45,6 +45,7 @@ func main() {
 	close(done)
 	wg.Wait()
 }
+
 func startService1(c chan<- context.Context) {
 	tracer := otela.NewTracer("test-tracer")
 

@@ -3,17 +3,17 @@ package rbbitmqchannel
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"sync"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type rabbitmqChannel struct {

@@ -3,11 +3,11 @@ package rbbitmqchannel
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
 	"log/slog"
 	"sync"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"

@@ -3,14 +3,14 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Config struct {
