@@ -3,26 +3,27 @@ package main
 import (
 	"context"
 	"crypto/rand"
-	"encoding/json"
 	"fmt"
 	"log"
 	"log/slog"
 	"math/big"
+
 	"os"
 	"sync"
 	"time"
 
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
 	"github.com/ormushq/ormus/logger"
-	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/metricname"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const timeoutSeconds = 5
@@ -105,50 +106,59 @@ func main() {
 	span.AddEvent("exchange-declared")
 
 	// generate fake processedEvent
-	pageName := "Home"
-	pe := event.ProcessedEvent{
-		SourceID: "4",
-		Integration: entity.Integration{
-			ID:       "2",
-			SourceID: "2",
-			Metadata: entity.DestinationMetadata{
-				ID:   "2",
-				Name: "webhook",
-				Slug: "webhook",
-			},
-			Config: webhookintegration.WebhookConfig{
-				Headers: map[string]string{
-					"Authorization": "Basic MY_BASIC_AUTH_TOKEN",
-					"Content-Type":  "MY_CONTENT_TYPE",
+	fakeEvent := &processedevent.ProcessedEvent{
+		SourceId: "source-123",
+		Integration: &processedevent.Integration{
+			Id:       "integration-456",
+			SourceId: "source-123",
+			Name:     "Fake Integration",
+			Metadata: &processedevent.DestinationMetadata{
+				Id:   "metadata-789",
+				Name: "Test Metadata",
+				Slug: processedevent.DestinationType_webhook,
+				Categories: []processedevent.DestinationCategory{
+					processedevent.DestinationCategory_ANALYTICS,
+					processedevent.DestinationCategory_EMAIL_MARKETING,
 				},
-				Payload: map[string]string{
-					"name":      "ali",
-					"birth_day": "2020-12-12",
-					"mail":      "ali@mail.com",
-				},
-				Method: webhookintegration.POSTWebhookMethod,
-				URL:    "https://eoc0z7vqfxu6io.m.pipedream.net",
 			},
+			ConnectionType: processedevent.ConnectionType_EVENT_STREAM,
+			Enabled:        true,
+			Config: &processedevent.Integration_Webhook{
+				Webhook: &processedevent.WebhookConfig{
+					Headers: map[string]string{
+						"Authorization": "Basic MY_BASIC_AUTH_TOKEN",
+						"Content-Type":  "MY_CONTENT_TYPE",
+					},
+					Payload: map[string]string{
+						"name":      "ali",
+						"birth_day": "2020-12-12",
+						"mail":      "ali@mail.com",
+					},
+					Method: processedevent.WebhookMethod_POST,
+					Url:    "https://eoc0z7vqfxu6io.m.pipedream.net",
+				},
+			},
+			CreatedAt: timestamppb.New(time.Now().Add(-1 * time.Hour)),
 		},
-		MessageID:         "43",
-		EventType:         "page",
-		Name:              &pageName,
-		Version:           1,
-		SentAt:            time.Now(),
-		ReceivedAt:        time.Now(),
-		OriginalTimestamp: time.Now(),
-		Timestamp:         time.Now(),
+		MessageId: "4",
+		EventType: processedevent.Type_TRACK,
+		Version:   1,
+		//<<<<<<< HEAD
+		SentAt:            timestamppb.New(time.Now()),
+		ReceivedAt:        timestamppb.New(time.Now()),
+		OriginalTimestamp: timestamppb.New(time.Now()),
+		Timestamp:         timestamppb.New(time.Now()),
 	}
 
 	args := os.Args
 	if len(args) > 1 && args[1] == "bulk" {
 		for {
-			publishEvent(pe, ch)
+			publishEvent(fakeEvent, ch)
 			l.Debug("Publish new processed event.")
 			time.Sleep(time.Second)
 		}
 	} else {
-		publishEvent(pe, ch)
+		publishEvent(fakeEvent, ch)
 		l.Debug("Publish new processed event.")
 	}
 
@@ -158,6 +168,42 @@ func main() {
 	time.Sleep(time.Second * timeoutSeconds)
 	close(done)
 	wg.Wait()
+}
+
+func publishEvent(pe *processedevent.ProcessedEvent, ch *amqp.Channel) {
+	tracer := otela.NewTracer("FakerTracer")
+
+	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@publishEvent")
+
+	pe.TracerCarrier = otela.GetCarrierFromContext(ctx)
+	l := 3
+	pe.MessageId = randSeq(l)
+	pe.Integration.Id = randSeq(l)
+
+	taskSpan.AddEvent("json-event-created", trace.WithAttributes(
+		attribute.String("source-id", pe.SourceId),
+		// TODO: write id service for processedevent
+		attribute.String("event-id", pe.Id()),
+		attribute.String("event-type", string(pe.EventType)),
+	))
+
+	taskSpan.End()
+
+	meter := otel.Meter("FakerTracer@publishEvent")
+
+	ppe, err := proto.Marshal(pe)
+
+	err = ch.PublishWithContext(ctx,
+		"processed-events-exchange", // exchange
+		"pe.webhook",                // routing key
+		false,                       // mandatory
+		false,                       // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        ppe,
+		})
+	failOnError(err, "Failed to publish a message")
+	otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputCore, "event_sent_to_destination")
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -174,40 +220,4 @@ func randSeq(n int) string {
 	}
 
 	return string(b)
-}
-
-func publishEvent(pe event.ProcessedEvent, ch *amqp.Channel) {
-	tracer := otela.NewTracer("FakerTracer")
-
-	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@publishEvent")
-
-	pe.TracerCarrier = otela.GetCarrierFromContext(ctx)
-	l := 3
-	pe.MessageID = randSeq(l)
-	pe.Integration.ID = randSeq(l)
-
-	jpe, err := json.Marshal(pe)
-	if err != nil {
-		log.Panicf("Error: %s", err)
-	}
-	taskSpan.AddEvent("json-event-created", trace.WithAttributes(
-		attribute.String("source-id", pe.SourceID),
-		attribute.String("event-id", pe.ID()),
-		attribute.String("event-type", string(pe.EventType)),
-	))
-
-	taskSpan.End()
-
-	meter := otel.Meter("FakerTracer@publishEvent")
-	err = ch.PublishWithContext(ctx,
-		"processed-events-exchange", // exchange
-		"pe.webhook",                // routing key
-		false,                       // mandatory
-		false,                       // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        jpe,
-		})
-	failOnError(err, "Failed to publish a message")
-	otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowOutputCore, "event_sent_to_destination")
 }
