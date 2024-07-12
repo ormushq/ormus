@@ -12,6 +12,8 @@ import (
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/pkg/metricname"
+
+	"github.com/ormushq/ormus/pkg/protobufmapper"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -120,16 +122,19 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 						return
 					}
 
-					e, uErr := taskentity.UnmarshalBytesToProcessedEvent(msg.Body)
+					pe, uErr := taskentity.ProtoUnmarshalBytesToProcessedEvnet(msg.Body)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
 						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DestinationInputUnmarshalError, "processed_event_unmarshal_error")
 
 						return
 					}
-					ctx := otela.GetContextFromCarrier(e.TracerCarrier)
+					// TODO: add TracerCarrier as type of map[string]string to ProcessedEvent proto message
+					ctx := otela.GetContextFromCarrier(pe.TracerCarrier)
 					ctx, span = tracer.Start(ctx, "rabbitmqconsumer@StartProccessEvent")
 					defer span.End()
+
+					e := protobufmapper.MapProcessedEventFromProtobuf(pe)
 
 					otela.IncrementFloat64Counter(ctx, meter, metricname.ProcessFlowInputDestination, "event_received_in_destination")
 

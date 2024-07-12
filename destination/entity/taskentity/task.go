@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
+	"google.golang.org/protobuf/proto"
 )
 
 type IntegrationDeliveryStatus uint8
@@ -86,6 +88,18 @@ func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	}
 
 	return pe, nil
+}
+
+func ProtoUnmarshalBytesToProcessedEvnet(body []byte) (*processedevent.ProcessedEvent, error) {
+	var pe processedevent.ProcessedEvent
+
+	if err := proto.Unmarshal(body, &pe); err != nil {
+		logger.L().Error("Error on unMarshaling processed event :", err)
+
+		return &pe, err
+	}
+
+	return &pe, nil
 }
 
 func NumericStringToIntegrationDeliveryStatus(statusStr string) IntegrationDeliveryStatus {

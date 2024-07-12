@@ -16,6 +16,7 @@ import (
 )
 
 func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) error {
+	// TODO: complete retruns
 	var task taskentity.Task
 	var err error
 	tracer := otela.NewTracer("taskservice")
@@ -92,7 +93,6 @@ func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) 
 
 	// Get Delivery handler from task delivery mapper.
 	deliveryHandler, ok := taskdelivery.Mapper[destinationType]
-
 	if !ok {
 		span.AddEvent("there-is-no-delivery-handler-for-this-type")
 
