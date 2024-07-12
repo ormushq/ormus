@@ -57,7 +57,7 @@ enum Type {
 }
 
 enum DestinationType {
-  WEBHOOK = 0;
+  webhook = 0;
 }
 
 enum DestinationCategory {
