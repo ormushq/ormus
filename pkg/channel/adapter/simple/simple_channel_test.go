@@ -2,13 +2,13 @@ package simple
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/stretchr/testify/assert"
 )
 
 type testCase struct {

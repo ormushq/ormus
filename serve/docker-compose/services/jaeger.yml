@@ -2,7 +2,7 @@ version: '3.8'
 services:
   #Jaeger Service
   jaeger:
-    image: jaegertracing/all-in-one:${JAEGER_IMAGE_TAG:-latest}
+    image: jaegertracing/all-in-one:${JAEGER_IMAGE_TAG:-1.57}
     container_name: "ormus-jaeger"
     volumes:
       - "./jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"

@@ -9,4 +9,4 @@ scrape_configs:
       - targets: ['otel_collector:8889']
   - job_name: destination
     static_configs:
-      - targets: ["destination:8081"]
+      - targets: ['destination_task_publisher:8081', 'destination_webhook_worker:8081']

@@ -11,8 +11,6 @@ services:
       - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.rule=Host(`rabbitmq.${COMPOSE_PROJECT_NAME}.local`)"
       - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.entrypoints=web"
       - "traefik.http.services.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.loadbalancer.server.port=15672"
-    ports:
-      - "15672:15672"
 
 #Volumes
 volumes:

@@ -20,6 +20,7 @@ var op otelProvider
 
 func Configure(wg *sync.WaitGroup, done <-chan bool, cfg Config) error {
 	if cfg.EnableMetricExpose && !op.isConfigure {
+		fmt.Println(cfg)
 		serveMetric(cfg, wg, done)
 	}
 
@@ -54,7 +55,7 @@ func Configure(wg *sync.WaitGroup, done <-chan bool, cfg Config) error {
 func serveMetric(cfg Config, wg *sync.WaitGroup, done <-chan bool) {
 	fmt.Printf("Metric enabled on port %d and path: %s \n", cfg.MetricExposePort, cfg.MetricExposePath)
 	srv := &http.Server{
-		Addr:        fmt.Sprintf("localhost:%d", cfg.MetricExposePort),
+		Addr:        fmt.Sprintf(":%d", cfg.MetricExposePort),
 		ReadTimeout: time.Second,
 	}
 

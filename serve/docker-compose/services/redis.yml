@@ -5,6 +5,6 @@ services:
     image: redis:alpine
     container_name: "ormus-redis"
     volumes:
-      - ormus_redis:/data
+      - ormus-redis:/data
 volumes:
   ormus-redis:
