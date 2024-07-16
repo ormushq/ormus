@@ -25,7 +25,6 @@ import (
 	"github.com/ormushq/ormus/adapter/etcd"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/taskdelivery"
-
 	"github.com/ormushq/ormus/destination/taskservice"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
 	"github.com/ormushq/ormus/destination/worker"
