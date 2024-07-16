@@ -3,16 +3,16 @@ package taskservice
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/logger"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"strconv"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/logger"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) error {
@@ -24,8 +24,23 @@ func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) 
 	newEvent.TracerCarrier = otela.GetCarrierFromContext(ctx)
 	span.AddEvent("start-handle-task")
 
-	var taskStatus taskentity.IntegrationDeliveryStatus
 	taskID := newEvent.ID()
+
+	unlock, err := s.LockTaskByID(ctx, taskID)
+	if err != nil {
+		span.AddEvent("error-on-lock-task", trace.WithAttributes(
+			attribute.String("error", err.Error())))
+
+		return err
+	}
+	defer func() {
+		unlockErr := unlock()
+		if unlockErr != nil {
+			logger.L().Error(fmt.Sprintf("unlock task failed %s", unlockErr))
+		}
+	}()
+
+	var taskStatus taskentity.IntegrationDeliveryStatus
 
 	// Get task status using idempotency in the task service.
 	if taskStatus, err = s.GetTaskStatusByID(ctx, taskID); err != nil {
@@ -43,20 +58,6 @@ func (s Service) HandleTask(ctx context.Context, newEvent event.ProcessedEvent) 
 
 		return nil
 	}
-
-	unlock, err := s.LockTaskByID(ctx, taskID)
-	if err != nil {
-		span.AddEvent("error-on-lock-task", trace.WithAttributes(
-			attribute.String("error", err.Error())))
-
-		return err
-	}
-	defer func() {
-		err = unlock()
-		if err != nil {
-			logger.L().Error(fmt.Sprintf("unlock task failed %s", err))
-		}
-	}()
 
 	span.AddEvent("task-status-retrieved", trace.WithAttributes(
 		attribute.String("status", taskStatus.String()),
