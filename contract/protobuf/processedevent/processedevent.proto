@@ -7,15 +7,16 @@ import "google/protobuf/timestamp.proto";
 
 message ProcessedEvent {
   string source_id = 1;
-  Integration integration = 2;
-  string message_id = 3;
-  Type event_type = 4;
-  uint32 version = 5;
+  map<string, string> tracer_carrier = 2;
+  Integration integration = 3;
+  string message_id = 4;
+  Type event_type = 5;
+  uint32 version = 6;
 
-  google.protobuf.Timestamp sent_at = 6;
-  google.protobuf.Timestamp received_at = 7;
-  google.protobuf.Timestamp original_timestamp = 8;
-  google.protobuf.Timestamp timestamp = 9;
+  google.protobuf.Timestamp sent_at = 7;
+  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp original_timestamp = 9;
+  google.protobuf.Timestamp timestamp = 10;
 }
 
 message Integration {
