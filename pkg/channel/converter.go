@@ -54,7 +54,7 @@ func (c *Converter) ConvertToOutputProcessedEventChannel(originalChannel <-chan 
 				c.wg.Add(1)
 				go func() {
 					defer c.wg.Done()
-					pe, uErr := taskentity.ProtoUnmarshalBytesToProcessedEvnet(msg)
+					pe, uErr := taskentity.ProtoUnmarshalBytesToProcessedEvent(msg)
 					if uErr != nil {
 						logger.L().Debug(string(msg))
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))

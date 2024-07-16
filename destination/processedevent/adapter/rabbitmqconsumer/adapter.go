@@ -122,7 +122,7 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 						return
 					}
 
-					pe, uErr := taskentity.ProtoUnmarshalBytesToProcessedEvnet(msg.Body)
+					pe, uErr := taskentity.ProtoUnmarshalBytesToProcessedEvent(msg.Body)
 					if uErr != nil {
 						slog.Error(fmt.Sprintf("Failed to convert bytes to processed events: %v", uErr))
 						otela.IncrementFloat64Counter(context.Background(), meter, metricname.DestinationInputUnmarshalError, "processed_event_unmarshal_error")

@@ -140,10 +140,9 @@ func main() {
 			},
 			CreatedAt: timestamppb.New(time.Now().Add(-1 * time.Hour)),
 		},
-		MessageId: "4",
-		EventType: processedevent.Type_TRACK,
-		Version:   1,
-		//<<<<<<< HEAD
+		MessageId:         "4",
+		EventType:         processedevent.Type_TRACK,
+		Version:           1,
 		SentAt:            timestamppb.New(time.Now()),
 		ReceivedAt:        timestamppb.New(time.Now()),
 		OriginalTimestamp: timestamppb.New(time.Now()),
@@ -183,7 +182,7 @@ func publishEvent(pe *processedevent.ProcessedEvent, ch *amqp.Channel) {
 	taskSpan.AddEvent("json-event-created", trace.WithAttributes(
 		attribute.String("source-id", pe.SourceId),
 		// TODO: write id service for processedevent
-		attribute.String("event-id", pe.Id()),
+		attribute.String("event-id", ID(pe)),
 		attribute.String("event-type", string(pe.EventType)),
 	))
 
@@ -220,4 +219,8 @@ func randSeq(n int) string {
 	}
 
 	return string(b)
+}
+
+func ID(e *processedevent.ProcessedEvent) string {
+	return e.SourceId + "-" + e.TracerCarrier["integration_id"]
 }

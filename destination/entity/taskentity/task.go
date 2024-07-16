@@ -90,7 +90,7 @@ func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	return pe, nil
 }
 
-func ProtoUnmarshalBytesToProcessedEvnet(body []byte) (*processedevent.ProcessedEvent, error) {
+func ProtoUnmarshalBytesToProcessedEvent(body []byte) (*processedevent.ProcessedEvent, error) {
 	var pe processedevent.ProcessedEvent
 
 	if err := proto.Unmarshal(body, &pe); err != nil {
