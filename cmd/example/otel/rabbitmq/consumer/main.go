@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
 	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
-	"os"
-	"os/signal"
-	"sync"
 )
 
 type MyMessage struct {
@@ -61,7 +62,7 @@ func main() {
 			select {
 			case msg := <-outputChannel:
 				func() {
-					fmt.Printf("recived message : %s\n", msg.Body)
+					fmt.Printf("received message : %s\n", msg.Body)
 					var decode MyMessage
 					err = json.Unmarshal(msg.Body, &decode)
 					if err != nil {

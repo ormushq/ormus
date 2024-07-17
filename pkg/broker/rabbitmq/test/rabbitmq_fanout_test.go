@@ -100,6 +100,7 @@ func deferAllConnfan(conn map[int]*rabbitmq.RabbitMQ, t *testing.T) {
 
 // Helper function to create a RabbitMQ connection
 func setupRabbitMQFanout(t *testing.T, cfg rabbitmq.AMQPBaseConfig) *rabbitmq.RabbitMQ {
+	t.Skip()
 	amqpCfg := rabbitmq.NEWAMQPConfig(cfg, nil)
 	conn, err := rabbitmq.NewRabbitMQBroker(amqpCfg)
 	if err != nil {

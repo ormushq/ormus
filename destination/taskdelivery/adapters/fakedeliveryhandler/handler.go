@@ -2,14 +2,14 @@ package fakedeliveryhandler
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type FakeHandler struct{}

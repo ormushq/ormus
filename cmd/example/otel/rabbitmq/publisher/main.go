@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/destination/dconfig"
-	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"os"
 	"os/signal"
 	"sync"
 	"time"
+
+	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/destination/dconfig"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 type MyMessage struct {

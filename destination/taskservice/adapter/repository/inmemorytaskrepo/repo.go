@@ -3,12 +3,12 @@ package inmemorytaskrepo
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskservice/param"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (db DB) GetTaskByID(taskID string) (taskentity.Task, error) {

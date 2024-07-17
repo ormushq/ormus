@@ -3,15 +3,15 @@ package inmemorytaskmanager
 import (
 	"sync"
 
-	"github.com/ormushq/ormus/destination/taskmanager"
+	"github.com/ormushq/ormus/destination/worker"
 )
 
 type Worker struct {
 	TaskManager *TaskManager
-	Handler     taskmanager.TaskHandler
+	Handler     worker.TaskHandler
 }
 
-func NewWorker(tm *TaskManager, h taskmanager.TaskHandler) *Worker {
+func NewWorker(tm *TaskManager, h worker.TaskHandler) *Worker {
 	return &Worker{
 		TaskManager: tm,
 		Handler:     h,

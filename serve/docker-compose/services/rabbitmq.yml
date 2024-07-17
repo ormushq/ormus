@@ -2,8 +2,9 @@ version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    container_name: "ormus-rabbitmq"
     volumes:
-      - rabbitmq:/var/lib/rabbitmq/
+      - ormus-rabbitmq:/var/lib/rabbitmq/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.service=rabbitmq_${COMPOSE_PROJECT_NAME}_manager"
@@ -11,8 +12,7 @@ services:
       - "traefik.http.routers.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.entrypoints=web"
       - "traefik.http.services.rabbitmq_${COMPOSE_PROJECT_NAME}_manager.loadbalancer.server.port=15672"
 
-
 #Volumes
 volumes:
-  rabbitmq:
+  ormus-rabbitmq:
     driver: local

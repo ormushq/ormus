@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/stretchr/testify/assert"
 )
 
 type testCase struct {
@@ -82,6 +83,7 @@ func TestSimpleChannel(t *testing.T) {
 			}
 
 			outputChannel, err := adapter.GetOutputChannel(tc.name)
+			assert.NoError(t, err)
 			if err != nil {
 				t.Error(err.Error())
 				t.Fail()
@@ -161,5 +163,6 @@ func TestSimpleChannel(t *testing.T) {
 	t.Log("Before close done channel")
 	close(done)
 	t.Log("Before final wait")
+
 	wg.Wait()
 }

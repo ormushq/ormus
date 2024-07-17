@@ -2,22 +2,20 @@ package rabbitmqconsumer
 
 import (
 	"context"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/pkg/metricname"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-
-	//"context"
 	"fmt"
 	"log"
 	"log/slog"
 	"sync"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/pkg/metricname"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Consumer struct {
@@ -48,6 +46,7 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 		defer close(events)
 		_, span := tracer.Start(c.ctx, "rabbitmqconsumer@consume")
 
+		fmt.Println(c.connectionConfig)
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", c.connectionConfig.User, c.connectionConfig.Password, c.connectionConfig.Host, c.connectionConfig.Port))
 		failOnError(err, "Failed to connect to RabbitMQ")
 		defer func(conn *amqp.Connection) {

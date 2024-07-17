@@ -3,12 +3,12 @@ package redistaskidempotency
 import (
 	"context"
 	"errors"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (db DB) SaveTaskStatus(ctx context.Context, taskID string, status taskentity.IntegrationDeliveryStatus) error {

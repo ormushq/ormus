@@ -2,17 +2,17 @@ package dtcoordinator
 
 import (
 	"fmt"
+	"log/slog"
+	"sync"
+
 	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/destination/taskmanager"
+	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/metricname"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
-	"sync"
-
-	"github.com/ormushq/ormus/destination/taskmanager"
-	"github.com/ormushq/ormus/event"
-	"github.com/ormushq/ormus/manager/entity"
 )
 
 type TaskPublisherMap map[entity.DestinationType]taskmanager.Publisher

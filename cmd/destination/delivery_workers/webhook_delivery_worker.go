@@ -2,11 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/adapter/redis"
-	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log"
 	"log/slog"
 	"os"
@@ -15,17 +10,22 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/adapter/etcd"
+	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/taskdelivery"
 	"github.com/ormushq/ormus/destination/taskdelivery/adapters/fakedeliveryhandler"
 	"github.com/ormushq/ormus/destination/taskmanager/adapter/rabbitmqchanneltaskmanager"
 	"github.com/ormushq/ormus/destination/taskservice"
+	"github.com/ormushq/ormus/destination/taskservice/adapter/idempotency/redistaskidempotency"
 	"github.com/ormushq/ormus/destination/taskservice/adapter/repository/inmemorytaskrepo"
 	"github.com/ormushq/ormus/destination/worker"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const waitingAfterShutdownInSeconds = 2

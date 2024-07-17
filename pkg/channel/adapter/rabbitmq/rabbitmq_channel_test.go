@@ -2,12 +2,12 @@ package rbbitmqchannel
 
 import (
 	"encoding/json"
-	"github.com/ormushq/ormus/adapter/otela"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
 )

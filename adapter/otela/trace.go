@@ -3,15 +3,15 @@ package otela
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/ormushq/ormus/logger"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv/v1.25.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -24,7 +24,6 @@ func (opr *otelProvider) newTraceExporter(ctx context.Context) (sdktrace.SpanExp
 	default:
 		panic("unsupported")
 	}
-
 }
 
 func (opr *otelProvider) newTraceProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {

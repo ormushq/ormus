@@ -20,6 +20,7 @@ var op otelProvider
 
 func Configure(wg *sync.WaitGroup, done <-chan bool, cfg Config) error {
 	if cfg.EnableMetricExpose && !op.isConfigure {
+		fmt.Println(cfg)
 		serveMetric(cfg, wg, done)
 	}
 

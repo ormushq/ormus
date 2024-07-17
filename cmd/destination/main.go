@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ormushq/ormus/adapter/otela"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"log"
 	"log/slog"
 	"os"
@@ -12,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/destination/processedevent/adapter/rabbitmqconsumer"
@@ -21,6 +19,8 @@ import (
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/channel"
 	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const waitingAfterShutdownInSeconds = 1

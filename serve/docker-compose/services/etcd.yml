@@ -4,3 +4,8 @@ services:
   etcd:
     image: quay.io/coreos/etcd:v3.5.13
     command: /usr/local/bin/etcd -name etcd0 -advertise-client-urls http://etcd:2379 -listen-client-urls http://0.0.0.0:2379
+    container_name: ormus-etcd
+    volumes:
+      - ormus-etcd:/data
+volumes:
+  ormus-etcd:
