@@ -58,7 +58,11 @@ func TestRabbitmqChannel(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
 			inputAdapter := New(done, wg, config)
-			inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+			err = inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+			if err != nil {
+				t.Error(err.Error())
+				t.Fail()
+			}
 			inputChannel, err := inputAdapter.GetInputChannel(tc.name)
 			if err != nil {
 				t.Error(err.Error())
