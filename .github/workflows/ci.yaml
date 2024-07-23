@@ -27,7 +27,7 @@ jobs:
         run: sudo docker-compose down
 
       - name: Format
-        run: make format
+        run: make format-check
 
       - name: Lint
         run: make lint

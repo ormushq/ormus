@@ -19,10 +19,16 @@ down:
 logs:
 	docker-compose logs
 
-format:
+format-fix:
 	@which gofumpt || (go install mvdan.cc/gofumpt@latest)
 	@gofumpt -l -w $(ROOT)
 	@which gci || (go install github.com/daixiang0/gci@latest)
 	@gci write $(ROOT)
 	@which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
 	@golangci-lint run --fix
+
+format-check:
+	@which gofumpt || (go install mvdan.cc/gofumpt@latest)
+	@gofumpt -l $(ROOT)
+	@which gci || (go install github.com/daixiang0/gci@latest)
+	@gci list $(ROOT)
