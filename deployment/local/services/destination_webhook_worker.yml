@@ -9,11 +9,10 @@ services:
         GO_IMAGE_NAME: ${GO_IMAGE_NAME}
         GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
     image: ormus-destination-webhook-worker:${GO_IMAGE_VERSION}
-    container_name: "ormus-destination-webhook-worker"
     entrypoint:
       - air
       - "-c"
-      - /home/app/serve/docker-compose/services/go/destination/webhook_worker/.destination.air.toml
+      - /home/app/deployment/local/services/go/destination/webhook_worker/.destination.air.toml
     volumes:
       - ../../../:/home/app
     depends_on:

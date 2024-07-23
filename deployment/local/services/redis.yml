@@ -3,7 +3,6 @@ services:
   #Redis Service
   redis:
     image: redis:alpine
-    container_name: "ormus-redis"
     volumes:
       - ormus-redis:/data
 volumes:

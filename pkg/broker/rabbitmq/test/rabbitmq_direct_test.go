@@ -49,8 +49,6 @@ func TestRabbitMQConcurrentConsumption(t *testing.T) {
 }
 
 func runTest(t *testing.T, tc DirectTestCase) {
-	// todo setup rabbitmq in test environment
-	t.Skip()
 	conn := make(map[int]*rabbitmq.RabbitMQ)
 	queueName := "test_queue"
 	for i := 0; i < tc.NumWorkers; i++ {
