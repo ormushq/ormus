@@ -32,12 +32,29 @@ in windows. This will start all the services in the background.
 - RabbitMQ Dashboard: [http://rabbitmq.ormus.local](http://rabbitmq.ormus.local)
 - Prometheus: [http://prometheus.ormus.local](http://prometheus.ormus.local)
 - Grafana: [http://grafana.ormus.local](http://grafana.ormus.local)
-- Jaeger: [http://jaeger.ormuse.local](http://jaeger.ormuse.local)
+- Jaeger: [http://jaeger.ormus.local](http://jaeger.ormus.local)
 
 
 
 # generate fake processed event for destination 
 
+Single task publish:
+Unix:
 ```bash
-docker exec -it ormus-destination-task-publisher go run cmd/destination/faker/fake_processed_event_producer.go
+./deployment/local/docker-compose.bash exec -it destination_task_publisher go run cmd/destination/faker/fake_processed_event_producer.go
 ```
+Windows:
+```bash
+ .\deployment\local\docker-compose.bat exec destination_task_publisher go run cmd/destination/faker/fake_processed_event_producer.go
+ ```
+
+Bulk task publish:
+Unix:
+```bash
+./deployment/local/docker-compose.bash exec -it destination_task_publisher go run cmd/destination/faker/fake_processed_event_producer.go bulk
+```
+Windows:
+```bash
+ .\deployment\local\docker-compose.bat exec destination_task_publisher go run cmd/destination/faker/fake_processed_event_producer.go bulk
+ ```
+
