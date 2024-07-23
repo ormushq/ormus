@@ -18,13 +18,13 @@ jobs:
         run: go mod tidy
 
       - name: dockerUp
-        run: sudo docker-compose up -d
+        run: sudo make up
 
       - name: Test
         run: make test
 
       - name: dockerDown
-        run: sudo docker-compose down
+        run: sudo make down
 
       - name: Format
         run: make format
