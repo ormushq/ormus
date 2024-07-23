@@ -18,13 +18,13 @@ jobs:
         run: go mod tidy
 
       - name: dockerUp
-        run: sudo make up
+        run: sudo make docker-test-up
 
       - name: Test
         run: make test
 
       - name: dockerDown
-        run: sudo make down
+        run: sudo make docker-test-down
 
       - name: Lint
         run: make lint
