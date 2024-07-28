@@ -5,15 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"time"
-
+	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"github.com/ormushq/ormus/pkg/richerror"
+	"google.golang.org/protobuf/proto"
+	"io"
+	"net/http"
+	"time"
 )
 
 type WebhookHandler struct{}
@@ -25,9 +26,24 @@ func New() *WebhookHandler {
 func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
-	_ = fmt.Sprintf("I am here in %s ------------------------ \n", op)
+	// TODO: need to implement task protobuf
+	serializedData, mErr := proto.Marshal(&task.ProcessedEvent)
+	if mErr != nil {
+		logger.L().Error("can't marshal the task", mErr)
 
-	// TODO: use oneof
+		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
+			WithMessage("can't marshal the task")
+	}
+
+	wc := &processedevent.ProcessedEvent{}
+	if err := proto.Unmarshal(serializedData, wc); err != nil {
+		logger.L().Error("can't unmarshal the task", err)
+
+		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
+			WithMessage("can't unmarshal the task")
+	}
+
+	// TODO: get config from processedevent.ProcessedEvent
 	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
 	if !ok {
 		logger.L().Info("invalid configuration for webhook")

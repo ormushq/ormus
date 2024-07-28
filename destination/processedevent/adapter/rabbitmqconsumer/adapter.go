@@ -129,7 +129,6 @@ func (c *Consumer) Consume(done <-chan bool, wg *sync.WaitGroup) (<-chan event.P
 
 						return
 					}
-					// TODO: add TracerCarrier as type of map[string]string to ProcessedEvent proto message
 					ctx := otela.GetContextFromCarrier(pe.TracerCarrier)
 					ctx, span = tracer.Start(ctx, "rabbitmqconsumer@StartProccessEvent")
 					defer span.End()
