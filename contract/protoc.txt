@@ -1,0 +1,11 @@
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/task/task.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/processedevent/processedevent.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/coreevent/coreevent.proto
