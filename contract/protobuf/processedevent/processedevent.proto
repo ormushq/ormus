@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package processedevent;
-option go_package = "contract/goprotobuf/processedevent";
-
-message ProcessedEvent {
-  string id = 1;
-}
