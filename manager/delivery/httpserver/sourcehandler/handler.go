@@ -9,16 +9,16 @@ import (
 )
 
 type Handler struct {
-	sourceSvc   sourceservice.Service
-	userSvc     userservice.Service
-	validateSvc sourcevalidator.Validator
-	authSvc     authservice.JWT
+	sourceSvc   *sourceservice.Service
+	userSvc     *userservice.Service
+	validateSvc *sourcevalidator.Validator
+	authSvc     *authservice.JWT
 }
 
-func New(sourceSvc sourceservice.Service,
-	userSvc userservice.Service,
-	validateSvc sourcevalidator.Validator,
-	authSvc authservice.JWT,
+func New(sourceSvc *sourceservice.Service,
+	userSvc *userservice.Service,
+	validateSvc *sourcevalidator.Validator,
+	authSvc *authservice.JWT,
 ) *Handler {
 	return &Handler{
 		sourceSvc:   sourceSvc,
