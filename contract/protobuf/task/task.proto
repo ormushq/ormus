@@ -4,7 +4,7 @@ package task;
 option go_package = "contract/goprotobuf/task";
 
 import "google/protobuf/timestamp.proto";
-// TODO: manually append "github.com/ormushq/ormus/" to the compiled version
+// manually append "github.com/ormushq/ormus/" to the compiled version
 import "contract/protobuf/processedevent/processedevent.proto";
 
 enum IntegrationDeliveryStatus {

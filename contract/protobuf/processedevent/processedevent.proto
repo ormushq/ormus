@@ -4,7 +4,7 @@ package processedevent;
 option go_package = "contract/goprotobuf/processedevent";
 
 import "google/protobuf/timestamp.proto";
-// TODO: manually append "github.com/ormushq/ormus/" to the compiled version
+// manually append "github.com/ormushq/ormus/" to the compiled version
 import "contract/protobuf/coreevent/coreevent.proto";
 
 message ProcessedEvent {
