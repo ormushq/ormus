@@ -7,6 +7,7 @@ import (
 
 	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
+	pbwritekey "github.com/ormushq/ormus/contract/protobuf/manager/goproto/writekey"
 	"github.com/ormushq/ormus/source/repository/redis/writekey"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +23,9 @@ func setup(t *testing.T) (writekey.DB, func()) {
 	managerClientConn, err := grpc.Dial(config.C().Manager.GRPCServiceAddress, grpc.WithInsecure())
 	assert.Nil(t, err)
 
-	redisRepository := writekey.New(redisAdapter, managerClientConn)
+	managerClient := pbwritekey.NewWriteKeyManagerClient(managerClientConn)
+
+	redisRepository := writekey.New(redisAdapter, managerClient)
 	return redisRepository, func() {
 		err := managerClientConn.Close()
 		if err != nil {
