@@ -3,10 +3,11 @@ package sourcerepo
 import (
 	"context"
 	"errors"
+	"strings"
+
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/repository/scyllarepo"
 	"github.com/scylladb/gocqlx/v2/qb"
-	"strings"
 )
 
 var ErrWriteKeyNotFound = errors.New("write key not found")
@@ -24,8 +25,8 @@ func New(scyllaAdapter *scyllarepo.StorageAdapter) SourceRepository {
 }
 
 func (s sourceRepo) GetWriteKey(ctx context.Context,
-	writeKey string) (entity.WriteKeyMetaData, error) {
-
+	writeKey string,
+) (entity.WriteKeyMetaData, error) {
 	var metadata entity.WriteKeyMetaData
 
 	stmt, names := qb.Select("write_keys").

@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"context"
 	"errors"
+
 	"github.com/ormushq/ormus/contract/protobuf/manager/goproto/writekey"
 	"github.com/ormushq/ormus/manager/repository/sourcerepo"
 	"google.golang.org/grpc/codes"
@@ -11,8 +12,8 @@ import (
 )
 
 func (s *Server) GetWriteKey(ctx context.Context,
-	req *writekey.GetWriteKeyRequest) (*writekey.GetWriteKeyResponse, error) {
-
+	req *writekey.GetWriteKeyRequest,
+) (*writekey.GetWriteKeyResponse, error) {
 	if req.WriteKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "write key is required")
 	}

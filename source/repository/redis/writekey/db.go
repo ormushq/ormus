@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/contract/protobuf/manager/goproto/writekey"
 	"github.com/ormushq/ormus/manager/entity"
-	"time"
 )
 
 type DB struct {
@@ -47,7 +48,7 @@ func (db DB) IsValidWriteKey(ctx context.Context, writeKey string) (*entity.Writ
 	}
 
 	// cache the metadata
-	if err := db.updateRedis(ctx, writeKey, metadata); err != nil { //TODO: retrying strategy?
+	if err := db.updateRedis(ctx, writeKey, metadata); err != nil { // TODO: retrying strategy?
 		// Continue even though there is an error
 		// TODO: logging maybe! I suppose nothing happen when Redis's not updated, we send GRPC.
 	}
