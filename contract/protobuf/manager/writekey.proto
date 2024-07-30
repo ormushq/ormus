@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package writekey;
+
+option go_package = "github.com/ormushq/ormus/contract/protobuf/manager/goproto/writekey";
+
+import "google/protobuf/timestamp.proto";
+
+message WriteKeyMetaData {
+  string write_key = 1;
+  string owner_id = 2;
+  string source_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp last_used_at = 5;
+  WriteKeyStatus status = 6;
+}
+
+enum WriteKeyStatus {
+  WRITE_KEY_STATUS_INACTIVE = 0;
+  WRITE_KEY_STATUS_ACTIVE = 1;
+}
+
+message GetWriteKeyRequest {
+  string write_key = 1;
+}
+
+message GetWriteKeyResponse {
+  WriteKeyMetaData metadata = 1;
+}
+
+service WriteKeyManager {
+  rpc GetWriteKey(GetWriteKeyRequest) returns (GetWriteKeyResponse);
+}

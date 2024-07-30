@@ -1,9 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/ormushq/ormus/manager/delivery/grpcserver"
+	"github.com/ormushq/ormus/manager/repository/sourcerepo"
 	"log/slog"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
+	"time"
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/logger"
@@ -53,9 +60,39 @@ func main() {
 	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
-	server := httpserver.New(cfg, httpserver.SetupServicesResponse{
+	httpServer := httpserver.New(cfg, httpserver.SetupServicesResponse{
 		UserHandler: userHand,
 	})
 
-	server.Server()
+	sourceRepo := sourcerepo.New(scylla)
+
+	grpcServer := grpcserver.New(sourceRepo, cfg)
+
+	if err := httpServer.Start(); err != nil {
+		logger.L().Error("Failed to start manager HTTP server", err)
+		os.Exit(1)
+	}
+
+	if err := grpcServer.Start(); err != nil {
+		logger.L().Error("Failed to start gRPC server", "error", err)
+		os.Exit(1)
+	}
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+	logger.L().Info("Shutting down manager server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := httpServer.Shutdown(ctx); err != nil {
+		logger.L().Error("manager HTTP server forced to shutdown", "error", err)
+	}
+
+	if err := grpcServer.Stop(ctx); err != nil {
+		logger.L().Error("manager gRPC server forced to shutdown", "error", err)
+	}
+
+	logger.L().Info("Server exiting")
 }

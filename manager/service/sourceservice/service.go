@@ -3,6 +3,7 @@ package sourceservice
 import (
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/managerparam"
+	"time"
 )
 
 type SourceRepo interface {
@@ -11,6 +12,9 @@ type SourceRepo interface {
 	DeleteSource(id, userID string) error
 	GetUserSourceByID(ownerID, id string) (*entity.Source, error)
 	IsSourceAlreadyCreatedByName(name string) (bool, error)
+	UpdateWriteKeyMetaData(metadata *entity.WriteKeyMetaData) error
+	GetWriteKeyMetaData(writeKey string) (*managerparam.WriteKeyMetaData, error)
+	UpdateLastUsedAt(writeKey string, lastUsedAt time.Time) error
 }
 
 type Service struct {

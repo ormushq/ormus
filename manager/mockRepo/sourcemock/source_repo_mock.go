@@ -2,6 +2,8 @@ package sourcemock
 
 import (
 	"fmt"
+	writekey "github.com/ormushq/ormus/pkg/write_key"
+	"time"
 
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/managerparam"
@@ -13,17 +15,30 @@ const RepoErr = "repository error"
 
 type DefaultSourceTest struct {
 	ID          string
-	WriteKey    entity.WriteKey
+	WriteKey    entity.WriteKeyMetaData
 	Name        string
 	Description string
 	ProjectID   string
 	OwnerID     string
 }
 
+func GetDefaultWriteKeyMetaData() entity.WriteKeyMetaData {
+	w, _ := writekey.GenerateNewWriteKey()
+
+	return entity.WriteKeyMetaData{
+		WriteKey:   w,
+		OwnerID:    "owner_id",
+		SourceID:   "source_id",
+		CreatedAt:  time.Now(),
+		LastUsedAt: time.Now(),
+		Status:     entity.WriteKeyStatusActive,
+	}
+}
+
 func DefaultSource() DefaultSourceTest {
 	return DefaultSourceTest{
 		ID:          "source_id",
-		WriteKey:    entity.WriteKey("writekey"),
+		WriteKey:    GetDefaultWriteKeyMetaData(),
 		Name:        "name name",
 		Description: "description",
 		ProjectID:   "project_id",
@@ -63,16 +78,16 @@ func (m *MockRepo) InsertSource(source *entity.Source) (*managerparam.AddSourceR
 	m.sources = append(m.sources, source)
 
 	return &managerparam.AddSourceResponse{
-		ID:          source.ID,
-		WriteKey:    string(source.WriteKey),
-		Name:        source.Name,
-		Description: source.Description,
-		ProjectID:   source.ProjectID,
-		OwnerID:     source.OwnerID,
-		Status:      source.Status,
-		CreateAt:    source.CreateAt,
-		UpdateAt:    source.UpdateAt,
-		DeleteAt:    source.DeleteAt,
+		ID:               source.ID,
+		WriteKeyMetaData: source.WriteKey, // TODO: Only write key value or the whole meta data object?
+		Name:             source.Name,
+		Description:      source.Description,
+		ProjectID:        source.ProjectID,
+		OwnerID:          source.OwnerID,
+		Status:           source.Status,
+		CreateAt:         source.CreateAt,
+		UpdateAt:         source.UpdateAt,
+		DeleteAt:         source.DeleteAt,
 	}, nil
 }
 
@@ -86,16 +101,16 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*managerparam
 			m.sources[i] = source
 
 			return &managerparam.UpdateSourceResponse{
-				ID:          source.ID,
-				WriteKey:    string(source.WriteKey),
-				Name:        source.Name,
-				Description: source.Description,
-				ProjectID:   source.ProjectID,
-				OwnerID:     source.OwnerID,
-				Status:      source.Status,
-				CreateAt:    source.CreateAt,
-				UpdateAt:    source.UpdateAt,
-				DeleteAt:    source.DeleteAt,
+				ID:               source.ID,
+				WriteKeyMetaData: source.WriteKey,
+				Name:             source.Name,
+				Description:      source.Description,
+				ProjectID:        source.ProjectID,
+				OwnerID:          source.OwnerID,
+				Status:           source.Status,
+				CreateAt:         source.CreateAt,
+				UpdateAt:         source.UpdateAt,
+				DeleteAt:         source.DeleteAt,
 			}, nil
 		}
 	}
@@ -145,4 +160,57 @@ func (m *MockRepo) IsSourceAlreadyCreatedByName(name string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (m *MockRepo) UpdateWriteKeyMetaData(metadata *entity.WriteKeyMetaData) error {
+	if m.hasErr {
+		return richerror.New("MockRepo.UpdateWriteKey").WithWrappedError(fmt.Errorf(RepoErr))
+	}
+
+	for i, s := range m.sources {
+		if s.WriteKey.WriteKey == metadata.WriteKey {
+			s.WriteKey = *metadata
+			m.sources[i] = s
+			return nil
+		}
+	}
+
+	return richerror.New("MockRepo.UpdateWriteKey").WithMessage(errmsg.ErrFailedToUpdateWriteKeyMetaData)
+}
+
+func (m *MockRepo) GetWriteKeyMetaData(writeKey string) (*managerparam.WriteKeyMetaData, error) {
+	if m.hasErr {
+		return nil, richerror.New("MockRepo.GetWriteKey").WithWrappedError(fmt.Errorf(RepoErr))
+	}
+
+	for _, s := range m.sources {
+		if s.WriteKey.WriteKey == writeKey {
+			return &managerparam.WriteKeyMetaData{
+				WriteKey:   s.WriteKey.WriteKey,
+				OwnerID:    s.WriteKey.OwnerID,
+				SourceID:   s.WriteKey.SourceID,
+				CreatedAt:  s.WriteKey.CreatedAt,
+				LastUsedAt: s.WriteKey.LastUsedAt,
+				Status:     managerparam.WriteKeyStatus(s.WriteKey.Status),
+			}, nil
+		}
+	}
+
+	return nil, richerror.New("MockRepo.GetWriteKeyMetaData").WithMessage(errmsg.ErrFailedToGetWriteKeyMetaData)
+}
+
+func (m *MockRepo) UpdateLastUsedAt(writeKey string, lastUsedAt time.Time) error {
+	if m.hasErr {
+		return richerror.New("MockRepo.UpdateLastUsedAt").WithWrappedError(fmt.Errorf(RepoErr))
+	}
+
+	for i, s := range m.sources {
+		if s.WriteKey.WriteKey == writeKey {
+			s.WriteKey.LastUsedAt = lastUsedAt
+			m.sources[i] = s
+			return nil
+		}
+	}
+
+	return richerror.New("MockRepo.UpdateLastUsedAt").WithMessage(errmsg.ErrWriteKeyNotFound)
 }
