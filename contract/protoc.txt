@@ -9,3 +9,21 @@ protoc --go_out=. \
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/coreevent/coreevent.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/project.proto
+
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/source.proto
+
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/user.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/messages/message.proto
