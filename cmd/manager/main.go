@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/ormushq/ormus/manager/delivery/grpcserver"
-	"github.com/ormushq/ormus/manager/repository/sourcerepo"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -14,11 +12,13 @@ import (
 
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/manager/delivery/grpcserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/manager/mockRepo/projectstub"
 	"github.com/ormushq/ormus/manager/repository/scyllarepo"
+	"github.com/ormushq/ormus/manager/repository/sourcerepo"
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
@@ -83,7 +83,9 @@ func main() {
 	<-quit
 	logger.L().Info("Shutting down manager server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	const timeoutDuration = 10 * time.Second
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDuration)
 	defer cancel()
 
 	if err := httpServer.Shutdown(ctx); err != nil {
