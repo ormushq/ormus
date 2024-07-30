@@ -27,3 +27,7 @@ protoc --go_out=. \
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/messages/message.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+     contract/protobuf/processedevent/processedevent.proto

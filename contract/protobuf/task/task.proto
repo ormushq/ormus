@@ -4,6 +4,8 @@ package task;
 option go_package = "contract/goprotobuf/task";
 
 import "google/protobuf/timestamp.proto";
+// TODO: manually append "github.com/ormushq/ormus/" to the compiled version
+import "contract/protobuf/processedevent/processedevent.proto";
 
 enum IntegrationDeliveryStatus {
   INVALID_TASK_STATUS = 0;
@@ -18,10 +20,7 @@ message Task {
   IntegrationDeliveryStatus delivery_status = 2;
   uint32 attempts = 3;
   string failed_reason = 4;
-  ProcessedEvent processed_event = 5;
+  processedevent.ProcessedEvent processed_event = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
 }
-
-// TODO: import this message from contract/protobuf/processedevent/processedevent.proto
-message ProcessedEvent {}

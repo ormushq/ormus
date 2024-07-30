@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package processedevent;
+option go_package = "contract/goprotobuf/processedevent";
+
+import "google/protobuf/timestamp.proto";
+// TODO: manually append "github.com/ormushq/ormus/" to the compiled version
+import "contract/protobuf/coreevent/coreevent.proto";
+
+message ProcessedEvent {
+  string source_id = 1;
+  map<string, string> tracer_carrier = 2;
+  Integration integration = 3;
+  string message_id = 4;
+  Type event_type = 5;
+  uint32 version = 6;
+
+  google.protobuf.Timestamp sent_at = 7;
+  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp original_timestamp = 9;
+  google.protobuf.Timestamp timestamp = 10;
+
+  string user_id = 11;
+  string anonymous_id = 12;
+  string event = 13;
+  string name = 14;
+  string group_id = 15;
+  string previous_id = 16;
+  coreevent.Context context = 17;
+  coreevent.Properties properties = 18;
+  coreevent.Traits traits = 19;
+}
+
+message Integration {
+  string id = 1;
+  string source_id = 2;
+  string name = 3;
+  DestinationMetadata metadata = 4;
+  ConnectionType connection_type = 5;
+  bool enabled = 6;
+
+  oneof config {
+    FakeConfig fake = 100;
+    WebhookConfig webhook = 101;
+  }
+
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message DestinationMetadata {
+  string id = 1;
+  string name = 2;
+  DestinationType slug = 3;
+  repeated DestinationCategory categories = 4;
+}
+
+enum ConnectionType {
+  EVENT_STREAM = 0;
+  STORAGE = 1;
+  REVERSE_ETL = 2;
+}
+
+enum Type {
+  TRACK = 0;
+  PAGE = 1;
+  IDENTITY = 2;
+  GROUP = 3;
+  ALIAS = 4;
+  SCREEN = 5;
+}
+
+enum DestinationType {
+  webhook = 0;
+}
+
+enum DestinationCategory {
+  ANALYTICS = 0;
+  ADVERTISING = 1;
+  CRM = 2;
+  EMAIL_MARKETING = 3;
+  LIVECHAT = 4;
+  PAYMENTS = 5;
+  SURVEYS = 6;
+}
+
+message FakeConfig{
+  string name = 1;
+}
+
+message WebhookConfig {
+  map<string, string> headers = 1;
+  map<string, string> payload = 2;
+  WebhookMethod method = 3;
+  string url = 4;
+}
+
+enum WebhookMethod {
+  POST = 0;
+  PUT = 1;
+  PATCH = 2;
+}
