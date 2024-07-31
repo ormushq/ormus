@@ -26,8 +26,5 @@ jobs:
       - name: dockerDown
         run: sudo docker-compose down
 
-      - name: Format
-        run: make format
-
       - name: Lint
         run: make lint
