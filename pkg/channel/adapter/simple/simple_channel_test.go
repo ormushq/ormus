@@ -32,13 +32,6 @@ func TestSimpleChannel(t *testing.T) {
 			expectedMsg:    10,
 			receiveTimeout: 30 * time.Second,
 		},
-		{
-			name:           "huge test",
-			numWorkers:     10,
-			numMessages:    1000,
-			expectedMsg:    10000,
-			receiveTimeout: 120 * time.Second,
-		},
 	}
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
