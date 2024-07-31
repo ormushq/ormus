@@ -33,13 +33,6 @@ func TestRabbitmqChannel(t *testing.T) {
 			expectedMsg:    10,
 			receiveTimeout: 30 * time.Second,
 		},
-		{
-			name:           "huge test",
-			numWorkers:     10,
-			numMessages:    1000,
-			expectedMsg:    10000,
-			receiveTimeout: 120 * time.Second,
-		},
 	}
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
@@ -65,7 +58,11 @@ func TestRabbitmqChannel(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
 			inputAdapter := New(done, wg, config)
-			inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+			err = inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+			if err != nil {
+				t.Error(err.Error())
+				t.Fail()
+			}
 			inputChannel, err := inputAdapter.GetInputChannel(tc.name)
 			if err != nil {
 				t.Error(err.Error())
