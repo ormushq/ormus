@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"context"
 	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/manager"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/sourcehandler"
@@ -26,7 +27,7 @@ func New(cfg manager.Config, setupSvc SetupServicesResponse) *Server {
 	}
 }
 
-func (s *Server) Server() {
+func (s *Server) Start() error {
 	e := echo.New()
 
 	s.userHandler.SetUserRoute(e)
@@ -34,5 +35,26 @@ func (s *Server) Server() {
 
 	e.GET("/health-check", s.healthCheck)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	go func() {
+		if err := e.Start(s.config.HTTPAddress); err != nil {
+			e.Logger.Info("shutting down the server")
+		}
+	}()
+
+	return nil
 }
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.Router.Shutdown(ctx)
+}
+
+//func (s *Server) Server() {
+//	e := echo.New()
+//
+//	s.userHandler.SetUserRoute(e)
+//	s.sourceHandler.SetSourceRoute(e)
+//
+//	e.GET("/health-check", s.healthCheck)
+//
+//	e.Logger.Fatal(e.Start(":8080"))
+//}

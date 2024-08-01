@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-type WriteKey string // because we might change the format in future
-
 type SourceCategory string
 
 type Status string
@@ -18,7 +16,7 @@ const (
 // TODO: need change feilds.
 type Source struct {
 	ID          string
-	WriteKey    WriteKey
+	WriteKey    WriteKeyMetaData
 	Name        string
 	Description string
 	ProjectID   string
