@@ -9,11 +9,10 @@ services:
         GO_IMAGE_NAME: ${GO_IMAGE_NAME}
         GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
     image: ormus-destination-task-publisher:${GO_IMAGE_VERSION}
-    container_name: "ormus-destination-task-publisher"
     entrypoint:
       - air
       - "-c"
-      - /home/app/serve/docker-compose/services/go/destination/task_publisher/.destination.air.toml
+      - /home/app/deployment/local/services/go/destination/task_publisher/.destination.air.toml
     volumes:
       - ../../../:/home/app
     depends_on:

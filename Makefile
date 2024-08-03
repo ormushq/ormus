@@ -10,11 +10,11 @@ lint:
 test:
 	go test ./...
 
-up:
-	docker-compose up -d
+docker-test-up:
+	docker-compose -f ./deployment/test/docker-compose.yml up -d
 
-down:
-	docker-compose down
+docker-test-down:
+	docker-compose -f ./deployment/test/docker-compose.yml down
 
 logs:
 	docker-compose logs

@@ -2,7 +2,6 @@ version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: "ormus-rabbitmq"
     volumes:
       - ormus-rabbitmq:/var/lib/rabbitmq/
     labels:

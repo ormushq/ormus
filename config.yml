@@ -10,12 +10,12 @@ scylladb:
   keyspace: ormus
 redis:
   port: 6379
-  host: redis
+  host: 127.0.0.1
   db: 0
   password: ""
 etcd:
   port: 2379
-  host: etcd
+  host: 127.0.0.1
   dial_timeout: 5
 destination:
   debug_mode: true
@@ -23,18 +23,18 @@ destination:
   rabbitmq_consumer_connection:
     user: guest
     password: guest
-    host: rabbitmq
+    host: 127.0.0.1
     port: 5672
     vhost:
     reconnect_second: 5
   rabbitmq_task_manager_connection:
     user: guest
     password: guest
-    host: rabbitmq
+    host: 127.0.0.1
     port: 5672
   redis_task_idempotency:
     port: 6379
-    host: redis
+    host: 127.0.0.1
     db: 0
     password: ""
     prefix: "destination-task-status::"

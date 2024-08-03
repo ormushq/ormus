@@ -3,7 +3,6 @@ version: '3.8'
 services:
   scylladb:
     image: scylladb/scylla:latest
-    container_name: scylladb
     restart: always
 
 
