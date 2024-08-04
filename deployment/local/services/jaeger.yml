@@ -3,7 +3,6 @@ services:
   #Jaeger Service
   jaeger:
     image: jaegertracing/all-in-one:${JAEGER_IMAGE_TAG:-1.57}
-    container_name: "ormus-jaeger"
     volumes:
       - "./jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"
     command: --query.ui-config /etc/jaeger/jaeger-ui.json --query.max-clock-skew-adjustment 5s

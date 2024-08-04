@@ -13,14 +13,12 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq  # Persist data
   redis:
     image: redis:7.2.4
-    container_name: ormus-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
   etcd:
     image: quay.io/coreos/etcd:v3.5.13
-    container_name: etcd
     command: /usr/local/bin/etcd -name etcd0 -advertise-client-urls http://etcd:2379 -listen-client-urls http://0.0.0.0:2379
     ports:
       - "2379:2379"
@@ -30,7 +28,6 @@ services:
 
   scylladb:
     image: scylladb/scylla:latest
-    container_name: scylladb
     restart: always
     ports:
       - "9042:9042"

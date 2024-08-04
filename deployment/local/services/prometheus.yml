@@ -3,7 +3,6 @@ services:
   #Prometheus Service
   prometheus:
     image: prom/prometheus:latest
-    container_name: "ormus-prometheus"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     labels:

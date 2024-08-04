@@ -3,7 +3,6 @@ version: '3'
 services:
   traefik:
     image: traefik:latest
-    container_name: "ormus-traefik"
     ports:
       - "80:80"
       - "8080:8080"

@@ -3,9 +3,9 @@ tmp_dir = "temp"
 
 [build]
   bin = "./cmd/destination/temp/main"
-  cmd = "go build -o ./cmd/destination/temp/main ./cmd/destination"
+  cmd = "go build -o ./cmd/destination/temp/main ./cmd/destination/delivery_workers/webhook_delivery_worker.go"
   delay = 1000
-  exclude_dir = []
+  exclude_dir = ["vendor"]
   exclude_file = []
   exclude_regex = []
   exclude_unchanged = false
