@@ -9,6 +9,10 @@ import (
 )
 
 func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, error) {
+	vErr := s.userValidator.ValidateRegisterRequest(req)
+	if vErr != nil {
+		return nil, vErr
+	}
 	hashedPassword, err := password.HashPassword(req.Password)
 	if err != nil {
 		return nil, richerror.New("register.hash").WithWrappedError(err)

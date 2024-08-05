@@ -11,6 +11,7 @@ import (
 	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
+	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/channel"
@@ -60,7 +61,8 @@ func TestService_Register(t *testing.T) {
 			// 1. setup
 			jwt := MockJwtEngine{}
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo, internalBroker)
+			validateUserSvc := uservalidator.New(repo)
+			svc := userservice.New(jwt, repo, internalBroker, validateUserSvc)
 
 			// 2. execution
 			user, err := svc.Register(tc.req)
@@ -127,7 +129,8 @@ func TestService_Login(t *testing.T) {
 			jwt := MockJwtEngine{}
 
 			repo := usermock.NewMockRepository(tc.repoErr)
-			svc := userservice.New(jwt, repo, nil)
+			validateUserSvc := uservalidator.New(repo)
+			svc := userservice.New(jwt, repo, nil, validateUserSvc)
 
 			// 2. execution
 			user, err := svc.Login(tc.req)
