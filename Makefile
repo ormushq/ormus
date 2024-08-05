@@ -17,7 +17,7 @@ docker-test-down:
 	docker compose -f $(ROOT)/deployment/test/docker-compose.yml down
 
 logs:
-	docker-compose logs
+	docker compose -f $(ROOT)/deployment/test/docker-compose.yml logs
 
 format:
 	@which gofumpt || (go install mvdan.cc/gofumpt@latest)
