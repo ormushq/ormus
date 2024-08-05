@@ -44,3 +44,4 @@ note:
 - The COMPOSE_PROJECT_NAME parameter is configured in .env file
 - You must define host first in your host file with IP 127.0.0.1
 
+
