@@ -12,7 +12,8 @@ test:
 
 docker-test-up:
 	ls -ll
-	docker-compose -f deployment/test/docker-compose.yml up -d
+	cat ./deployment/test/docker-compose.yml
+	docker-compose -f ./deployment/test/docker-compose.yml up -d
 
 docker-test-down:
 	docker-compose -f ./deployment/test/docker-compose.yml down
