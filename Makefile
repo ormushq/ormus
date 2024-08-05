@@ -11,8 +11,7 @@ test:
 	go test ./...
 
 docker-test-up:
-	ls -ll
-	cat ./deployment/test/docker-compose.yml
+	pwd
 	docker-compose -f ./deployment/test/docker-compose.yml up -d
 
 docker-test-down:
