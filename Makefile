@@ -11,10 +11,10 @@ test:
 	go test ./...
 
 docker-test-up:
-	docker-compose -f ./deployment/test/docker-compose.yml up -d
+	docker compose -f ./deployment/test/docker-compose.yml up -d
 
 docker-test-down:
-	docker-compose -f ./deployment/test/docker-compose.yml down
+	docker compose -f ./deployment/test/docker-compose.yml down
 
 logs:
 	docker-compose logs
