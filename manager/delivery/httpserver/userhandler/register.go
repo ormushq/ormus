@@ -21,8 +21,8 @@ func (h Handler) RegisterUser(ctx echo.Context) error {
 	// TODO: should we return service error? or should we only return bad request error?
 	resp, err := h.userSvc.Register(Req)
 
-	vErr := validator.Error{}
-	if errors.Is(err, vErr) {
+	var vErr *validator.Error
+	if errors.As(err, &vErr) {
 		msg, code := httpmsg.Error(vErr.Err)
 
 		return ctx.JSON(code, echo.Map{

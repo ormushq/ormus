@@ -22,8 +22,8 @@ func (h Handler) UserLogin(ctx echo.Context) error {
 
 	response, err := h.userSvc.Login(req)
 
-	vErr := validator.Error{}
-	if errors.Is(err, vErr) {
+	var vErr *validator.Error
+	if errors.As(err, &vErr) {
 		msg, code := httpmsg.Error(vErr.Err)
 		if vErr.Fields["email"] == "user not found" {
 			return ctx.JSON(http.StatusUnauthorized, echomsg.DefaultMessage(errmsg.ErrWrongCredentials))
