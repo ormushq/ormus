@@ -14,7 +14,7 @@ const (
 )
 
 type CoreEvent struct {
-	MessageID ID
+	MessageID string
 	Type      Type // track, page , ...
 
 	// Category  string // specific to page event
@@ -22,7 +22,7 @@ type CoreEvent struct {
 
 	Properties *Properties
 
-	Integration *Integrations
+	Integration []*Integrations
 	Ctx         *Context
 
 	SendAt            time.Time
@@ -30,10 +30,10 @@ type CoreEvent struct {
 	OriginalTimeStamp time.Time // TODO: don't know the difference between this and Timestamp example(2023-11-19T12:04:25.271Z)
 	Timestamp         time.Time // 2023-11-19T12:04:25.779Z
 
-	AnonymousID ID
-	UserID      ID
-	GroupID     ID
-	PreviousID  ID
+	AnonymousID string
+	UserID      string
+	GroupID     string
+	PreviousID  string
 
 	Event string
 
@@ -49,8 +49,8 @@ type Options struct {
 	Integrations *Integrations
 	Timestamp    time.Time
 	Ctx          *Context
-	AnonymousID  ID
-	UserID       ID
+	AnonymousID  string
+	UserID       string
 	Traits       Traits
 	CustomData   *CustomData
 }
