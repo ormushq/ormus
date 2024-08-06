@@ -4,21 +4,15 @@ protoc --go_out=. \
 
 protoc --go_out=. \
     --go-grpc_out=. \
-    contract/protobuf/processedevent/processedevent.proto
-
-protoc --go_out=. \
-    --go-grpc_out=. \
     contract/protobuf/event/event.proto
 
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/manager/project.proto
 
-
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/manager/source.proto
-
 
 protoc --go_out=. \
     --go-grpc_out=. \
@@ -27,7 +21,3 @@ protoc --go_out=. \
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/messages/message.proto
-
-protoc --go_out=. \
-    --go-grpc_out=. \
-     contract/protobuf/processedevent/processedevent.proto

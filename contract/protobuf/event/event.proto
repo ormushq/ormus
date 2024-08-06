@@ -20,7 +20,7 @@ message CoreEvent {
   Type type = 2;
   string name = 3;
   Properties properties = 4;
-  repeated Integrations integrations = 5;
+  repeated Integration integrations = 5;
   Context ctx = 6;
   google.protobuf.Timestamp send_at = 7;
   google.protobuf.Timestamp received_at = 8;
@@ -38,11 +38,6 @@ message CoreEvent {
 
 message Properties {
   map<string, google.protobuf.Any> properties = 1;
-}
-
-message Integrations {
-  bool all = 1;
-  Properties config = 2;
 }
 
 message Context {
@@ -63,7 +58,7 @@ message Context {
 message MetaData {}
 
 message Options {
-  Integrations integrations = 1;
+  repeated Integration integrations = 1;
   google.protobuf.Timestamp timestamp = 2;
   Context context = 3;
   string anonymous_id = 4;
@@ -131,4 +126,88 @@ message Location {
   string longitude = 4;
   string region = 5;
   int32 speed = 6;
+}
+
+message ProcessedEvent {
+  string source_id = 1;
+  map<string, string> tracer_carrier = 2;
+  Integration integration = 3;
+  string message_id = 4;
+  Type event_type = 5;
+  uint32 version = 6;
+
+  google.protobuf.Timestamp sent_at = 7;
+  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp original_timestamp = 9;
+  google.protobuf.Timestamp timestamp = 10;
+
+  string user_id = 11;
+  string anonymous_id = 12;
+  string event = 13;
+  string name = 14;
+  string group_id = 15;
+  string previous_id = 16;
+  Context context = 17;
+  Properties properties = 18;
+  Traits traits = 19;
+}
+
+message Integration {
+  string id = 1;
+  string source_id = 2;
+  string name = 3;
+  DestinationMetadata metadata = 4;
+  ConnectionType connection_type = 5;
+  bool enabled = 6;
+
+  oneof config {
+    FakeConfig fake = 100;
+    WebhookConfig webhook = 101;
+  }
+
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message DestinationMetadata {
+  string id = 1;
+  string name = 2;
+  DestinationType slug = 3;
+  repeated DestinationCategory categories = 4;
+}
+
+enum ConnectionType {
+  EVENT_STREAM = 0;
+  STORAGE = 1;
+  REVERSE_ETL = 2;
+}
+
+enum DestinationType {
+  webhook = 0;
+}
+
+enum DestinationCategory {
+  ANALYTICS = 0;
+  ADVERTISING = 1;
+  CRM = 2;
+  EMAIL_MARKETING = 3;
+  LIVECHAT = 4;
+  PAYMENTS = 5;
+  SURVEYS = 6;
+}
+
+message FakeConfig{
+  string name = 1;
+}
+
+message WebhookConfig {
+  map<string, string> headers = 1;
+  map<string, string> payload = 2;
+  WebhookMethod method = 3;
+  string url = 4;
+}
+
+enum WebhookMethod {
+  POST = 0;
+  PUT = 1;
+  PATCH = 2;
 }
