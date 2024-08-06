@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  #Manager main Service
+  manager_main:
+    build:
+      context: .
+      dockerfile: go/manager/main/Dockerfile
+      args:
+        GO_IMAGE_NAME: ${GO_IMAGE_NAME}
+        GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
+    image: ormus-manager-main:${GO_IMAGE_VERSION}
+    entrypoint:
+      - air
+      - "-c"
+      - /home/app/deployment/local/services/go/manager/main/.manager.main.air.toml
+    volumes:
+      - ../../../:/home/app
+    depends_on:
+      - otel_collector
+      - redis
+      - rabbitmq
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.manager_${COMPOSE_PROJECT_NAME}.service=manager_${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.routers.manager_${COMPOSE_PROJECT_NAME}.rule=Host(`manager.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.manager_${COMPOSE_PROJECT_NAME}.entrypoints=web"
+      - "traefik.http.services.manager_${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8080"
+    environment:
+      ORMUS_DESTINATION__RABBITMQ_CONSUMER_CONNECTION__HOST: rabbitmq
+      ORMUS_DESTINATION__RABBITMQ_TASK_MANAGER_CONNECTION__HOST: rabbitmq
+      ORMUS_DESTINATION__REDIS_TASK_IDEMPOTENCY__HOST: redis
+      ORMUS_REDIS__HOST: redis
+      ORMUS_ETCD__HOST: etcd
+      ORMUS_MANAGER__SCYLLA_DB_CONFIG__HOSTS: "scylladb:9042"
+
+
