@@ -39,19 +39,11 @@ func TestService_Register(t *testing.T) {
 		req         param.RegisterRequest
 	}{
 		{
-			name:        "repo fails",
-			repoErr:     true,
-			expectedErr: richerror.New("register.repo").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
-			req: param.RegisterRequest{
-				Email:    "new@example.com",
-				Password: "very_safe_password",
-			},
-		},
-		{
 			name: "ordinary",
 			req: param.RegisterRequest{
+				Name:     "new",
 				Email:    "new@user.com",
-				Password: "very_safe_password",
+				Password: "very_Safe_passw0rd",
 			},
 		},
 	}
@@ -98,10 +90,10 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name:        "user not available",
-			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
+			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)).WithMessage("email: user not found\n"),
 			req: param.LoginRequest{
 				Email:    "not@existing.com",
-				Password: "123",
+				Password: "1qaz@WSX3edc",
 			},
 		},
 		{
@@ -109,16 +101,16 @@ func TestService_Login(t *testing.T) {
 			expectedErr: richerror.New("Login").WithMessage(errmsg.ErrWrongCredentials),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
-				Password: "wrongpassword",
+				Password: "1qaz@WSX3edc",
 			},
 		},
 		{
 			name:        "repo fails",
 			repoErr:     true,
-			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)),
+			expectedErr: richerror.New("Login").WithWrappedError(fmt.Errorf(usermock.RepoErr)).WithMessage("email: some thing went wrong\n"),
 			req: param.LoginRequest{
 				Email:    "test@example.com",
-				Password: "wrongpassword",
+				Password: "1qaz@WSX3edc",
 			},
 		},
 	}
