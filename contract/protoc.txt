@@ -1,3 +1,5 @@
+
+// every time you compile the task file update the import of compiled version manually
 protoc --go_out=. \
     --go-grpc_out=. \
     contract/protobuf/task/task.proto
