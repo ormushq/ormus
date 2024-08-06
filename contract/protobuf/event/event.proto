@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package coreevent;
-option go_package = "contract/goprotobuf/coreevent";
+package event;
+option go_package = "contract/goprotobuf/event";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";
@@ -15,25 +15,21 @@ enum Type {
   SCREEN = 5;
 }
 
-message ID {
-  string value = 1;
-}
-
 message CoreEvent {
-  ID message_id = 1;
+  string message_id = 1;
   Type type = 2;
   string name = 3;
   Properties properties = 4;
-  Integrations integrations = 5;
+  repeated Integrations integrations = 5;
   Context ctx = 6;
   google.protobuf.Timestamp send_at = 7;
   google.protobuf.Timestamp received_at = 8;
   google.protobuf.Timestamp original_timestamp = 9;
   google.protobuf.Timestamp timestamp = 10;
-  ID anonymous_id = 11;
-  ID user_id = 12;
-  ID group_id = 13;
-  ID previous_id = 14;
+  string anonymous_id = 11;
+  string user_id = 12;
+  string group_id = 13;
+  string previous_id = 14;
   string event = 15;
   string write_key = 16;
   MetaData MetaData = 17;
@@ -70,8 +66,8 @@ message Options {
   Integrations integrations = 1;
   google.protobuf.Timestamp timestamp = 2;
   Context context = 3;
-  ID anonymous_id = 4;
-  ID user_id = 5;
+  string anonymous_id = 4;
+  string user_id = 5;
   Traits traits = 6;
   CustomData custom_data = 7;
 }

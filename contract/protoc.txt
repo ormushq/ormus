@@ -8,7 +8,7 @@ protoc --go_out=. \
 
 protoc --go_out=. \
     --go-grpc_out=. \
-    contract/protobuf/coreevent/coreevent.proto
+    contract/protobuf/event/event.proto
 
 protoc --go_out=. \
     --go-grpc_out=. \
