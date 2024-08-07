@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package task;
+option go_package = "contract/goprotobuf/task";
+
+import "google/protobuf/timestamp.proto";
+// manually append "github.com/ormushq/ormus/" to the compiled version of bellow import
+import "contract/protobuf/event/event.proto";
+
+enum IntegrationDeliveryStatus {
+  INVALID_TASK_STATUS = 0;
+  NOT_EXECUTED_TASK_STATUS = 1;
+  RETRIABLE_FAILED_TASK_STATUS = 2;
+  UNRETRIABLE_FAILED_TASK_STATUS = 3;
+  SUCCESS_TASK_STATUS = 4;
+}
+
+message Task {
+  string id = 1;
+  IntegrationDeliveryStatus delivery_status = 2;
+  uint32 attempts = 3;
+  string failed_reason = 4;
+  event.ProcessedEvent processed_event = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package source;
+option go_package = "contract/goprotobuf/source";
+
+import "google/protobuf/timestamp.proto";
+
+enum Status {
+  STATUS_ACTIVE = 0;
+  STATUS_NOT_ACTIVE = 1;
+}
+
+message SourceMetadata {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string category = 4;
+}
+
+message Source {
+  string id = 1;
+  string write_key = 2;
+  string name = 3;
+  string description = 4;
+  string project_id = 5;
+  string owner_id = 6;
+  Status status = 7;
+  SourceMetadata metadata = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  google.protobuf.Timestamp deleted_at = 11;
+}

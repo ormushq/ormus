@@ -12,7 +12,7 @@ type Traits struct {
 type UserTraits struct {
 	Traits
 
-	ID       ID     // Unique ID in your database for a user
+	ID       string // Unique ID in your database for a user
 	Industry string // Industry a user works in
 
 	FirstName   string
@@ -43,7 +43,7 @@ type UserTraits struct {
 
 type Company struct {
 	Name          string
-	ID            ID // Unique ID in your database for a company
+	ID            string // Unique ID in your database for a company
 	EmployeeCount int
 }
 

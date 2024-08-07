@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+package event;
+option go_package = "contract/goprotobuf/event";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+enum Type {
+  TRACK = 0;
+  PAGE = 1;
+  IDENTITY = 2;
+  GROUP = 3;
+  ALIAS = 4;
+  SCREEN = 5;
+}
+
+message CoreEvent {
+  string message_id = 1;
+  Type type = 2;
+  string name = 3;
+  Properties properties = 4;
+  repeated Integration integrations = 5;
+  Context ctx = 6;
+  google.protobuf.Timestamp send_at = 7;
+  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp original_timestamp = 9;
+  google.protobuf.Timestamp timestamp = 10;
+  string anonymous_id = 11;
+  string user_id = 12;
+  string group_id = 13;
+  string previous_id = 14;
+  string event = 15;
+  string write_key = 16;
+  MetaData MetaData = 17;
+  Options options = 18;
+}
+
+message Properties {
+  map<string, google.protobuf.Any> properties = 1;
+}
+
+message Context {
+  bool active = 1;
+  string ip = 2;
+  string locale = 3;
+  Location location = 4;
+  Page page = 5;
+  string user_agent = 6;
+  UserAgentData user_agent_data = 7;
+  Library library = 8;
+  Traits traits = 9;
+  Campaign campaign = 10;
+  Referrer referrer = 11;
+  CustomData custom_data = 12;
+}
+
+message MetaData {}
+
+message Options {
+  repeated Integration integrations = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  Context context = 3;
+  string anonymous_id = 4;
+  string user_id = 5;
+  Traits traits = 6;
+  CustomData custom_data = 7;
+}
+
+message Traits {
+  CustomData custom_traits = 1;
+}
+
+message CustomData {
+  map<string, string> entries = 1;
+}
+
+message Referrer {
+  string referrer_type = 1;
+  string name = 2;
+  string url = 3;
+  string link = 4;
+}
+
+message Campaign {
+  string name = 1;
+  string source = 2;
+  string medium = 3;
+  CustomData custom_data = 4;
+}
+
+message Library {
+  string name = 1;
+  string version = 2;
+}
+
+message UserAgentData {
+  bool mobile = 1;
+  string platform = 2;
+  string architecture = 3;
+  string bitness = 4;
+  string model = 5;
+  string platform_version = 6;
+  bool wow64 = 7;
+  repeated AgentBrandVersion brands = 8;
+  repeated AgentBrandVersion full_version_list = 9;
+}
+
+message AgentBrandVersion {
+  string brand = 1;
+  string version = 2;
+}
+
+message Page {
+  string path = 1;
+  string referrer = 2;
+  string search = 3;
+  string title = 4;
+  string url = 5;
+}
+
+message Location {
+  string city = 1;
+  string country = 2;
+  string latitude = 3;
+  string longitude = 4;
+  string region = 5;
+  int32 speed = 6;
+}
+
+message ProcessedEvent {
+  string source_id = 1;
+  map<string, string> tracer_carrier = 2;
+  Integration integration = 3;
+  string message_id = 4;
+  Type event_type = 5;
+  uint32 version = 6;
+
+  google.protobuf.Timestamp sent_at = 7;
+  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp original_timestamp = 9;
+  google.protobuf.Timestamp timestamp = 10;
+
+  string user_id = 11;
+  string anonymous_id = 12;
+  string event = 13;
+  string name = 14;
+  string group_id = 15;
+  string previous_id = 16;
+  Context context = 17;
+  Properties properties = 18;
+  Traits traits = 19;
+}
+
+message Integration {
+  string id = 1;
+  string source_id = 2;
+  string name = 3;
+  DestinationMetadata metadata = 4;
+  ConnectionType connection_type = 5;
+  bool enabled = 6;
+
+  oneof config {
+    FakeConfig fake = 100;
+    WebhookConfig webhook = 101;
+  }
+
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message DestinationMetadata {
+  string id = 1;
+  string name = 2;
+  DestinationType slug = 3;
+  repeated DestinationCategory categories = 4;
+}
+
+enum ConnectionType {
+  EVENT_STREAM = 0;
+  STORAGE = 1;
+  REVERSE_ETL = 2;
+}
+
+enum DestinationType {
+  webhook = 0;
+}
+
+enum DestinationCategory {
+  ANALYTICS = 0;
+  ADVERTISING = 1;
+  CRM = 2;
+  EMAIL_MARKETING = 3;
+  LIVECHAT = 4;
+  PAYMENTS = 5;
+  SURVEYS = 6;
+}
+
+message FakeConfig{
+  string name = 1;
+}
+
+message WebhookConfig {
+  map<string, string> headers = 1;
+  map<string, string> payload = 2;
+  WebhookMethod method = 3;
+  string url = 4;
+}
+
+enum WebhookMethod {
+  POST = 0;
+  PUT = 1;
+  PATCH = 2;
+}

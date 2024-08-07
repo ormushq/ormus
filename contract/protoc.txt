@@ -1,0 +1,25 @@
+
+// every time you compile the task file update the import of compiled version manually
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/task/task.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/event/event.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/project.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/source.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/manager/user.proto
+
+protoc --go_out=. \
+    --go-grpc_out=. \
+    contract/protobuf/messages/message.proto
