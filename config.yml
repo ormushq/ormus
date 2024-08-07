@@ -57,6 +57,14 @@ manager:
     refresh_expiration_time_in_day: 2419200  # 28 * 24 * 3600
     access_subject: "ac"
     refresh_subject: "rt"
-
+  scylla_db_config:
+    hosts:
+      - 127.0.0.1:9042
+    consistency: 4  # Quorum
+    keyspace: "manager"
+    timeout_cluster: 5s
+    num_retries: 10
+    min_retry_delay: 1s
+    max_retry_delay: 10s
 
 
