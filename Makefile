@@ -11,13 +11,13 @@ test:
 	go test ./...
 
 docker-test-up:
-	docker-compose -f ./deployment/test/docker-compose.yml up -d
+	docker compose -f $(ROOT)/deployment/test/docker-compose.yml up -d
 
 docker-test-down:
-	docker-compose -f ./deployment/test/docker-compose.yml down
+	docker compose -f $(ROOT)/deployment/test/docker-compose.yml down
 
 logs:
-	docker-compose logs
+	docker compose -f $(ROOT)/deployment/test/docker-compose.yml logs
 
 format:
 	@which gofumpt || (go install mvdan.cc/gofumpt@latest)

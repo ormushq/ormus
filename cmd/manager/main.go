@@ -27,6 +27,7 @@ func main() {
 	cfg := config.C().Manager
 	done := make(chan bool)
 	wg := sync.WaitGroup{}
+	fmt.Println(cfg)
 	fmt.Println(cfg.ScyllaDBConfig)
 
 	internalBroker := simple.New(done, &wg)

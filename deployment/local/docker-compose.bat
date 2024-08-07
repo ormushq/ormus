@@ -11,4 +11,5 @@ docker-compose ^
 -f .\deployment\local\services\scylladb.yml ^
 -f .\deployment\local\services\rabbitmq.yml ^
 -f .\deployment\local\services\traefik.yml ^
+-f .\deployment\local\services\manager_main.yml ^
 %*

@@ -8,7 +8,7 @@ import (
 type Config struct {
 	JWTConfig            authservice.JwtConfig `koanf:"jwt_config"`
 	InternalBrokerConfig InternalBrokerConfig  `koanf:"internal_broker_config"`
-	ScyllaDBConfig       scylladb.Config       `koanf:"scylla_DB_Config"`
+	ScyllaDBConfig       scylladb.Config       `koanf:"scylla_db_config"`
 }
 type InternalBrokerConfig struct {
 	ChannelSize    int `koanf:"channel_size"`
