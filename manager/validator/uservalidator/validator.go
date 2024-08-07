@@ -1,13 +1,19 @@
 package uservalidator
 
 import (
-	"github.com/ormushq/ormus/manager/service/userservice"
+	"github.com/ormushq/ormus/manager/entity"
 )
 
-type Validator struct {
-	repo userservice.Repository
+type Repository interface {
+	Register(u entity.User) (*entity.User, error)
+	GetUserByEmail(email string) (*entity.User, error)
+	DoesUserExistsByEmail(email string) (bool, error)
 }
 
-func New(repo userservice.Repository) Validator {
+type Validator struct {
+	repo Repository
+}
+
+func New(repo Repository) Validator {
 	return Validator{repo: repo}
 }

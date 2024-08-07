@@ -82,9 +82,10 @@ func TestIntegrationHandler_Login(t *testing.T) {
 	cfg := config.C()
 	repo := usermock.NewMockRepository(false)
 	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
-	service := userservice.New(jwt, repo, nil)
 	validator := uservalidator.New(repo)
-	handler := userhandler.New(service, validator, nil)
+	service := userservice.New(jwt, repo, nil, validator)
+
+	handler := userhandler.New(service, nil)
 
 	e := echo.New()
 
