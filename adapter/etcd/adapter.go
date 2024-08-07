@@ -60,15 +60,15 @@ func (a Adapter) Close() error {
 	return a.client.Close()
 }
 
-func (a Adapter) Lock(ctx context.Context, key string, ttl int64) (unlock func() error, err error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(ttl))
+func (a Adapter) Lock(ctx context.Context, key string, ttlSeconds int64) (unlock func() error, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(ttlSeconds))
 
 	tracer := otela.NewTracer("etcd")
 	ctx, span := tracer.Start(ctx, "etcd@Lock", trace.WithAttributes(
 		attribute.String("key", key)))
 	defer span.End()
 
-	session, err := concurrency.NewSession(a.client, concurrency.WithTTL(int(ttl)), concurrency.WithContext(ctx))
+	session, err := concurrency.NewSession(a.client, concurrency.WithTTL(int(ttlSeconds)), concurrency.WithContext(ctx))
 	if err != nil {
 		span.AddEvent("error-on-new-session", trace.WithAttributes(
 			attribute.String("error", err.Error())))
