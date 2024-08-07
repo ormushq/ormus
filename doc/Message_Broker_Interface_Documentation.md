@@ -8,6 +8,7 @@ The `MessageBroker` interface defines the following methods:
 
 ### `PublishMessage`
 
+
 ```go
 PublishMessage(topic string, messages ...*Message) error
 ```
