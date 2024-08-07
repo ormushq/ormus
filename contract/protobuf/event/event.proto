@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package event;
-option go_package = "contract/goprotobuf/event";
+option go_package = "github.com/ormushq/ormus/contract/protobuf/event";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";

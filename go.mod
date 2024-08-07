@@ -1,6 +1,6 @@
 module github.com/ormushq/ormus
 
-go 1.22.3
+go 1.22.0
 
 require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0

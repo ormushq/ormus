@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package task;
-option go_package = "contract/goprotobuf/task";
+option go_package = "github.com/ormushq/ormus/contract/protobuf/task";
 
 import "google/protobuf/timestamp.proto";
 // manually append "github.com/ormushq/ormus/" to the compiled version of bellow import

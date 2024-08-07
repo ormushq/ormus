@@ -1,25 +1,25 @@
 
 // every time you compile the task file update the import of compiled version manually
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative . \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative . \
     contract/protobuf/task/task.proto
 
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative\ \
     contract/protobuf/event/event.proto
 
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative . \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative . \
     contract/protobuf/manager/project.proto
 
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative . \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative . \
     contract/protobuf/manager/source.proto
 
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative . \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative . \
     contract/protobuf/manager/user.proto
 
-protoc --go_out=. \
-    --go-grpc_out=. \
+protoc --go_out=. --go_opt=paths=source_relative . \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative . \
     contract/protobuf/messages/message.proto
