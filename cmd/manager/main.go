@@ -47,11 +47,12 @@ func main() {
 
 	ProjectSvc := projectservice.New(&unknownRepo1, internalBroker)
 
-	userSvc := userservice.New(jwt, scylla, internalBroker)
-
 	validateUserSvc := uservalidator.New(scylla)
 
-	userHand := userhandler.New(userSvc, validateUserSvc, ProjectSvc)
+	userSvc := userservice.New(jwt, scylla, internalBroker, validateUserSvc)
+
+	userHand := userhandler.New(userSvc, ProjectSvc)
+
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)
 
 	server := httpserver.New(cfg, httpserver.SetupServicesResponse{

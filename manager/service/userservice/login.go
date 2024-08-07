@@ -8,6 +8,11 @@ import (
 )
 
 func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
+	vErr := s.userValidator.ValidateLoginRequest(req)
+	if vErr != nil {
+		return nil, vErr
+	}
+
 	// check the existing of email address  from repository
 	// get user by email address
 	user, err := s.repo.GetUserByEmail(req.Email)

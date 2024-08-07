@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 )
 
@@ -19,6 +20,7 @@ type JWTEngine interface {
 type Service struct {
 	repo           Repository
 	jwt            JWTEngine
+	userValidator  uservalidator.Validator
 	internalBroker *simple.ChannelAdapter
 }
 
@@ -32,6 +34,11 @@ type Service struct {
 // PASS
 // ok      github.com/ormushq/ormus/manager/service        2.590s
 
-func New(authGenerator JWTEngine, repository Repository, internalBroker *simple.ChannelAdapter) *Service {
-	return &Service{jwt: authGenerator, repo: repository, internalBroker: internalBroker}
+func New(authGenerator JWTEngine, repository Repository, internalBroker *simple.ChannelAdapter, userValidator uservalidator.Validator) *Service {
+	return &Service{
+		jwt:            authGenerator,
+		repo:           repository,
+		internalBroker: internalBroker,
+		userValidator:  userValidator,
+	}
 }
