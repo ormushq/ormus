@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 package task;
-option go_package = "github.com/ormushq/ormus/contract/protobuf/task";
+option go_package = "github.com/ormushq/ormus/contract/go/task";
 
 import "google/protobuf/timestamp.proto";
 // manually append "github.com/ormushq/ormus/" to the compiled version of bellow import
-import "contract/protobuf/event/event.proto";
+import "event/event.proto";
 
 enum IntegrationDeliveryStatus {
   INVALID_TASK_STATUS = 0;

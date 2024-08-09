@@ -26,3 +26,11 @@ format:
 	@gci write $(ROOT)
 	@which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
 	@golangci-lint run --fix
+
+protobuf:
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/task/task.proto
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/event/event.proto
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/manager/project.proto
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/manager/source.proto
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/manager/user.proto
+	protoc --go-grpc_out=./contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/messages/message.proto
