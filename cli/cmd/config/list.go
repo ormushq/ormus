@@ -5,12 +5,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// listCmd represents the list command
+// listCmd represents the list command.
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: " List all configuration settings.",
@@ -23,7 +23,6 @@ var listCmd = &cobra.Command{
 		for k, v := range config {
 			fmt.Printf("%s => %s\n", k, v)
 		}
-
 	},
 }
 

@@ -5,12 +5,12 @@ package user
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// userCmd represents the user command
+// userCmd represents the user command.
 var userCmd = &cobra.Command{
 	Use:   "user",
 	Short: "User Registration and Authentication",

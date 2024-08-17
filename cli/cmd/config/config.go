@@ -5,12 +5,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// configCmd represents the config command
+// configCmd represents the config command.
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configuration and Settings",

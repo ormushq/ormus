@@ -6,14 +6,15 @@ package user
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/ormushq/ormus/param"
 	"github.com/spf13/cobra"
-	"io"
-	"net/http"
 )
 
-// loginCmd represents the login command
+// loginCmd represents the login command.
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Log in as a user.",
@@ -22,17 +23,20 @@ var loginCmd = &cobra.Command{
 		email, err := cmdCobra.Flags().GetString("email")
 		if err != nil {
 			fmt.Println("error on get email flag", err)
+
 			return
 		}
 
 		password, err := cmdCobra.Flags().GetString("password")
 		if err != nil {
 			fmt.Println("error on get password flag", err)
+
 			return
 		}
 
 		if password == "" || email == "" {
 			fmt.Println("password and email is required")
+
 			return
 		}
 		resp, err := cmd.Client.SendRequest(cmd.Client.User.Login(email, password))
@@ -55,7 +59,6 @@ var loginCmd = &cobra.Command{
 		}
 		cmd.Client.StoreToken(lRsp.Tokens.AccessToken)
 		fmt.Println("Token stored successfully")
-
 	},
 }
 

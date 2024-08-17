@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// logoutCmd represents the logout command
+// logoutCmd represents the logout command.
 var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "Log out the current user.",

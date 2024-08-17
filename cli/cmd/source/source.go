@@ -5,12 +5,12 @@ package source
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// sourceCmd represents the source command
+// sourceCmd represents the source command.
 var sourceCmd = &cobra.Command{
 	Use:   "source",
 	Short: "Define and Manage Sources",

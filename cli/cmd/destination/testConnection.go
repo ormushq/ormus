@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// testConnectionCmd represents the testConnection command
+// testConnectionCmd represents the testConnection command.
 var testConnectionCmd = &cobra.Command{
 	Use:   "testConnection",
 	Short: "Test the connection of a destination",

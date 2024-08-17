@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// disableCmd represents the disable command
+// disableCmd represents the disable command.
 var disableCmd = &cobra.Command{
 	Use:   "disable",
 	Short: "Disable a source",

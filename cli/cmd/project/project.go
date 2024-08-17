@@ -5,12 +5,12 @@ package project
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// projectCmd represents the project command
+// projectCmd represents the project command.
 var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Create, View, and Manage Projects",

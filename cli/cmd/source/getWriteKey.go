@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getWriteKeyCmd represents the getWriteKey command
+// getWriteKeyCmd represents the getWriteKey command.
 var getWriteKeyCmd = &cobra.Command{
 	Use:   "getWriteKey",
 	Short: "Get write-key of a source",

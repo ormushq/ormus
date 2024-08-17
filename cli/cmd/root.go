@@ -4,15 +4,15 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/ormushq/ormus/cli/api"
 	"os"
 
+	"github.com/ormushq/ormus/cli/api"
 	"github.com/spf13/cobra"
 )
 
 var Client = api.New()
 
-// rootCmd represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
 	Use:   "ormus",
 	Short: "A brief description of your application",
@@ -41,7 +41,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ormus.yaml)")
+	// set config rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ormus.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

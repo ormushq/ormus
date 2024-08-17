@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// showCmd represents the show command
+// showCmd represents the show command.
 var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Show details of a specific destination.",

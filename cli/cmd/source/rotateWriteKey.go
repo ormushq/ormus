@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rotateWriteKeyCmd represents the rotateWriteKey command
+// rotateWriteKeyCmd represents the rotateWriteKey command.
 var rotateWriteKeyCmd = &cobra.Command{
 	Use:   "rotateWriteKey",
 	Short: "Rotate write-key for a source",

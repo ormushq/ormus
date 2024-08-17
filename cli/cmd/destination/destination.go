@@ -5,12 +5,12 @@ package destination
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
-// destinationCmd represents the destination command
+// destinationCmd represents the destination command.
 var destinationCmd = &cobra.Command{
 	Use:   "destination",
 	Short: "Set Up and Manage Destinations",

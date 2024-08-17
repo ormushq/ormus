@@ -2,20 +2,25 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+
 	"github.com/ormushq/ormus/cli/api/destination"
 	"github.com/ormushq/ormus/cli/api/project"
 	"github.com/ormushq/ormus/cli/api/source"
 	"github.com/ormushq/ormus/cli/api/types"
 	"github.com/ormushq/ormus/cli/api/user"
-	"io"
-	"net/http"
-	"os"
 )
 
-const configFIlePath = "./cli/config.json"
+const (
+	configFIlePath       = "./cli/config.json"
+	configFilePermission = 0o644
+)
 
 type Client struct {
 	User        user.Client
@@ -27,7 +32,7 @@ type Client struct {
 
 type Config struct {
 	Token   string `json:"token"`
-	BaseUrl string `json:"base_url"`
+	BaseURL string `json:"base_url"`
 }
 
 func New() Client {
@@ -46,30 +51,33 @@ func (c *Client) StoreToken(token string) {
 	c.config.Token = token
 	c.storeConfig()
 }
+
 func (c *Client) ReadToken() string {
 	return c.config.Token
 }
+
 func (c *Client) SetConfig(key, value string) error {
 	switch key {
 	case "token":
 		c.config.Token = value
 	case "base_url":
-		c.config.BaseUrl = value
+		c.config.BaseURL = value
 	default:
-		return fmt.Errorf("Key is invalid %s", key)
+		return fmt.Errorf("key is invalid %s", key)
 	}
 	c.storeConfig()
 
 	return nil
 }
+
 func (c *Client) GetConfig(key string) (string, error) {
 	switch key {
 	case "token":
 		return c.config.Token, nil
 	case "base_url":
-		return c.config.BaseUrl, nil
+		return c.config.BaseURL, nil
 	default:
-		return "", fmt.Errorf("Key is invalid %s", key)
+		return "", fmt.Errorf("key is invalid %s", key)
 	}
 }
 
@@ -83,18 +91,21 @@ func (c *Client) ListConfig() (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
-func (c *Client) getUrl(path string) string {
-	return fmt.Sprintf("%s/%s", c.config.BaseUrl, path)
+func (c *Client) getURL(path string) string {
+	return fmt.Sprintf("%s/%s", c.config.BaseURL, path)
 }
+
 func (c *Client) SendRequest(req types.Request) (*http.Response, error) {
 	cl := &http.Client{
-		//Timeout: 2000,
+		// Timeout: 2000,
 	}
 	var respBody []byte
-	r, err := http.NewRequest(req.Method, c.getUrl(req.Path), bytes.NewBuffer(respBody))
+
+	r, err := http.NewRequestWithContext(context.Background(), req.Method, c.getURL(req.Path), bytes.NewBuffer(respBody))
 	if err != nil {
 		panic(err)
 	}
@@ -107,11 +118,12 @@ func (c *Client) SendRequest(req types.Request) (*http.Response, error) {
 
 func (c *Client) checkFileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
+
 	return !errors.Is(err, os.ErrNotExist)
 }
 
 func (c *Client) storeConfig() {
-	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, configFilePermission)
 	if err != nil {
 		panic(fmt.Sprintf("can't create or open file, ERR: %s", err))
 	}
@@ -130,10 +142,11 @@ func (c *Client) storeConfig() {
 		panic(fmt.Sprintf("can't write to the file %v\n", wErr))
 	}
 }
+
 func (c *Client) initConfig() {
 	c.config = Config{
 		Token:   "",
-		BaseUrl: "http://manager.ormus.local",
+		BaseURL: "http://manager.ormus.local",
 	}
 	c.storeConfig()
 }
@@ -141,14 +154,14 @@ func (c *Client) initConfig() {
 func (c *Client) readConfig() {
 	if !c.checkFileExists(configFIlePath) {
 		c.initConfig()
+
 		return
 	}
-	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_RDONLY, 0644)
+	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_RDONLY, configFilePermission)
 	if err != nil {
 		panic(fmt.Sprintf("can't create or open file, ERR: %s", err))
 	}
 	j, err := io.ReadAll(file)
-
 	if err != nil {
 		panic(fmt.Sprintf("can't read to the file %v\n", err))
 	}

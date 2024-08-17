@@ -1,11 +1,12 @@
 package user
 
 import (
-	"github.com/ormushq/ormus/cli/api/types"
 	"net/http"
+
+	"github.com/ormushq/ormus/cli/api/types"
 )
 
-func (c Client) Login(email string, password string) types.Request {
+func (c Client) Login(email, password string) types.Request {
 	return types.Request{
 		Path:                  "login",
 		Method:                http.MethodPost,

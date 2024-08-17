@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// registerCmd represents the register command
+// registerCmd represents the register command.
 var registerCmd = &cobra.Command{
 	Use:   "register",
 	Short: "Register a new user with an email.",
