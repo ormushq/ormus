@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/ormushq/ormus/cli/cmd"
+	_ "github.com/ormushq/ormus/cli/cmd/config"
 	_ "github.com/ormushq/ormus/cli/cmd/destination"
 	_ "github.com/ormushq/ormus/cli/cmd/project"
 	_ "github.com/ormushq/ormus/cli/cmd/source"
