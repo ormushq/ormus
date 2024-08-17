@@ -4,7 +4,6 @@ package task;
 option go_package = "github.com/ormushq/ormus/contract/go/task";
 
 import "google/protobuf/timestamp.proto";
-// manually append "github.com/ormushq/ormus/" to the compiled version of bellow import
 import "event/event.proto";
 
 enum IntegrationDeliveryStatus {

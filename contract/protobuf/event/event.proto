@@ -15,7 +15,7 @@ enum Type {
   SCREEN = 5;
 }
 
-message CoreEvent {
+message Event {
   string message_id = 1;
   Type type = 2;
   string name = 3;
