@@ -22,20 +22,22 @@ type Idempotency interface {
 }
 
 type Locker interface {
-	Lock(ctx context.Context, key string, ttl int64) (unlock func() error, err error)
+	Lock(ctx context.Context, key string, ttlSeconds int64) (unlock func() error, err error)
 }
 
 type Service struct {
-	idempotency Idempotency
-	repo        Repository
-	locker      Locker
+	idempotency        Idempotency
+	repo               Repository
+	locker             Locker
+	taskLockTTLSeconds int64
 }
 
-func New(idempotency Idempotency, repo Repository, l Locker) Service {
+func New(idempotency Idempotency, repo Repository, l Locker, taskLockTTLSeconds int64) Service {
 	return Service{
-		idempotency: idempotency,
-		repo:        repo,
-		locker:      l,
+		idempotency:        idempotency,
+		repo:               repo,
+		locker:             l,
+		taskLockTTLSeconds: taskLockTTLSeconds,
 	}
 }
 
@@ -47,9 +49,8 @@ func (s Service) LockTaskByID(ctx context.Context, taskID string) (unlock func()
 	defer span.End()
 
 	lockKey := "task:" + taskID
-	const ttl = 10
 
-	return s.locker.Lock(ctx, lockKey, ttl)
+	return s.locker.Lock(ctx, lockKey, s.taskLockTTLSeconds)
 }
 
 func (s Service) GetTaskStatusByID(ctx context.Context, taskID string) (taskentity.IntegrationDeliveryStatus, error) {

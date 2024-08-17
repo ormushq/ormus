@@ -70,11 +70,11 @@ func TestIntegrationHandler_Register(t *testing.T) {
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	repo := usermock.NewMockRepository(false)
 	jwt := authservice.NewJWT(cfg.JWTConfig)
-	service := userservice.New(jwt, repo, internalBroker)
 	validator := uservalidator.New(repo)
+	service := userservice.New(jwt, repo, internalBroker, validator)
 	RepoPr := projectstub.New(false)
 	ProjectSvc := projectservice.New(&RepoPr, internalBroker)
-	handler := userhandler.New(service, validator, ProjectSvc)
+	handler := userhandler.New(service, ProjectSvc)
 	e := echo.New()
 
 	workers.New(ProjectSvc, internalBroker).Run(done, &wg)

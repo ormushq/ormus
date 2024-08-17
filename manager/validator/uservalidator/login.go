@@ -2,6 +2,7 @@ package uservalidator
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"unicode"
 
@@ -66,6 +67,7 @@ func (v Validator) isUserRegistered(value interface{}) error {
 // TODO: implement this function with regex
 // isPasswordValid is a helper function to validate  password.
 func (v Validator) isPasswordValid(value interface{}) error {
+	fmt.Println(value)
 	password, ok := value.(string)
 	if !ok {
 		return richerror.New("validator.isPasswordValid").WithMessage("wrong type")

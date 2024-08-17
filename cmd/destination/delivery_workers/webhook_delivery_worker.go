@@ -28,7 +28,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-const waitingAfterShutdownInSeconds = 2
+const (
+	waitingAfterShutdownInSeconds = 2
+	taskLockTTLInSeconds          = 10
+)
 
 func main() {
 	done := make(chan bool)
@@ -93,7 +96,7 @@ func main() {
 	}
 	span.AddEvent("etcd-created")
 
-	taskHandler := taskservice.New(taskIdempotency, taskRepo, distributedLocker)
+	taskHandler := taskservice.New(taskIdempotency, taskRepo, distributedLocker, taskLockTTLInSeconds)
 	span.AddEvent("task-handler-created")
 
 	// Register delivery handlers
