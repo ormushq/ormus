@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package project;
+option go_package = "github.com/ormushq/ormus/contract/go/manager";
+
+import "google/protobuf/timestamp.proto";
+
+message Project {
+  string  id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  string name = 5;
+  string description = 6;
+  string user_id = 7;
+}
