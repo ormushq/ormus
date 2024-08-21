@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package internalevent;
+option go_package = "github.com/ormushq/ormus/contract/go/internalevent";
+
+import "google/protobuf/timestamp.proto";
+import "project/project.proto";
+import "task/task.proto";
+
+enum EventName {
+  EVENT_NAME_USER_CREATED = 0;
+  EVENT_NAME_PROJECT_CREATED = 1;
+  EVENT_NAME_WRITE_KEY_GENERATED = 2;
+  EVENT_NAME_TASK_CREATED = 3;
+}
+
+message Event {
+  string id = 1;
+  EventName event_name = 2;
+  google.protobuf.Timestamp time = 3;
+  oneof payload {
+      UserCreatedEvent user_created_event = 100;
+      DefaultProjectCreatedEvent default_project_created_event = 101;
+      WriteKeyGeneratedEvent write_key_generated_event = 102;
+      TaskCreatedEvent task_created_event = 103;
+  }
+}
+
+message UserCreatedEvent {
+  string user_id = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+message DefaultProjectCreatedEvent {
+  project.Project project = 1;
+}
+
+message WriteKeyGeneratedEvent {
+  project.Project project = 1;
+}
+
+message TaskCreatedEvent {
+  task.Task task = 1;
+}

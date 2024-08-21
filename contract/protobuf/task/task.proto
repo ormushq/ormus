@@ -6,17 +6,17 @@ option go_package = "github.com/ormushq/ormus/contract/go/task";
 import "google/protobuf/timestamp.proto";
 import "event/event.proto";
 
-enum IntegrationDeliveryStatus {
-  INVALID_TASK_STATUS = 0;
-  NOT_EXECUTED_TASK_STATUS = 1;
-  RETRIABLE_FAILED_TASK_STATUS = 2;
-  UNRETRIABLE_FAILED_TASK_STATUS = 3;
-  SUCCESS_TASK_STATUS = 4;
+enum TaskStatus {
+  TASK_STATUS_INVALID = 0;
+  TASK_STATUS_NOT_EXECUTED = 1;
+  TASK_STATUS_RETRIABLE_FAILED = 2;
+  TASK_STATUS_UNRETRIABLE_FAILED = 3;
+  TASK_STATUS_SUCCESS = 4;
 }
 
 message Task {
   string id = 1;
-  IntegrationDeliveryStatus delivery_status = 2;
+  TaskStatus  task_status = 2;
   uint32 attempts = 3;
   string failed_reason = 4;
   event.ProcessedEvent processed_event = 5;
