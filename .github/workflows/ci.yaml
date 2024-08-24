@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: ci
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
