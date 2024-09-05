@@ -2,7 +2,7 @@ type: yml
 
 source:
   http_server:
-    port: 8090
+    port: 8080
     network: "tcp"
 scylladb:
   hosts:
