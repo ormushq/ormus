@@ -10,8 +10,8 @@ type UserInfo struct {
 	Email     string
 }
 type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email"  example:"name@test.com"`
+	Password string `json:"password"  example:"123Qwe!@#"`
 }
 
 type LoginResponse struct {

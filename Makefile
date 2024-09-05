@@ -28,3 +28,9 @@ format:
 
 protobuf:
 	find contract/protobuf/ -name '*.proto' | xargs -I {} protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative --go_out=contract/go --go_opt=paths=source_relative --proto_path=contract/protobuf/ {}
+
+swagger-generator:
+	@which swag || (go install github.com/swaggo/swag/cmd/swag@latest)
+	swag fmt
+	swag init -g ../cmd/manager/main.go -d manager/ --parseDependency --output doc/swagger --instanceName manager
+	swag init -g ../cmd/source/main.go -d source/ --parseDependency --output doc/swagger --instanceName source

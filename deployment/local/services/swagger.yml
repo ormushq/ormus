@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  #Swagger Service
+  swagger:
+    build:
+      context: .
+      dockerfile: go/swagger/Dockerfile
+      args:
+        GO_IMAGE_NAME: ${GO_IMAGE_NAME}
+        GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
+    image: ormus-swagger:${GO_IMAGE_VERSION}
+    entrypoint:
+      - air
+      - "-c"
+      - /home/app/deployment/local/services/go/swagger/.swagger.air.toml
+    volumes:
+      - ../../../:/home/app
+    depends_on:
+      - otel_collector
+      - redis
+      - rabbitmq
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swagger_${COMPOSE_PROJECT_NAME}.service=swagger_${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.routers.swagger_${COMPOSE_PROJECT_NAME}.rule=Host(`swagger.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.swagger_${COMPOSE_PROJECT_NAME}.entrypoints=web"
+      - "traefik.http.services.swagger_${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8081"
