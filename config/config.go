@@ -16,4 +16,5 @@ type Config struct {
 	Source      source.Config   `koanf:"source"`
 	Destination dconfig.Config  `koanf:"destination"`
 	Scylladb    scylladb.Config `koanf:"scylladb"`
+	Swagger     Swagger         `koanf:"swagger"`
 }

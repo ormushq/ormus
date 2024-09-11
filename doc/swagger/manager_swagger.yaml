@@ -1,0 +1,162 @@
+definitions:
+  httputil.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  param.LoginRequest:
+    properties:
+      email:
+        example: name@test.com
+        type: string
+      password:
+        example: 123Qwe!@#
+        type: string
+    type: object
+  param.LoginResponse:
+    properties:
+      token:
+        $ref: '#/definitions/param.Token'
+      user:
+        $ref: '#/definitions/param.UserInfo'
+    type: object
+  param.RegisterRequest:
+    properties:
+      email:
+        example: name@test.com
+        type: string
+      name:
+        example: name
+        type: string
+      password:
+        example: 123Qwe!@#
+        type: string
+    type: object
+  param.RegisterResponse:
+    properties:
+      email:
+        example: name@test.com
+        type: string
+      id:
+        example: f90631e0-aad3-4eb1-8cef-1478711e16e9
+        type: string
+    type: object
+  param.Token:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  param.UserInfo:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+paths:
+  /health-check:
+    get:
+      consumes:
+      - application/json
+      description: get service health check
+      produces:
+      - application/json
+      responses: {}
+      summary: Show health check
+      tags:
+      - healthCheck
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: Login request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/param.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/param.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Login user
+      tags:
+      - User
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: Register request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/param.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/param.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Login user
+      tags:
+      - User
+securityDefinitions:
+  JWTToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
