@@ -13,4 +13,5 @@ docker-compose ^
 -f .\deployment\local\services\traefik.yml ^
 -f .\deployment\local\services\manager_main.yml ^
 -f .\deployment\local\services\swagger.yml ^
+-f .\deployment\local\services\source_main.yml ^
 %*
