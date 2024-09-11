@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  #Source main Service
+  source_main:
+    build:
+      context: .
+      dockerfile: go/source/main/Dockerfile
+      args:
+        GO_IMAGE_NAME: ${GO_IMAGE_NAME}
+        GO_IMAGE_VERSION: ${GO_IMAGE_VERSION}
+    image: ormus-source-main:${GO_IMAGE_VERSION}
+    entrypoint:
+      - air
+      - "-c"
+      - /home/app/deployment/local/services/go/source/main/.source.main.air.toml
+    volumes:
+      - ../../../:/home/app
+    depends_on:
+      - otel_collector
+      - redis
+      - rabbitmq
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.source_${COMPOSE_PROJECT_NAME}.service=source_${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.routers.source_${COMPOSE_PROJECT_NAME}.rule=Host(`source.${COMPOSE_PROJECT_NAME}.local`)"
+      - "traefik.http.routers.source_${COMPOSE_PROJECT_NAME}.entrypoints=web"
+      - "traefik.http.services.source_${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8080"
