@@ -2,7 +2,7 @@ package projectservice
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type Repository interface {
@@ -11,10 +11,10 @@ type Repository interface {
 
 type Service struct {
 	repo           Repository
-	internalBroker *simple.ChannelAdapter
+	internalBroker channel.Adapter
 }
 
-func New(repository Repository, internalBroker *simple.ChannelAdapter) *Service {
+func New(repository Repository, internalBroker channel.Adapter) *Service {
 	return &Service{
 		repo:           repository,
 		internalBroker: internalBroker,
