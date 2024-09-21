@@ -42,29 +42,29 @@ func NewMockRepository(hasErr bool) *MockRepository {
 	}
 }
 
-func (m *MockRepository) Register(u entity.User) (*entity.User, error) {
+func (m *MockRepository) Register(u entity.User) (entity.User, error) {
 	if m.hasErr {
-		return nil, fmt.Errorf(RepoErr)
+		return entity.User{}, fmt.Errorf(RepoErr)
 	}
 
 	u.ID = "new_id"
 	m.users = append(m.users, u)
 
-	return &u, nil
+	return u, nil
 }
 
-func (m *MockRepository) GetUserByEmail(email string) (*entity.User, error) {
+func (m *MockRepository) GetUserByEmail(email string) (entity.User, error) {
 	if m.hasErr {
-		return nil, fmt.Errorf(RepoErr)
+		return entity.User{}, fmt.Errorf(RepoErr)
 	}
 
 	for _, user := range m.users {
 		if user.Email == email {
-			return &user, nil
+			return user, nil
 		}
 	}
 
-	return nil, richerror.New("MockRepo.GetUserByEmail").WithMessage(errmsg.ErrAuthUserNotFound)
+	return entity.User{}, richerror.New("MockRepo.GetUserByEmail").WithMessage(errmsg.ErrAuthUserNotFound)
 }
 
 func (m *MockRepository) DoesUserExistsByEmail(email string) (bool, error) {

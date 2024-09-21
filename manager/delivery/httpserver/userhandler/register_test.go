@@ -18,6 +18,7 @@ import (
 	"github.com/ormushq/ormus/manager/service/authservice"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
+	"github.com/ormushq/ormus/manager/validator/projectvalidator"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/param"
@@ -69,11 +70,12 @@ func TestIntegrationHandler_Register(t *testing.T) {
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	repo := usermock.NewMockRepository(false)
-	jwt := authservice.NewJWT(cfg.JWTConfig)
+	jwt := authservice.New(cfg.AuthConfig)
 	validator := uservalidator.New(repo)
 	service := userservice.New(jwt, repo, internalBroker, validator)
 	RepoPr := projectstub.New(false)
-	ProjectSvc := projectservice.New(&RepoPr, internalBroker)
+	val := projectvalidator.New(&RepoPr)
+	ProjectSvc := projectservice.New(&RepoPr, internalBroker, val)
 	handler := userhandler.New(service, ProjectSvc)
 	e := echo.New()
 

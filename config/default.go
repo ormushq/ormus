@@ -29,8 +29,8 @@ const (
 )
 
 func Default() Config {
-	var accessExpirationTimeInDay time.Duration = 7
-	var refreshExpirationTimeInDay time.Duration = 28
+	accessExpirationTimeInDay := 7
+	refreshExpirationTimeInDay := 28
 
 	return Config{
 		Scylladb: scylladb.Config{
@@ -43,7 +43,7 @@ func Default() Config {
 			MaxRetryDelay:  MaxRetryDelay,
 		},
 		Manager: manager.Config{
-			JWTConfig: authservice.JwtConfig{
+			AuthConfig: authservice.Config{
 				SecretKey:                  "Ormus_jwt",
 				AccessExpirationTimeInDay:  accessExpirationTimeInDay,
 				RefreshExpirationTimeInDay: refreshExpirationTimeInDay,

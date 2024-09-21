@@ -1,7 +1,6 @@
 package authservice
 
 import (
-	b64 "encoding/base64"
 	"strings"
 	"time"
 
@@ -11,54 +10,51 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-type JwtConfig struct {
-	SecretKey                  string        `koanf:"secret_key"`
-	AccessExpirationTimeInDay  time.Duration `koanf:"access_expiration_time_in_day"`
-	RefreshExpirationTimeInDay time.Duration `koanf:"refresh_expiration_time_in_day"`
-	AccessSubject              string        `koanf:"access_subject"`
-	RefreshSubject             string        `koanf:"refresh_subject"`
+type Config struct {
+	SecretKey                  string `koanf:"secret_key"`
+	ContextKey                 string `koanf:"context_key"`
+	AccessExpirationTimeInDay  int    `koanf:"access_expiration_time_in_day"`
+	AccessExpirationTTL        time.Duration
+	RefreshExpirationTimeInDay int `koanf:"refresh_expiration_time_in_day"`
+	RefreshExpirationTTL       time.Duration
+	AccessSubject              string `koanf:"access_subject"`
+	RefreshSubject             string `koanf:"refresh_subject"`
 }
 
-type JWT struct {
-	configs JwtConfig
+type Service struct {
+	configs Config
 }
 
-func NewJWT(cfg JwtConfig) *JWT {
+func New(cfg Config) Service {
 	hoursInDay := 24
 
-	accessExpDuration := cfg.AccessExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
-	refreshExpDuration := cfg.RefreshExpirationTimeInDay * time.Duration(hoursInDay*int(time.Hour))
+	cfg.AccessExpirationTTL = time.Duration(cfg.AccessExpirationTimeInDay * hoursInDay * int(time.Hour))
+	cfg.RefreshExpirationTTL = time.Duration(cfg.RefreshExpirationTimeInDay * hoursInDay * int(time.Hour))
 
-	return &JWT{
-		configs: JwtConfig{
-			SecretKey:                  cfg.SecretKey,
-			AccessExpirationTimeInDay:  accessExpDuration,
-			RefreshExpirationTimeInDay: refreshExpDuration,
-			AccessSubject:              cfg.AccessSubject,
-			RefreshSubject:             cfg.RefreshSubject,
-		},
+	return Service{
+		configs: cfg,
 	}
 }
 
-func (s JWT) GetConfig() *JwtConfig {
-	return &s.configs
+func (s Service) GetConfig() Config {
+	return s.configs
 }
 
-func (s JWT) CreateAccessToken(user entity.User) (string, error) {
-	return s.createToken(user.ID, s.configs.AccessSubject, s.configs.AccessExpirationTimeInDay)
+func (s Service) CreateAccessToken(user entity.User) (string, error) {
+	return s.createToken(user.ID, s.configs.AccessSubject, s.configs.AccessExpirationTTL)
 }
 
-func (s JWT) CreateRefreshToken(user entity.User) (string, error) {
-	return s.createToken(user.ID, s.configs.RefreshSubject, s.configs.RefreshExpirationTimeInDay)
+func (s Service) CreateRefreshToken(user entity.User) (string, error) {
+	return s.createToken(user.ID, s.configs.RefreshSubject, s.configs.RefreshExpirationTTL)
 }
 
-func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
+func (s Service) ParseToken(bearerToken string) (*Claims, error) {
 	// https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
 
 	tokenStr := strings.Replace(bearerToken, "Bearer ", "", 1)
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(s.configs.SecretKey), nil
+		return []byte(s.GetConfig().SecretKey), nil
 	})
 	if err != nil {
 		return nil, richerror.New("parse token failed").WithWrappedError(err)
@@ -68,18 +64,14 @@ func (s JWT) ParseToken(bearerToken string) (*Claims, error) {
 		return claims, nil
 	}
 
-	return nil, richerror.New("parse token failed").WithWrappedError(err)
+	return nil, richerror.New("parse token failed")
 }
 
-func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (string, error) {
+func (s Service) createToken(userID, subject string, expireDuration time.Duration) (string, error) {
 	if userID == "" {
 		// it is weird to build a jwt token for no one, right?
 		return "", richerror.New("jwt.createToken").WithMessage(errmsg.ErrJwtEmptyUser)
 	}
-	// create a signer for rsa 256
-	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
-
-	b64UserID := b64.StdEncoding.EncodeToString([]byte(userID))
 
 	// set our claims
 	claims := Claims{
@@ -87,7 +79,7 @@ func (s JWT) createToken(userID, subject string, expireDuration time.Duration) (
 			Subject:   subject,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 		},
-		UserID: b64UserID,
+		UserID: userID,
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

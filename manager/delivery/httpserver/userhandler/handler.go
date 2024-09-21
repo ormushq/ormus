@@ -7,12 +7,12 @@ import (
 
 type Handler struct {
 	// TODO - add configurations
-	userSvc    *userservice.Service
-	projectSvc *projectservice.Service
+	userSvc    userservice.Service
+	projectSvc projectservice.Service
 }
 
-func New(userSvc *userservice.Service, projectSvc *projectservice.Service) *Handler {
-	return &Handler{
+func New(userSvc userservice.Service, projectSvc projectservice.Service) Handler {
+	return Handler{
 		userSvc:    userSvc,
 		projectSvc: projectSvc,
 	}

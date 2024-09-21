@@ -1,6 +1,7 @@
 package userservice
 
 import (
+	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
@@ -13,7 +14,8 @@ func (s Service) IsUserIDValid(email string) (bool, error) {
 		return false, richerror.New(op).WithWrappedError(rErr).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 
-	if user == nil {
+	nilUser := entity.User{}
+	if user == nilUser {
 		return false, nil
 	}
 

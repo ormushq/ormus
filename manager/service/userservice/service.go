@@ -7,8 +7,8 @@ import (
 )
 
 type Repository interface {
-	Register(u entity.User) (*entity.User, error)
-	GetUserByEmail(email string) (*entity.User, error)
+	Register(u entity.User) (entity.User, error)
+	GetUserByEmail(email string) (entity.User, error)
 	DoesUserExistsByEmail(email string) (bool, error)
 }
 
@@ -34,8 +34,8 @@ type Service struct {
 // PASS
 // ok      github.com/ormushq/ormus/manager/service        2.590s
 
-func New(authGenerator JWTEngine, repository Repository, internalBroker *simple.ChannelAdapter, userValidator uservalidator.Validator) *Service {
-	return &Service{
+func New(authGenerator JWTEngine, repository Repository, internalBroker *simple.ChannelAdapter, userValidator uservalidator.Validator) Service {
+	return Service{
 		jwt:            authGenerator,
 		repo:           repository,
 		internalBroker: internalBroker,

@@ -2,21 +2,29 @@ package projectservice
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/validator/projectvalidator"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 )
 
 type Repository interface {
-	Create(name, ID string) (entity.Project, error)
+	Create(project entity.Project) (entity.Project, error)
+	GetWithID(ID string) (entity.Project, error)
+	Update(project entity.Project) (entity.Project, error)
+	Delete(project entity.Project) error
+	List(userID string, lastToken int64, limit int) ([]entity.Project, error)
+	HaseMore(userID string, lastToken int64, perPage int) (bool, error)
 }
 
 type Service struct {
 	repo           Repository
 	internalBroker *simple.ChannelAdapter
+	validator      projectvalidator.Validator
 }
 
-func New(repository Repository, internalBroker *simple.ChannelAdapter) *Service {
-	return &Service{
+func New(repository Repository, internalBroker *simple.ChannelAdapter, validator projectvalidator.Validator) Service {
+	return Service{
 		repo:           repository,
 		internalBroker: internalBroker,
+		validator:      validator,
 	}
 }

@@ -1,9 +1,25 @@
 definitions:
+  entity.Project:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      token_id:
+        type: string
+      updated_at:
+        type: string
+      user:
+        type: string
+    type: object
   httputil.HTTPError:
     properties:
-      code:
-        example: 400
-        type: integer
       message:
         example: status bad request
         type: string
@@ -65,6 +81,60 @@ definitions:
       updatedAt:
         type: string
     type: object
+  projectparam.CreateRequest:
+    properties:
+      description:
+        example: description
+        type: string
+      name:
+        example: name
+        type: string
+    type: object
+  projectparam.CreateResponse:
+    properties:
+      project:
+        $ref: '#/definitions/entity.Project'
+    type: object
+  projectparam.DeleteResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  projectparam.ListResponse:
+    properties:
+      has_more:
+        type: boolean
+      last_token:
+        type: integer
+      per_page:
+        type: integer
+      projects:
+        items:
+          $ref: '#/definitions/entity.Project'
+        type: array
+    type: object
+  projectparam.UpdateRequest:
+    properties:
+      description:
+        example: description
+        type: string
+      name:
+        example: name
+        type: string
+    type: object
+  projectparam.UpdateResponse:
+    properties:
+      project:
+        $ref: '#/definitions/entity.Project'
+    type: object
+  sql.NullTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -86,6 +156,154 @@ paths:
       summary: Show health check
       tags:
       - healthCheck
+  /projects:
+    get:
+      consumes:
+      - application/json
+      description: List projects
+      parameters:
+      - description: Last token fetched
+        in: query
+        name: last_token_id
+        type: string
+      - description: Per page count
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/projectparam.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: List projects
+      tags:
+      - Project
+    post:
+      consumes:
+      - application/json
+      description: Create project
+      parameters:
+      - description: Create project request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/projectparam.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/projectparam.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Create project
+      tags:
+      - Project
+  /projects/{project_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete project
+      parameters:
+      - description: Project identifier
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/projectparam.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Delete project
+      tags:
+      - Project
+    post:
+      consumes:
+      - application/json
+      description: Update project
+      parameters:
+      - description: Project identifier
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Update project request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/projectparam.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/projectparam.UpdateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Update project
+      tags:
+      - Project
   /users/login:
     post:
       consumes:

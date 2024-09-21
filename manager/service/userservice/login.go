@@ -25,11 +25,11 @@ func (s Service) Login(req param.LoginRequest) (*param.LoginResponse, error) {
 	}
 
 	// jwt token
-	AccessToken, err := s.jwt.CreateAccessToken(*user)
+	AccessToken, err := s.jwt.CreateAccessToken(user)
 	if err != nil {
 		return nil, richerror.New("Login").WithWrappedError(err)
 	}
-	RefreshToken, err := s.jwt.CreateRefreshToken(*user)
+	RefreshToken, err := s.jwt.CreateRefreshToken(user)
 	if err != nil {
 		return nil, richerror.New("Login").WithWrappedError(err)
 	}

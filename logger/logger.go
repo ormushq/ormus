@@ -1,10 +1,12 @@
 package logger
 
 import (
+	"errors"
 	"io"
 	"log/slog"
 	"os"
 
+	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/ormushq/ormus/pkg/trace"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -40,6 +42,16 @@ func init() {
 
 func L() *slog.Logger {
 	return l
+}
+
+func LogError(err error) {
+	if err == nil {
+		return
+	}
+	var rErr richerror.RichError
+	if errors.As(err, &rErr) {
+		L().Error(rErr.Message())
+	}
 }
 
 func WithGroup(groupName string) *slog.Logger {

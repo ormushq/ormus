@@ -13,6 +13,7 @@ import (
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 	"github.com/ormushq/ormus/manager/mockRepo/usermock"
 	"github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/manager/service/userservice"
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/param"
@@ -81,11 +82,11 @@ func TestIntegrationHandler_Login(t *testing.T) {
 
 	cfg := config.C()
 	repo := usermock.NewMockRepository(false)
-	jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+	jwt := authservice.New(cfg.Manager.AuthConfig)
 	validator := uservalidator.New(repo)
-	service := userservice.New(jwt, repo, nil, validator)
+	userSvc := userservice.New(jwt, repo, nil, validator)
 
-	handler := userhandler.New(service, nil)
+	handler := userhandler.New(userSvc, projectservice.Service{})
 
 	e := echo.New()
 
