@@ -74,7 +74,7 @@ manager:
     max_retry_policy: 5
   auth_config:
     secret_key: "Ormus_jwt"
-    context_key: "user  1"
+    context_key: "user"
     access_expiration_time_in_day: 7
     refresh_expiration_time_in_day: 28
     access_subject: "ac"
