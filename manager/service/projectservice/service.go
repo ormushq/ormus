@@ -3,7 +3,7 @@ package projectservice
 import (
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/validator/projectvalidator"
-	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type Repository interface {
@@ -17,11 +17,11 @@ type Repository interface {
 
 type Service struct {
 	repo           Repository
-	internalBroker *simple.ChannelAdapter
+	internalBroker channel.Adapter
 	validator      projectvalidator.Validator
 }
 
-func New(repository Repository, internalBroker *simple.ChannelAdapter, validator projectvalidator.Validator) Service {
+func New(repository Repository, internalBroker channel.Adapter, validator projectvalidator.Validator) Service {
 	return Service{
 		repo:           repository,
 		internalBroker: internalBroker,
