@@ -26,7 +26,7 @@ func (r Repository) List(userID string, lastToken int64, limit int) ([]entity.Pr
 	})
 
 	var projects []entity.Project
-	if err = query.Select(&projects); err != nil {
+	if err := query.Select(&projects); err != nil {
 		return nil, err
 	}
 

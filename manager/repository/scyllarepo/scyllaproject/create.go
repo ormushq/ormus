@@ -35,7 +35,7 @@ func (r Repository) Create(project entity.Project) (entity.Project, error) {
 		"updated_at":  project.UpdatedAt,
 	})
 
-	if err = query.Exec(); err != nil {
+	if err := query.Exec(); err != nil {
 		return entity.Project{}, err
 	}
 
