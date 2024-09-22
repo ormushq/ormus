@@ -29,9 +29,7 @@ func (r Repository) Delete(project entity.Project) error {
 		"deleted_at": project.DeletedAt,
 	})
 
-	if err := query.Exec(); err != nil {
-		return err
-	}
+	err = query.Exec()
 
-	return nil
+	return err
 }
