@@ -88,3 +88,81 @@ counter.Add(context.Background(), 1)
 ```
 
 There is two helper method: `otela.AddFloat64Counter` and `otela.IncrementFloat64Counter` 
+
+## Trace helper
+
+### `GetCarrierFromContext(ctx context.Context) map[string]string`
+For extract carrier from context use this method. 
+This method is useful when you want pass tracer id between services that in separate binaries and they use eventing or messaging design pattern.
+You can simply in client service set tracerId with this value and pass it to host and with below function generate context with this value and use it in host service.
+
+### `GetContextFromCarrier(carrier map[string]string) context.Context`
+As mention in top you can use this method to convert tracer id to context.
+
+## Trace builder
+
+``go
+TraceBuilder(packageName, functionName string, options ...TracerOptions) (context.Context, trace.Span)
+``
+Use this method for easy use of OTEL collector. just like this:
+```go
+ctx, span := otela.TraceBuilder("package name", "Function name",
+    TracerOptions...),
+)
+```
+There is some helper function for generate TraceOption like :
+- `WithCarrier(carrier map[string]string) TracerOptions`
+- `WithContext(ctx context.Context) TracerOptions`
+- `WithTracerOptions(options ...trace.TracerOption) TracerOptions`
+- `WithSpanOptions(options ...trace.SpanStartOption) TracerOptions`
+- `WithSpanOptionAttributes(attributes ...attribute.KeyValue) TracerOptions`
+
+
+
+## Log echo requests
+
+In delivery layer you can register the otela log as below:
+
+```go
+    s.Router.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:           true,
+		LogStatus:        true,
+		LogHost:          true,
+		LogRemoteIP:      true,
+		LogRequestID:     true,
+		LogMethod:        true,
+		LogContentLength: true,
+		LogResponseSize:  true,
+		LogLatency:       true,
+		LogError:         true,
+		LogProtocol:      true,
+		LogValuesFunc:    otela.EchoRequestLoggerLogValuesFunc("httpserver", "Serve"),
+	}))
+```
+Then it start span on request and inject trace id to the context, you can continue to append spans to the tracer like below:
+
+```go
+package statushandler
+
+import (
+	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/labstack/echo/v4"
+)
+
+
+    func (h Handler) healthCheck(c echo.Context) error {
+
+        // You can pass newCtx to service for set this span as parent of spans that start in services 
+        newCtx, span := otela.TraceBuilder("statushandler", "status",
+        otela.WithContext(ctx.Request().Context()),
+        )
+        defer span.End()
+        
+        span.AddEvent("Starting status handler")
+        // Do something
+        span.AddEvent("Ending status handler")
+		
+        ...
+    }
+        
+```
