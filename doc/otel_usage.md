@@ -89,28 +89,28 @@ counter.Add(context.Background(), 1)
 
 There is two helper method: `otela.AddFloat64Counter` and `otela.IncrementFloat64Counter` 
 
+
 ## Trace helper
 
 ### `GetCarrierFromContext(ctx context.Context) map[string]string`
-For extract carrier from context use this method. 
-This method is useful when you want pass tracer id between services that in separate binaries and they use eventing or messaging design pattern.
-You can simply in client service set tracerId with this value and pass it to host and with below function generate context with this value and use it in host service.
+To extract the carrier from the context, use this method. It's particularly useful when passing a tracer ID between services running in separate binaries, especially in event-driven or messaging-based design patterns. On the client service, you can easily set the tracer ID with this value, pass it to the host, and then use the following function to generate a context with the tracer ID for use in the host service.
 
 ### `GetContextFromCarrier(carrier map[string]string) context.Context`
-As mention in top you can use this method to convert tracer id to context.
+As mentioned above, you can use this method to convert the tracer ID into a context.
+
 
 ## Trace builder
 
 ``go
 TraceBuilder(packageName, functionName string, options ...TracerOptions) (context.Context, trace.Span)
 ``
-Use this method for easy use of OTEL collector. just like this:
+You can use this method for easy integration with the Otel collector, like this:
 ```go
 ctx, span := otela.TraceBuilder("package name", "Function name",
     TracerOptions...),
 )
 ```
-There is some helper function for generate TraceOption like :
+Here is a helper function for generating `TraceOption`, such as:
 - `WithCarrier(carrier map[string]string) TracerOptions`
 - `WithContext(ctx context.Context) TracerOptions`
 - `WithTracerOptions(options ...trace.TracerOption) TracerOptions`
@@ -118,10 +118,9 @@ There is some helper function for generate TraceOption like :
 - `WithSpanOptionAttributes(attributes ...attribute.KeyValue) TracerOptions`
 
 
-
 ## Log echo requests
 
-In delivery layer you can register the otela log as below:
+In the delivery layer, you can register the Otel log as shown below:
 
 ```go
     s.Router.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
@@ -139,7 +138,7 @@ In delivery layer you can register the otela log as below:
 		LogValuesFunc:    otela.EchoRequestLoggerLogValuesFunc("httpserver", "Serve"),
 	}))
 ```
-Then it start span on request and inject trace id to the context, you can continue to append spans to the tracer like below:
+It then starts the tracer on the request and injects the trace ID into the context. You can continue to append spans to the tracer as shown below:
 
 ```go
 package statushandler
