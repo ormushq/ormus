@@ -26,6 +26,9 @@ func TraceBuilder(packageName, functionName string, options ...TracerOptions) (c
 			traceOpt.tracerOptions = option.tracerOptions
 		}
 	}
+	if traceOpt.ctx == nil {
+		traceOpt.ctx = context.Background()
+	}
 	tracer := NewTracer(packageName, traceOpt.tracerOptions...)
 
 	return tracer.Start(traceOpt.ctx, packageName+"@"+functionName, traceOpt.spanOptions...)
