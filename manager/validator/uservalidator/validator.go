@@ -5,8 +5,8 @@ import (
 )
 
 type Repository interface {
-	Register(u entity.User) (*entity.User, error)
-	GetUserByEmail(email string) (*entity.User, error)
+	Register(u entity.User) (entity.User, error)
+	GetUserByEmail(email string) (entity.User, error)
 	DoesUserExistsByEmail(email string) (bool, error)
 }
 

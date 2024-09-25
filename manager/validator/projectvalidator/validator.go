@@ -1,15 +1,17 @@
 package projectvalidator
 
-type UserExistenceChecker interface {
-	IsUserIDValid(email string) (bool, error)
-}
+import "github.com/ormushq/ormus/manager/entity"
 
 type Validator struct {
-	userExistenceChecker UserExistenceChecker
+	repo Repository
 }
 
-func New(userExistenceChecker UserExistenceChecker) Validator {
+type Repository interface {
+	GetWithID(id string) (entity.Project, error)
+}
+
+func New(repo Repository) Validator {
 	return Validator{
-		userExistenceChecker: userExistenceChecker,
+		repo: repo,
 	}
 }

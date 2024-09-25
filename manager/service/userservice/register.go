@@ -1,8 +1,12 @@
 package userservice
 
 import (
+	"encoding/json"
+
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/managerparam"
+	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/password"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -33,11 +37,23 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 
 	// TODO: we have to trigger an event of registration in this phase of function
 	// return create new user
-	inOutChan, err := s.internalBroker.GetInputChannel(managerparam.CreateDefaultProject)
+	// TODO move this to init service and store input channel to service struct
+	inputChan, err := s.internalBroker.GetInputChannel(managerparam.CreateDefaultProject)
 	if err != nil {
+		// TODO don`t send trigger error to client just log it
 		return nil, richerror.New("register.internalBroker").WithWrappedError(err)
 	}
-	inOutChan <- []byte(createdUser.ID)
+	createProjectReq := projectparam.CreateThoughChannel{
+		UserID:      createdUser.ID,
+		Name:        "Default",
+		Description: "Default project",
+	}
+	js, err := json.Marshal(createProjectReq)
+	if err != nil {
+		logger.L().Error(err.Error())
+	} else {
+		inputChan <- js
+	}
 
 	return &param.RegisterResponse{
 		ID:    createdUser.ID,

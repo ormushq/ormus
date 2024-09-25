@@ -6,10 +6,10 @@ import (
 )
 
 type Config struct {
-	Application          ApplicationConfig     `koanf:"application"`
-	JWTConfig            authservice.JwtConfig `koanf:"jwt_config"`
-	InternalBrokerConfig InternalBrokerConfig  `koanf:"internal_broker_config"`
-	ScyllaDBConfig       scylladb.Config       `koanf:"scylla_db_config"`
+	Application          ApplicationConfig    `koanf:"application"`
+	AuthConfig           authservice.Config   `koanf:"auth_config"`
+	InternalBrokerConfig InternalBrokerConfig `koanf:"internal_broker_config"`
+	ScyllaDBConfig       scylladb.Config      `koanf:"scylla_db_config"`
 }
 
 type ApplicationConfig struct {

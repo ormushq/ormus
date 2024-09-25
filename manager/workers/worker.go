@@ -1,20 +1,22 @@
 package workers
 
 import (
+	"encoding/json"
 	"sync"
 
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/managerparam"
+	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/manager/service/projectservice"
 	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
 )
 
 type Worker struct {
-	prSvc          *projectservice.Service
+	prSvc          projectservice.Service
 	internalBroker *simple.ChannelAdapter
 }
 
-func New(prSvc *projectservice.Service, internalBroker *simple.ChannelAdapter) *Worker {
+func New(prSvc projectservice.Service, internalBroker *simple.ChannelAdapter) *Worker {
 	return &Worker{
 		prSvc:          prSvc,
 		internalBroker: internalBroker,
@@ -35,7 +37,13 @@ func (w *Worker) Run(done <-chan bool, wg *sync.WaitGroup) {
 		for {
 			select {
 			case msg := <-internalBroker:
-				createErr := w.prSvc.Create(msg.Body)
+				var req projectparam.CreateThoughChannel
+				err = json.Unmarshal(msg.Body, &req)
+				if err != nil {
+					logger.L().Error(err.Error())
+				}
+
+				_, createErr := w.prSvc.Create(projectparam.CreateRequest(req))
 				if createErr != nil {
 					logger.L().Error("err on creating project", "err msg:", createErr)
 

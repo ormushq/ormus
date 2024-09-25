@@ -72,10 +72,11 @@ manager:
     channel_size: 100
     number_instant: 5
     max_retry_policy: 5
-  jwt_config:
+  auth_config:
     secret_key: "Ormus_jwt"
-    access_expiration_time_in_day: 604800 # 7 * 24 * 3600
-    refresh_expiration_time_in_day: 2419200  # 28 * 24 * 3600
+    context_key: "user"
+    access_expiration_time_in_day: 7
+    refresh_expiration_time_in_day: 28
     access_subject: "ac"
     refresh_subject: "rt"
   scylla_db_config:

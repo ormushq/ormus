@@ -16,19 +16,19 @@ import (
 func TestNewJWT(t *testing.T) {
 	t.Run("test durations", func(t *testing.T) {
 		// 1. setup
-		cfg := authservice.JwtConfig{
+		cfg := authservice.Config{
 			AccessExpirationTimeInDay:  7,  // 7 * 24 * 60 * 60 * 1000 * 1000 = 604,800,000,000,000
 			RefreshExpirationTimeInDay: 28, // 28 * 24 * 60 * 60 * 1000 * 1000 = 2,419,200,000,000,000
 		}
 
-		jwt := authservice.NewJWT(cfg)
+		jwt := authservice.New(cfg)
 
 		// 2. execution
 		jwtCfg := jwt.GetConfig()
 
 		// 3. assertion
-		assert.Equal(t, time.Duration(604_800_000_000_000), jwtCfg.AccessExpirationTimeInDay)
-		assert.Equal(t, time.Duration(2_419_200_000_000_000), jwtCfg.RefreshExpirationTimeInDay)
+		assert.Equal(t, time.Duration(604_800_000_000_000), jwtCfg.AccessExpirationTTL)
+		assert.Equal(t, time.Duration(2_419_200_000_000_000), jwtCfg.RefreshExpirationTTL)
 	})
 }
 
@@ -58,7 +58,7 @@ func Test_ParseToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+			jwt := authservice.New(cfg.Manager.AuthConfig)
 
 			// 2. execution
 			claims, err := jwt.ParseToken(tc.bearerToken)
@@ -102,11 +102,10 @@ func Test_CreateAccessToken(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			jwt := authservice.NewJWT(cfg.Manager.JWTConfig)
+			jwt := authservice.New(cfg.Manager.AuthConfig)
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)
-			fmt.Println(token)
 
 			// 3. assertion
 			if err != nil {

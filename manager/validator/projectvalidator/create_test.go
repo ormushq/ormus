@@ -4,57 +4,73 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/manager/validator/projectvalidator"
-	"github.com/ormushq/ormus/param"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestValidator_ValidateCreateRequest(t *testing.T) {
 	testCases := []struct {
-		name      string
-		params    param.CreateProjectRequest
-		svcErr    bool
-		validUser bool
-		error     error
+		name    string
+		params  projectparam.CreateRequest
+		svcErr  bool
+		project entity.Project
+		error   error
 	}{
 		{
 			name: "happy path",
-			params: param.CreateProjectRequest{
-				Name:   "correct name",
-				UserID: "0000000000",
+			params: projectparam.CreateRequest{
+				Name:        "correct name",
+				UserID:      "test-user-id",
+				Description: "Description",
 			},
-			validUser: true,
+			project: entity.Project{},
 		},
 		{
 			name:  "name is required",
-			error: fmt.Errorf("Name: cannot be blank\n"),
-			params: param.CreateProjectRequest{
-				UserID: "0000000000",
+			error: fmt.Errorf("name: cannot be blank\n"),
+			params: projectparam.CreateRequest{
+				UserID:      "0000000000",
+				Description: "Description",
 			},
-			validUser: true,
+			project: entity.Project{},
 		},
 		{
-			name: "name shorter than 3",
-			params: param.CreateProjectRequest{
-				Name:   "co",
+			name:  "description is required",
+			error: fmt.Errorf("description: cannot be blank\n"),
+			params: projectparam.CreateRequest{
 				UserID: "0000000000",
+				Name:   "correct name",
 			},
-			error:     fmt.Errorf("Name: the length must be no less than 3\n"),
-			validUser: true,
+			project: entity.Project{},
+		},
+
+		{
+			name: "name shorter than 3",
+			params: projectparam.CreateRequest{
+				Name:        "co",
+				UserID:      "0000000000",
+				Description: "Description",
+			},
+			error:   fmt.Errorf("name: the length must be no less than 3\n"),
+			project: entity.Project{},
 		},
 		{
 			name:  "user_id is required",
 			error: fmt.Errorf("UserID: cannot be blank\n"),
-			params: param.CreateProjectRequest{
-				Name: "correct name",
+			params: projectparam.CreateRequest{
+				Name:        "correct name",
+				Description: "description",
 			},
+			project: entity.Project{},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// 1. setup
-			repo := NewStubUserExistenceChecker(tc.svcErr, tc.validUser)
+			repo := NewStubProjectRepository(tc.svcErr, tc.project)
 			vld := projectvalidator.New(repo)
 
 			// 2. execution
@@ -95,4 +111,25 @@ func (s StubUserExistenceChecker) IsUserIDValid(userID string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+type StubProjectRepository struct {
+	hasErr  bool
+	project entity.Project
+}
+
+func NewStubProjectRepository(hasErr bool, project entity.Project) StubProjectRepository {
+	return StubProjectRepository{
+		hasErr:  hasErr,
+		project: project,
+	}
+}
+
+// IsUserIDValid is a stub implementation of the IsUserIDValid method.
+func (s StubProjectRepository) GetWithID(id string) (entity.Project, error) {
+	if s.hasErr {
+		return s.project, fmt.Errorf(ServiceErr)
+	}
+
+	return s.project, nil
 }

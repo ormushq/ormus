@@ -5,7 +5,7 @@
 For generate swagger file run this command:
 
 ```shell
-make swagger-generator
+make swagger-gen
 ```
 This command is installs swag if it is not installed before then run `swag format` command then generate swagger files.
 At this time swagger is generated for two service:

@@ -12,13 +12,13 @@ type Handler struct {
 	sourceSvc   sourceservice.Service
 	userSvc     userservice.Service
 	validateSvc sourcevalidator.Validator
-	authSvc     authservice.JWT
+	authSvc     authservice.Service
 }
 
 func New(sourceSvc sourceservice.Service,
 	userSvc userservice.Service,
 	validateSvc sourcevalidator.Validator,
-	authSvc authservice.JWT,
+	authSvc authservice.Service,
 ) *Handler {
 	return &Handler{
 		sourceSvc:   sourceSvc,
