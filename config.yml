@@ -4,6 +4,12 @@ source:
   http_server:
     port: 8080
     network: "tcp"
+  otel:
+    endpoint: "otel_collector:4317"
+    service_name: "source"
+    enable_metric_expose: true
+    metric_expose_port: 8081
+    metric_expose_path: "metrics"
 scylladb:
   hosts:
     - 127.0.0.1:9042
