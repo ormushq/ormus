@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/ormushq/ormus/cli/cmd"
@@ -41,21 +42,21 @@ var loginCmd = &cobra.Command{
 		}
 		resp, err := cmd.Client.SendRequest(cmd.Client.User.Login(email, password))
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		j, err := io.ReadAll(resp.Body)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			panic(fmt.Sprintf("status not OK ,status code %d, body: %s", resp.StatusCode, j))
+			log.Fatal(fmt.Sprintf("status not OK ,status code %d, body: %s", resp.StatusCode, j))
 		}
 
 		var lRsp param.LoginResponse
 		err = json.Unmarshal(j, &lRsp)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		cmd.Client.StoreToken(lRsp.Tokens.AccessToken)
 		fmt.Println("Token stored successfully")

@@ -8,13 +8,13 @@ import (
 
 func (c Client) Login(email, password string) types.Request {
 	return types.Request{
-		Path:                  "login",
+		Path:                  "users/login",
 		Method:                http.MethodPost,
 		AuthorizationRequired: false,
 		Header:                nil,
 		Body: map[string]string{
-			email:    email,
-			password: password,
+			"email":    email,
+			"password": password,
 		},
 	}
 }

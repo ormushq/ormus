@@ -4,6 +4,8 @@ type Request struct {
 	Path                  string
 	Method                string
 	AuthorizationRequired bool
-	Header                any
-	Body                  any
+	UrlParams             []string
+	Header                map[string]string
+	QueryParams           map[string]string
+	Body                  map[string]string
 }
