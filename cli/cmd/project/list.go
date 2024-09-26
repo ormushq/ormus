@@ -17,7 +17,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all projects associated with the user.",
-	Long:  `ormus project list`,
+	Long:  `ormus project list --last-token-id <last-token-id> --per-page <per-page>`,
 	Run: func(cmdCobra *cobra.Command, args []string) {
 		perPage, err := cmdCobra.Flags().GetString("per-page")
 		if err != nil {
