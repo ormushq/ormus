@@ -5,11 +5,11 @@ package project
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -33,20 +33,20 @@ var updateCmd = &cobra.Command{
 			return
 		}
 
-		projectId, err := cmdCobra.Flags().GetString("project-id")
+		projectID, err := cmdCobra.Flags().GetString("project-id")
 		if err != nil {
 			fmt.Println("error on get project id flag", err)
 
 			return
 		}
 
-		if name == "" || description == "" || projectId == "" {
+		if name == "" || description == "" || projectID == "" {
 			fmt.Println("name and description and project id is required")
 
 			return
 		}
 
-		resp, err := cmd.Client.SendRequest(cmd.Client.Project.Create(name, description))
+		resp, err := cmd.Client.SendRequest(cmd.Client.Project.Update(projectID, name, description))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -55,20 +55,20 @@ var updateCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		if resp.StatusCode != http.StatusCreated {
-			log.Fatal(fmt.Errorf("status not Created ,status code %d, body: %s", resp.StatusCode, j))
+		if resp.StatusCode != http.StatusOK {
+			log.Fatal(fmt.Errorf("status not Ok ,status code %d, body: %s", resp.StatusCode, j))
 		}
 
-		fmt.Printf("success response : \n %s\n", j)
+		fmt.Printf("success response : \n%s\n", j)
 	},
 }
 
 func init() {
 	projectCmd.AddCommand(updateCmd)
 
-	createCmd.Flags().String("name", "", "name")
-	createCmd.Flags().String("description", "", "description")
-	createCmd.Flags().String("project-id", "", "project-id")
+	updateCmd.Flags().String("name", "", "name")
+	updateCmd.Flags().String("description", "", "description")
+	updateCmd.Flags().String("project-id", "", "project-id")
 
 	// Here you will define your flags and configuration settings.
 

@@ -5,11 +5,11 @@ package project
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -52,7 +52,7 @@ var createCmd = &cobra.Command{
 			log.Fatal(fmt.Errorf("status not Created ,status code %d, body: %s", resp.StatusCode, j))
 		}
 
-		fmt.Printf("success response : \n %s\n", j)
+		fmt.Printf("success response : \n%s\n", j)
 	},
 }
 

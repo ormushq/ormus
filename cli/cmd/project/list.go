@@ -5,11 +5,12 @@ package project
 
 import (
 	"fmt"
-	"github.com/ormushq/ormus/cli/cmd"
-	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/ormushq/ormus/cli/cmd"
+	"github.com/spf13/cobra"
 )
 
 // listCmd represents the list command.
@@ -18,11 +19,19 @@ var listCmd = &cobra.Command{
 	Short: "List all projects associated with the user.",
 	Long:  `ormus project list`,
 	Run: func(cmdCobra *cobra.Command, args []string) {
-		perPage, _ := cmdCobra.Flags().GetString("per-page")
+		perPage, err := cmdCobra.Flags().GetString("per-page")
+		if err != nil {
+			fmt.Println("error on get per-page flag", err)
 
-		lastTokenId, _ := cmdCobra.Flags().GetString("last-token-id")
+			return
+		}
+		lastTokenID, err := cmdCobra.Flags().GetString("last-token-id")
+		if err != nil {
+			fmt.Println("error on get last-token-id flag", err)
 
-		resp, err := cmd.Client.SendRequest(cmd.Client.Project.List(perPage, lastTokenId))
+			return
+		}
+		resp, err := cmd.Client.SendRequest(cmd.Client.Project.List(perPage, lastTokenID))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -35,16 +44,15 @@ var listCmd = &cobra.Command{
 			log.Fatal(fmt.Errorf("status not OK ,status code %d, body: %s", resp.StatusCode, j))
 		}
 
-		fmt.Printf("success response : \n %s\n", j)
-
+		fmt.Printf("success response : \n%s\n", j)
 	},
 }
 
 func init() {
 	projectCmd.AddCommand(listCmd)
 
-	createCmd.Flags().String("per-page", "10", "per-page")
-	createCmd.Flags().String("last-token-id", "", "last-token-id")
+	listCmd.Flags().String("per-page", "10", "per-page")
+	listCmd.Flags().String("last-token-id", "", "last-token-id")
 
 	// Here you will define your flags and configuration settings.
 

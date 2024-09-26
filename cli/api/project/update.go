@@ -6,14 +6,14 @@ import (
 	"github.com/ormushq/ormus/cli/api/types"
 )
 
-func (c Client) Update(projectId, name, description string) types.Request {
+func (c Client) Update(projectID, name, description string) types.Request {
 	return types.Request{
 		Path:                  "projects/%s",
 		Method:                http.MethodPost,
 		AuthorizationRequired: true,
 		Header:                nil,
-		UrlParams: []string{
-			projectId,
+		URLParams: []any{
+			projectID,
 		},
 		Body: map[string]string{
 			"name":        name,

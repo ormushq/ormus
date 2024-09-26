@@ -1,20 +1,19 @@
 package project
 
 import (
-	"github.com/ormushq/ormus/cli/api/types"
 	"net/http"
+
+	"github.com/ormushq/ormus/cli/api/types"
 )
 
-func (c Client) List(perPage, lastTokenId string) types.Request {
+func (c Client) List(perPage, lastTokenID string) types.Request {
 	return types.Request{
 		Path:                  "projects",
 		Method:                http.MethodGet,
 		AuthorizationRequired: true,
-		Header:                nil,
 		QueryParams: map[string]string{
-			"lat_token_id": lastTokenId,
-			"per_page":     perPage,
+			"last_token_id": lastTokenID,
+			"per_page":      perPage,
 		},
-		Body: map[string]string{},
 	}
 }

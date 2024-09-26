@@ -50,7 +50,7 @@ var loginCmd = &cobra.Command{
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			log.Fatal(fmt.Sprintf("status not OK ,status code %d, body: %s", resp.StatusCode, j))
+			log.Fatalf("status not OK ,status code %d, body: %s", resp.StatusCode, j)
 		}
 
 		var lRsp param.LoginResponse
@@ -58,7 +58,10 @@ var loginCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		cmd.Client.StoreToken(lRsp.Tokens.AccessToken)
+		err = cmd.Client.StoreToken(lRsp.Tokens.AccessToken)
+		if err != nil {
+			log.Fatal(err)
+		}
 		fmt.Println("Token stored successfully")
 	},
 }
