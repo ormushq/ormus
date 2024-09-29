@@ -7,7 +7,7 @@ import (
 	"github.com/ormushq/ormus/manager/managerparam"
 )
 
-func (h Handler) UpdateSource(ctx echo.Context) error {
+func (h Handler) Update(ctx echo.Context) error {
 	// get user id from context
 	u := ctx.Get("userID")
 	userID, ok := u.(string)

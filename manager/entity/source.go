@@ -11,8 +11,8 @@ type SourceCategory string
 type Status string
 
 const (
-	StatusActive    Status = "active"
-	StatusNotActive Status = "not active"
+	SourceStatusActive    Status = "active"
+	SourceStatusNotActive Status = "not active"
 )
 
 // TODO: need change feilds.
@@ -25,9 +25,10 @@ type Source struct {
 	OwnerID     string
 	Status      Status
 	Metadata    SourceMetadata
-	CreateAt    time.Time
-	UpdateAt    time.Time
-	DeleteAt    *time.Time
+	Deleted     bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
 type SourceMetadata struct {

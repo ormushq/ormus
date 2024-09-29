@@ -25,7 +25,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "le",
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 		{
@@ -35,7 +35,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "more than max name len la la la la la la la la la la la la la la la la",
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "normal new name",
 				Description: "de",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 		{
@@ -55,7 +55,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "normal new name",
 				Description: "more then max description len la la la la la la la la la la la la la lal la la lal al al lal ala lal al lala l l",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 		{
@@ -65,7 +65,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "normal new name",
 				Description: "new normal description",
 				ProjectID:   "invalide project id",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 		{
@@ -75,7 +75,7 @@ func TestValidateUpdateSourceForm(t *testing.T) {
 				Name:        "normal new name",
 				Description: "new normal description",
 				ProjectID:   "01HJDQ386MW8EM6WMC8B6J5HAN",
-				Status:      entity.StatusNotActive,
+				Status:      entity.SourceStatusNotActive,
 			},
 		},
 	}
