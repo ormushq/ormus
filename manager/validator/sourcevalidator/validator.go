@@ -1,7 +1,9 @@
 package sourcevalidator
 
 import (
+	"errors"
 	"fmt"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/ormushq/ormus/manager/service/sourceservice"
 )
@@ -27,4 +29,18 @@ type Validator struct {
 
 func New(repo sourceservice.SourceRepo) Validator {
 	return Validator{repo: repo}
+}
+
+func (v Validator) validateULID(value interface{}) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("error while reflection interface")
+	}
+
+	_, err := ulid.Parse(s)
+	if err != nil {
+		return errors.New("invalid id")
+	}
+
+	return nil
 }

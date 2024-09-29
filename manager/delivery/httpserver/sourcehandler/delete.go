@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h Handler) DeleteSource(ctx echo.Context) error {
+func (h Handler) Delete(ctx echo.Context) error {
 	// get user id from context
 	u := ctx.Get("userID")
 	userID, ok := u.(string)
