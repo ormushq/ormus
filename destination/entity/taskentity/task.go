@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
+	protobufEvent "github.com/ormushq/ormus/contract/go/event"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
@@ -90,8 +90,8 @@ func UnmarshalBytesToProcessedEvent(body []byte) (event.ProcessedEvent, error) {
 	return pe, nil
 }
 
-func ProtoUnmarshalBytesToProcessedEvent(body []byte) (*processedevent.ProcessedEvent, error) {
-	var pe processedevent.ProcessedEvent
+func ProtoUnmarshalBytesToProcessedEvent(body []byte) (*protobufEvent.ProcessedEvent, error) {
+	var pe protobufEvent.ProcessedEvent
 
 	if err := proto.Unmarshal(body, &pe); err != nil {
 		logger.L().Error("Error on unMarshaling processed event :", err)
