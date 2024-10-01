@@ -1,15 +1,18 @@
 package protobufmapper
 
 import (
-	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
+	"fmt"
+	protobufEvent "github.com/ormushq/ormus/contract/go/event"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/manager/entity"
 	fakeintgration "github.com/ormushq/ormus/manager/entity/integrations/fakeconfig"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"reflect"
 )
 
-func MapProcessedEventFromProtobuf(pe *processedevent.ProcessedEvent) event.ProcessedEvent {
+// MapProcessedEventFromProtobuf TODO: update me with protobufEvent.ProcessedEvent
+func MapProcessedEventFromProtobuf(pe *protobufEvent.ProcessedEvent) event.ProcessedEvent {
 	integration := entity.Integration{
 		ID:       pe.Integration.Id,
 		SourceID: pe.Integration.SourceId,
@@ -26,9 +29,9 @@ func MapProcessedEventFromProtobuf(pe *processedevent.ProcessedEvent) event.Proc
 	}
 
 	switch config := pe.Integration.Config.(type) {
-	case *processedevent.Integration_Fake:
+	case *protobufEvent.Integration_Fake:
 		integration.Config = fakeintgration.FakeConfig{Name: config.Fake.Name}
-	case *processedevent.Integration_Webhook:
+	case *protobufEvent.Integration_Webhook:
 		headers := make(map[string]string)
 		for k, v := range config.Webhook.Headers {
 			headers[k] = v
@@ -62,36 +65,39 @@ func MapProcessedEventFromProtobuf(pe *processedevent.ProcessedEvent) event.Proc
 	}
 }
 
-func MapProcessedEventToProtobuf(e event.ProcessedEvent) *processedevent.ProcessedEvent {
-	integration := &processedevent.Integration{
+func MapProcessedEventToProtobuf(e event.ProcessedEvent) *protobufEvent.ProcessedEvent {
+	integration := &protobufEvent.Integration{
 		Id:       e.Integration.ID,
 		SourceId: e.Integration.SourceID,
 		Name:     e.Integration.Name,
-		ConnectionType: processedevent.ConnectionType(
-			processedevent.ConnectionType_value[string(e.Integration.ConnectionType)]),
+		ConnectionType: protobufEvent.ConnectionType(
+			protobufEvent.ConnectionType_value[string(e.Integration.ConnectionType)]),
 		Enabled:   e.Integration.Enabled,
 		CreatedAt: timestamppb.New(e.Integration.CreatedAt),
-		Metadata: &processedevent.DestinationMetadata{
+		Metadata: &protobufEvent.DestinationMetadata{
 			Id:   e.Integration.Metadata.ID,
 			Name: e.Integration.Metadata.Name,
-			Slug: processedevent.DestinationType(
-				processedevent.DestinationType_value[string(e.Integration.Metadata.Slug)]),
+			Slug: protobufEvent.DestinationType(
+				protobufEvent.DestinationType_value[string(e.Integration.Metadata.Slug)]),
 		},
 	}
 
-	for i, category := range e.Integration.Metadata.Categories {
-		integration.Metadata.Categories[i] = processedevent.DestinationCategory(
-			processedevent.DestinationCategory_value[string(category)])
+	for _, category := range e.Integration.Metadata.Categories {
+		integration.Metadata.Categories = append(integration.Metadata.Categories,
+			protobufEvent.DestinationCategory(protobufEvent.DestinationCategory_value[string(category)]))
 	}
 
 	switch config := e.Integration.Config.(type) {
 	case fakeintgration.FakeConfig:
-		integration.Config = &processedevent.Integration_Fake{
-			Fake: &processedevent.FakeConfig{
+		fmt.Println("--fakeintgration.FakeConfig--")
+		integration.Config = &protobufEvent.Integration_Fake{
+			Fake: &protobufEvent.FakeConfig{
 				Name: config.Name,
 			},
 		}
 	case webhookintegration.WebhookConfig:
+		fmt.Println("-webhookintegration.WebhookConfig--")
+
 		headers := make(map[string]string)
 		for k, v := range config.Headers {
 			headers[k] = v
@@ -100,25 +106,68 @@ func MapProcessedEventToProtobuf(e event.ProcessedEvent) *processedevent.Process
 		for k, v := range config.Payload {
 			payload[k] = v
 		}
-		integration.Config = &processedevent.Integration_Webhook{
-			Webhook: &processedevent.WebhookConfig{
+		integration.Config = &protobufEvent.Integration_Webhook{
+			Webhook: &protobufEvent.WebhookConfig{
 				Headers: headers,
 				Payload: payload,
-				Method:  processedevent.WebhookMethod(processedevent.WebhookMethod_value[string(config.Method)]),
+				Method:  protobufEvent.WebhookMethod(protobufEvent.WebhookMethod_value[string(config.Method)]),
 				Url:     config.URL,
 			},
 		}
+	default:
+		fmt.Println("--default what what what--")
+		fmt.Println(reflect.TypeOf(config))
 	}
 
-	return &processedevent.ProcessedEvent{
+	// TODO: complete me
+	return &protobufEvent.ProcessedEvent{
 		SourceId:          e.SourceID,
+		TracerCarrier:     e.TracerCarrier,
 		Integration:       integration,
 		MessageId:         e.MessageID,
-		EventType:         processedevent.Type(processedevent.Type_value[string(e.EventType)]),
+		EventType:         protobufEvent.Type(protobufEvent.Type_value[string(e.EventType)]),
 		Version:           uint32(e.Version),
 		SentAt:            timestamppb.New(e.SentAt),
 		ReceivedAt:        timestamppb.New(e.ReceivedAt),
 		OriginalTimestamp: timestamppb.New(e.OriginalTimestamp),
 		Timestamp:         timestamppb.New(e.Timestamp),
+
+		UserId:      "",
+		AnonymousId: "",
+		Event:       "",
+		Name:        "",
+		GroupId:     "",
+		PreviousId:  "",
+		Context:     &protobufEvent.Context{},
+		Properties:  &protobufEvent.Properties{},
+		Traits:      &protobufEvent.Traits{},
 	}
+}
+
+// MapContextToProtobuf TODO: implement me
+func MapContextToProtobuf(e event.Context) *protobufEvent.Context {
+	return &protobufEvent.Context{
+		Active:        false,
+		Ip:            "",
+		Locale:        "",
+		Location:      nil,
+		Page:          nil,
+		UserAgent:     "",
+		UserAgentData: nil,
+		Library:       nil,
+		Traits:        nil,
+		Campaign:      nil,
+		Referrer:      nil,
+		CustomData:    nil,
+	}
+}
+
+// MapPropertiesToProtobuf TODO: implement me
+func MapPropertiesToProtobuf(e event.Properties) *protobufEvent.Properties {
+	return &protobufEvent.Properties{}
+}
+
+// MapTraitsToProtobuf TODO: implement me
+func MapTraitsToProtobuf(e event.Traits) *protobufEvent.Traits {
+	return &protobufEvent.Traits{}
 }
