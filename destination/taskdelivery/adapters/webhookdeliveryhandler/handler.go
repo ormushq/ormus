@@ -5,13 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
+	"github.com/ormushq/ormus/contract/go/event"
 	"github.com/ormushq/ormus/destination/entity/taskentity"
 	"github.com/ormushq/ormus/destination/taskdelivery/param"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity/integrations/webhookintegration"
+	"github.com/ormushq/ormus/pkg/protobufmapper"
 	"github.com/ormushq/ormus/pkg/richerror"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 	"time"
@@ -26,38 +26,31 @@ func New() *WebhookHandler {
 func (h WebhookHandler) Handle(task taskentity.Task) (param.DeliveryTaskResponse, error) {
 	const op = "webhookhandler.Handle"
 
-	// TODO: need to implement task protobuf
-	serializedData, mErr := proto.Marshal(&task.ProcessedEvent)
-	if mErr != nil {
-		logger.L().Error("can't marshal the task", mErr)
+	pbTask := protobufmapper.MapTaskToProtobuf(task)
+	config := webhookintegration.WebhookConfig{}
 
-		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
-			WithMessage("can't marshal the task")
-	}
-
-	wc := &processedevent.ProcessedEvent{}
-	if err := proto.Unmarshal(serializedData, wc); err != nil {
-		logger.L().Error("can't unmarshal the task", err)
-
-		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
-			WithMessage("can't unmarshal the task")
-	}
-
-	// TODO: get config from processedevent.ProcessedEvent
-	config, ok := task.ProcessedEvent.Integration.Config.(webhookintegration.WebhookConfig)
-	if !ok {
+	switch c := pbTask.ProcessedEvent.Integration.Config.(type) {
+	case *event.Integration_Webhook:
+		config = webhookintegration.WebhookConfig{
+			Headers: c.Webhook.Headers,
+			Payload: c.Webhook.Payload,
+			Method:  webhookintegration.WebhookMethod(c.Webhook.Method),
+			URL:     c.Webhook.Url,
+		}
+	default:
 		logger.L().Info("invalid configuration for webhook")
 
 		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindInvalid).
 			WithMessage("invalid configuration for webhook")
 	}
 
+	fmt.Println("yes yes yes yes yes yes yes ")
 	_, err := MakeHTTPRequest(config)
 	if err != nil {
 		logger.L().Error("error in webhookhandler.Handle when try to Do GET request", err)
 
 		return param.DeliveryTaskResponse{}, richerror.New(op).WithKind(richerror.KindUnexpected).
-			WithMessage("unexpected error when try to do GET webhook request")
+			WithMessage("unexpected error when try to do get webhook request")
 	}
 
 	return param.DeliveryTaskResponse{
