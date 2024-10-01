@@ -14,7 +14,7 @@ import (
 
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/contract/goprotobuf/processedevent"
+	"github.com/ormushq/ormus/contract/go/event"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/metricname"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -106,25 +106,26 @@ func main() {
 	span.AddEvent("exchange-declared")
 
 	// generate fake processedEvent
-	fakeEvent := &processedevent.ProcessedEvent{
-		SourceId: "source-123",
-		Integration: &processedevent.Integration{
-			Id:       "integration-456",
-			SourceId: "source-123",
+	fakeEvent := &event.ProcessedEvent{
+		SourceId:      "source-11",
+		TracerCarrier: nil,
+		Integration: &event.Integration{
+			Id:       "sjdfkjsdkfjkdsfj",
+			SourceId: "source-11",
 			Name:     "Fake Integration",
-			Metadata: &processedevent.DestinationMetadata{
-				Id:   "metadata-789",
+			Metadata: &event.DestinationMetadata{
+				Id:   "metadata-11",
 				Name: "Test Metadata",
-				Slug: processedevent.DestinationType_webhook,
-				Categories: []processedevent.DestinationCategory{
-					processedevent.DestinationCategory_ANALYTICS,
-					processedevent.DestinationCategory_EMAIL_MARKETING,
+				Slug: event.DestinationType_webhook,
+				Categories: []event.DestinationCategory{
+					event.DestinationCategory_ANALYTICS,
+					event.DestinationCategory_EMAIL_MARKETING,
 				},
 			},
-			ConnectionType: processedevent.ConnectionType_EVENT_STREAM,
+			ConnectionType: event.ConnectionType_EVENT_STREAM,
 			Enabled:        true,
-			Config: &processedevent.Integration_Webhook{
-				Webhook: &processedevent.WebhookConfig{
+			Config: &event.Integration_Webhook{
+				Webhook: &event.WebhookConfig{
 					Headers: map[string]string{
 						"Authorization": "Basic MY_BASIC_AUTH_TOKEN",
 						"Content-Type":  "MY_CONTENT_TYPE",
@@ -134,19 +135,28 @@ func main() {
 						"birth_day": "2020-12-12",
 						"mail":      "ali@mail.com",
 					},
-					Method: processedevent.WebhookMethod_POST,
+					Method: event.WebhookMethod_POST,
 					Url:    "https://eoc0z7vqfxu6io.m.pipedream.net",
 				},
 			},
 			CreatedAt: timestamppb.New(time.Now().Add(-1 * time.Hour)),
 		},
-		MessageId:         "4",
-		EventType:         processedevent.Type_TRACK,
+		MessageId:         "11",
+		EventType:         event.Type_TRACK,
 		Version:           1,
 		SentAt:            timestamppb.New(time.Now()),
 		ReceivedAt:        timestamppb.New(time.Now()),
 		OriginalTimestamp: timestamppb.New(time.Now()),
 		Timestamp:         timestamppb.New(time.Now()),
+		UserId:            "",
+		AnonymousId:       "",
+		Event:             "",
+		Name:              "",
+		GroupId:           "",
+		PreviousId:        "",
+		Context:           nil,
+		Properties:        nil,
+		Traits:            nil,
 	}
 
 	args := os.Args
@@ -169,7 +179,7 @@ func main() {
 	wg.Wait()
 }
 
-func publishEvent(pe *processedevent.ProcessedEvent, ch *amqp.Channel) {
+func publishEvent(pe *event.ProcessedEvent, ch *amqp.Channel) {
 	tracer := otela.NewTracer("FakerTracer")
 
 	ctx, taskSpan := tracer.Start(context.Background(), "FakerTracer@publishEvent")
@@ -221,6 +231,6 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func ID(e *processedevent.ProcessedEvent) string {
+func ID(e *event.ProcessedEvent) string {
 	return e.SourceId + "-" + e.TracerCarrier["integration_id"]
 }
