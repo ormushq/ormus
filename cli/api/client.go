@@ -134,7 +134,7 @@ func (c *Client) checkFileExists(filePath string) bool {
 func (c *Client) storeConfig() error {
 	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, configFilePermission)
 	if err != nil {
-		return fmt.Errorf("can't create or open file, ERR: %s", err)
+		return fmt.Errorf("can't create or open file, ERR: %w", err)
 	}
 	defer func() {
 		err = file.Close()
