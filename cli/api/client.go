@@ -105,11 +105,11 @@ func (c *Client) SendRequest(req types.Request) (*http.Response, error) {
 
 	reqBody, err := req.GetBody()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	r, err := http.NewRequestWithContext(context.Background(), req.Method, req.GetURL(c.config.BaseURL), reqBody)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	if req.AuthorizationRequired {
@@ -134,7 +134,7 @@ func (c *Client) checkFileExists(filePath string) bool {
 func (c *Client) storeConfig() error {
 	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, configFilePermission)
 	if err != nil {
-		log.Fatalf("can't create or open file, ERR: %s", err)
+		return fmt.Errorf("can't create or open file, ERR: %s", err)
 	}
 	defer func() {
 		err = file.Close()
