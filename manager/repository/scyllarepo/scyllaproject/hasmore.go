@@ -12,7 +12,7 @@ func init() {
 	}
 }
 
-func (r Repository) HaseMore(userID string, lastToken int64, perPage int) (bool, error) {
+func (r Repository) HaseMore(userID, lastToken string, perPage int) (bool, error) {
 	query, err := r.db.GetStatement(statements["HaseMore"])
 	if err != nil {
 		return false, err

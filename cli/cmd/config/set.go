@@ -5,6 +5,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
@@ -18,18 +19,18 @@ var setCmd = &cobra.Command{
 	Run: func(cmdCobra *cobra.Command, args []string) {
 		key, err := cmdCobra.Flags().GetString("key")
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		value, err := cmdCobra.Flags().GetString("value")
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		if key == "" || value == "" {
-			panic("Key or value is empty")
+			log.Fatal("Key or value is empty")
 		}
 		err = cmd.Client.SetConfig(key, value)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		fmt.Printf("Config updated successfully %s => %s \n", key, value)
 	},

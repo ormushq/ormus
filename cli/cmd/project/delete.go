@@ -5,7 +5,11 @@ package project
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -14,13 +18,40 @@ var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a specific project.",
 	Long:  `ormus project delete --project-id <project-id>`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+	Run: func(cmdCobra *cobra.Command, args []string) {
+		projectID, err := cmdCobra.Flags().GetString("project-id")
+		if err != nil {
+			fmt.Println("error on get project id flag", err)
+
+			return
+		}
+
+		if projectID == "" {
+			fmt.Println("project id is required")
+
+			return
+		}
+		resp, err := cmd.Client.SendRequest(cmd.Client.Project.Delete(projectID))
+		if err != nil {
+			log.Fatal(err)
+		}
+		j, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			log.Fatal(fmt.Errorf("status not OK ,status code %d, body: %s", resp.StatusCode, j))
+		}
+
+		fmt.Printf("success response : \n%s\n", j)
 	},
 }
 
 func init() {
 	projectCmd.AddCommand(deleteCmd)
+
+	deleteCmd.Flags().String("project-id", "", "project-id")
 
 	// Here you will define your flags and configuration settings.
 

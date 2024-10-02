@@ -48,8 +48,8 @@ func (h Handler) List(ctx echo.Context) error {
 	if req.PerPage == 0 {
 		req.PerPage = 10
 	}
-	var lastTokenID int64 = -9223372036854775808
-	if req.LastTokenID == 0 {
+	lastTokenID := "-9223372036854775808"
+	if req.LastTokenID == "" {
 		req.LastTokenID = lastTokenID
 	}
 

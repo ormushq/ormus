@@ -13,7 +13,7 @@ func init() {
 	}
 }
 
-func (r Repository) List(userID string, lastToken int64, limit int) ([]entity.Project, error) {
+func (r Repository) List(userID, lastToken string, limit int) ([]entity.Project, error) {
 	query, err := r.db.GetStatement(statements["List"])
 	if err != nil {
 		return nil, err
