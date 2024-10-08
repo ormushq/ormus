@@ -2,3 +2,5 @@ type: yml
 
 http_server:
   port: 8088
+
+write_key_expiration_time: 120
