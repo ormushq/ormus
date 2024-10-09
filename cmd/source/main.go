@@ -1,16 +1,22 @@
 package main
 
 import (
+	"context"
+	"github.com/ormushq/ormus/adapter/otela"
+	rabbitadapter "github.com/ormushq/ormus/adapter/rabbitmq"
+	"github.com/ormushq/ormus/adapter/redis"
+	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/source/adapter/rabbitmq"
+	"github.com/ormushq/ormus/source/delivery/httpserver"
+	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
+	sourceevent "github.com/ormushq/ormus/source/eventhandler"
+	writekeyrepo "github.com/ormushq/ormus/source/repository/redis/rediswritekey"
+	"github.com/ormushq/ormus/source/service/writekey"
 	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
-
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/logger"
-	"github.com/ormushq/ormus/source/delivery/httpserver"
-	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
 )
 
 //	@termsOfService	http://swagger.io/terms/
@@ -58,6 +64,9 @@ func main() {
 	handlers := []httpserver.Handler{
 		statushandler.New(),
 	}
+	cfg := config.C()
+	_, Consumer := SetupSourceServices(cfg)
+	Consumer.ConsumeWriteKey(context.Background(), cfg.Source.NewSourceEventName, done, wg)
 
 	//----------------- Setup Tracer -----------------//
 	otelcfg := otela.Config{
@@ -85,4 +94,30 @@ func main() {
 
 	close(done)
 	wg.Wait()
+}
+
+func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consumer) {
+	rabbitadapter, err := rabbitadapter.New(cfg.RabbitMQ)
+	if err != nil {
+		panic(err)
+	}
+	sub := rabbitmq.NewRabbitMQAdapter(rabbitadapter)
+	if err != nil {
+		panic(err)
+	}
+	pub := rabbitmq.NewRabbitMQAdapter(rabbitadapter)
+	if err != nil {
+		panic(err)
+	}
+
+	adapter, err := redis.New(cfg.Redis)
+	if err != nil {
+		panic(err)
+	}
+
+	writekeyrepo := writekeyrepo.New(adapter)
+	writekeysvc := writekey.New(&pub, &sub, &writekeyrepo, cfg.Source)
+	eventhandler := sourceevent.New(&sub, writekeysvc)
+
+	return writekeysvc, *eventhandler
 }

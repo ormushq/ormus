@@ -4,6 +4,8 @@ source:
   http_server:
     port: 8080
     network: "tcp"
+  write_key_expiration: 120
+  new_source_event_name: "new-source-event"
   otel:
     endpoint: "otel_collector:4317"
     service_name: "source"
@@ -19,6 +21,11 @@ redis:
   host: 127.0.0.1
   db: 0
   password: ""
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  password: "guest"
+  username: "guest"
 etcd:
   port: 2379
   host: 127.0.0.1

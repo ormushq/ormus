@@ -15,5 +15,6 @@ type Config struct {
 	HTTPServer HTTPServer `koanf:"http_server"`
 	// TODO - add source, auth and etc configurations
 	Otel                    otela.Otel `koanf:"otel"`
-	WritekeyRedisExpiration uint       `koanf:"write_key_expiration_time"`
+	WriteKeyRedisExpiration uint       `koanf:"write_key_expiration"`
+	NewSourceEventName      string     `koanf:"new_source_event_name"`
 }

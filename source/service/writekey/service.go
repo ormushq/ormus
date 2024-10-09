@@ -2,53 +2,50 @@ package writekey
 
 import (
 	"context"
+	rabbitmq "github.com/ormushq/ormus/adapter/rabbitmq"
+	proto_source "github.com/ormushq/ormus/contract/go/source"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/ormushq/ormus/source"
-	"github.com/ormushq/ormus/source/params"
 )
 
-type Repository interface {
-	// TODO - implementation writekeyadapter
-	IsValidWriteKey(ctx context.Context, writeKey string) (bool, error)
+type WriteKeyRepo interface {
+	CreateNewWriteKey(ctx context.Context, WriteKey proto_source.NewSourceEvent, ExpirationTime uint) error
+	GetWriteKey(ctx context.Context, OwnerID string, ProjectID string) (*proto_source.NewSourceEvent, error)
 }
 
-type WriteKeyRepo interface {
-	CreateNewWriteKey(ctx context.Context, WriteKey params.WriteKey, ExpirationTime uint) error
-	GetWriteKey(ctx context.Context, OwnerID string, ProjectID string) (*params.WriteKey, error)
+type PublisherRepo interface {
+	Publish(queueName string, message []byte) error
+	Close()
+}
+
+type ConsumerRepo interface {
+	Subscribe(queueName string) (chan *rabbitmq.Message, error)
+	Close()
+	Ack(msg *rabbitmq.Message) error
 }
 
 type Service struct {
-	repo         Repository
+	Publisher    PublisherRepo
+	Consumer     ConsumerRepo
 	WriteKeyRepo WriteKeyRepo
 	config       source.Config
 }
 
-func New(repo Repository) Service {
+func New(Publisher PublisherRepo, Consumer ConsumerRepo, WriteKeyRepo WriteKeyRepo, config source.Config) Service {
 	return Service{
-		repo: repo,
+		Publisher:    Publisher,
+		Consumer:     Consumer,
+		WriteKeyRepo: WriteKeyRepo,
+		config:       config,
 	}
-}
-
-func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
-	// TODO - How errmsg handling ? Rich-errmsg or ...?
-	isValid, err := s.repo.IsValidWriteKey(ctx, writeKey)
-	if err != nil {
-		// TODO - logger
-		return false, err
-	}
-	if !isValid {
-		return false, err
-	}
-
-	return true, nil
 }
 
 func (s Service) CreateNewWriteKey(ctx context.Context, OwnerID string, ProjectID string, WriteKey string) error {
-	err := s.WriteKeyRepo.CreateNewWriteKey(ctx, params.WriteKey{
-		ProjectID: ProjectID,
-		OwnerID:   OwnerID,
+	err := s.WriteKeyRepo.CreateNewWriteKey(ctx, proto_source.NewSourceEvent{
+		ProjectId: ProjectID,
+		OwnerId:   OwnerID,
 		WriteKey:  WriteKey,
-	}, s.config.WritekeyRedisExpiration)
+	}, s.config.WriteKeyRedisExpiration)
 	if err != nil {
 		return richerror.New("source.service").WithWrappedError(err)
 	}
