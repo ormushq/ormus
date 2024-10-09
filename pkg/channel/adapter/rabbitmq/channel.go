@@ -27,6 +27,7 @@ type rabbitmqChannel struct {
 	queue          string
 	numberInstants int
 	maxRetryPolicy int
+	bufferSize     int
 }
 type rabbitmqChannelParams struct {
 	mode           channel.Mode
@@ -93,6 +94,7 @@ func newChannelWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitG
 		maxRetryPolicy: rabbitmqChannelParams.maxRetryPolicy,
 		inputChannel:   make(chan []byte, rabbitmqChannelParams.bufferSize),
 		outputChannel:  make(chan channel.Message, rabbitmqChannelParams.bufferSize),
+		bufferSize:     rabbitmqChannelParams.bufferSize,
 	}
 	rc.startWithContext(ctx)
 	span.AddEvent("rabbitmq-channel-started")
@@ -274,6 +276,14 @@ func (rc *rabbitmqChannel) startOutputWitContext(ctx context.Context) {
 		}
 		span.AddEvent("channel-opened")
 
+		err = ch.Qos(rc.bufferSize, 0, false)
+		if err != nil {
+			logger.L().Error(errmsg.ErrFailedToSetQosOnChannel)
+			rc.callMeNextTime(rc.startOutput)
+
+			return
+		}
+
 		defer func(ch *amqp.Channel) {
 			err = ch.Close()
 			if err != nil {
@@ -321,17 +331,12 @@ func (rc *rabbitmqChannel) startOutputWitContext(ctx context.Context) {
 
 				return
 			case msg := <-msgs:
-				rc.wg.Add(1)
-				go func() {
-					defer rc.wg.Done()
-
-					rc.outputChannel <- channel.Message{
-						Body: msg.Body,
-						Ack: func() error {
-							return msg.Ack(false)
-						},
-					}
-				}()
+				rc.outputChannel <- channel.Message{
+					Body: msg.Body,
+					Ack: func() error {
+						return msg.Ack(false)
+					},
+				}
 			}
 		}
 	}()
