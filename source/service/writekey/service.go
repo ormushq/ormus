@@ -2,27 +2,33 @@ package writekey
 
 import (
 	"context"
+	"github.com/ormushq/ormus/pkg/richerror"
+	"github.com/ormushq/ormus/source"
+	"github.com/ormushq/ormus/source/params"
 )
 
-// Repository is an interface representing what methods should be implemented by the repository.
 type Repository interface {
-	// TODO - implementation redis
+	// TODO - implementation writekeyadapter
 	IsValidWriteKey(ctx context.Context, writeKey string) (bool, error)
 }
 
-// Service show dependencies writeKey authservice.
-type Service struct {
-	repo Repository
+type WriteKeyRepo interface {
+	CreateNewWriteKey(ctx context.Context, WriteKey params.WriteKey, ExpirationTime uint) error
+	GetWriteKey(ctx context.Context, OwnerID string, ProjectID string) (*params.WriteKey, error)
 }
 
-// Constructor writeKey authservice.
+type Service struct {
+	repo         Repository
+	WriteKeyRepo WriteKeyRepo
+	config       source.Config
+}
+
 func New(repo Repository) Service {
 	return Service{
 		repo: repo,
 	}
 }
 
-// IsValid checks whether the writeKey is valid or not.
 func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
 	// TODO - How errmsg handling ? Rich-errmsg or ...?
 	isValid, err := s.repo.IsValidWriteKey(ctx, writeKey)
@@ -35,4 +41,16 @@ func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (s Service) CreateNewWriteKey(ctx context.Context, OwnerID string, ProjectID string, WriteKey string) error {
+	err := s.WriteKeyRepo.CreateNewWriteKey(ctx, params.WriteKey{
+		ProjectID: ProjectID,
+		OwnerID:   OwnerID,
+		WriteKey:  WriteKey,
+	}, s.config.WritekeyRedisExpiration)
+	if err != nil {
+		return richerror.New("source.service").WithWrappedError(err)
+	}
+	return nil
 }

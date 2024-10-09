@@ -1,6 +1,8 @@
 package source
 
-import "github.com/ormushq/ormus/adapter/otela"
+import (
+	"github.com/ormushq/ormus/adapter/otela"
+)
 
 // HTTPServer is the main object for http configurations.
 type HTTPServer struct {
@@ -12,5 +14,6 @@ type HTTPServer struct {
 type Config struct {
 	HTTPServer HTTPServer `koanf:"http_server"`
 	// TODO - add source, auth and etc configurations
-	Otel otela.Otel `koanf:"otel"`
+	Otel                    otela.Otel `koanf:"otel"`
+	WritekeyRedisExpiration uint       `koanf:"write_key_expiration_time"`
 }
