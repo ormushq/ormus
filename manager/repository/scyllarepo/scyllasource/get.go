@@ -8,7 +8,7 @@ import (
 
 func init() {
 	statements["GetWithId"] = scyllarepo.Statement{
-		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM sources where id = ? and deleted = false;",
+		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM sources where id = ? and deleted = false  ALLOW FILTERING;",
 		Values: []string{"id"},
 	}
 }
@@ -23,10 +23,10 @@ func (r Repository) GetWithID(id string) (entity.Source, error) {
 		"id": id,
 	})
 
-	var project entity.Source
-	if err := query.Get(&project); err != nil {
+	var source entity.Source
+	if err := query.Get(&source); err != nil {
 		return entity.Source{}, err
 	}
 
-	return project, nil
+	return source, nil
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/ormushq/ormus/manager/delivery/httpserver/userhandler"
 )
 
-type SetupServicesResponse struct {
+type SetupServices struct {
 	UserHandler    userhandler.Handler
 	ProjectHandler projecthandler.Handler
 	SourceHandler  sourcehandler.Handler
@@ -28,7 +28,7 @@ type Server struct {
 	Router         *echo.Echo
 }
 
-func New(cfg manager.Config, setupSvc SetupServicesResponse) *Server {
+func New(cfg manager.Config, setupSvc SetupServices) *Server {
 	return &Server{
 		config:         cfg,
 		userHandler:    setupSvc.UserHandler,

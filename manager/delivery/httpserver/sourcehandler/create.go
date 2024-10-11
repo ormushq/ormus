@@ -2,6 +2,9 @@ package sourcehandler
 
 import (
 	"errors"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
 	"github.com/ormushq/ormus/manager/service/authservice"
@@ -9,9 +12,6 @@ import (
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/httpmsg"
 	"github.com/ormushq/ormus/pkg/httputil"
-	"net/http"
-
-	"github.com/labstack/echo/v4"
 )
 
 // Create godoc
@@ -44,7 +44,6 @@ func (h Handler) Create(ctx echo.Context) error {
 
 	req.UserID = claim.UserID
 
-	// call save method in service
 	resp, err := h.sourceSvc.CreateSource(req)
 	logger.LogError(err)
 	var vErr *validator.Error

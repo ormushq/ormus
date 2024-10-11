@@ -106,7 +106,6 @@ func Test_CreateAccessToken(t *testing.T) {
 
 			// 2. execution
 			token, err := jwt.CreateAccessToken(tc.user)
-
 			// 3. assertion
 			if err != nil {
 				assert.Error(t, tc.err, err)

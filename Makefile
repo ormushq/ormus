@@ -2,6 +2,8 @@
 
 ROOT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
+OS := $(shell uname -s)
+
 lint:
 	which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
 	golangci-lint run --config=$(ROOT)/.golangci.yml $(ROOT)/...
@@ -15,6 +17,9 @@ docker-test-up:
 docker-test-down:
 	docker compose -f $(ROOT)/deployment/test/docker-compose.yml down
 
+docker-local-up:
+	sh -c "$(ROOT)/deployment/local/docker-compose.bash up -d"
+
 logs:
 	docker compose -f $(ROOT)/deployment/test/docker-compose.yml logs
 
@@ -27,7 +32,17 @@ format:
 	@golangci-lint run --fix
 
 protobuf:
+ifneq (,$(findstring NT,$(OS)))
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/event/event.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/task/task.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/internalevent/internalevent.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/project/project.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/source/source.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/user/user.proto
+	protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative  --go_out=contract/go --go_opt=paths=source_relative --proto_path=./contract/protobuf/ contract/protobuf/user/user_info.proto
+else
 	find contract/protobuf/ -name '*.proto' | xargs -I {} protoc --go-grpc_out=contract/go/ --go-grpc_opt=paths=source_relative --go_out=contract/go --go_opt=paths=source_relative --proto_path=contract/protobuf/ {}
+endif
 
 swagger-gen:
 	@which swag || (go install github.com/swaggo/swag/cmd/swag@latest)

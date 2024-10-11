@@ -9,9 +9,6 @@ type ValidatorError struct {
 	Fields map[string]string `json:"error"`
 	Err    error             `json:"message"`
 }
-type Repo interface {
-	IsExist(id string) (bool, error)
-}
 
 func (v ValidatorError) Error() string {
 	var err string
@@ -23,12 +20,16 @@ func (v ValidatorError) Error() string {
 	return err
 }
 
-type Validator struct {
-	sourceRepo  Repo
-	projectRepo Repo
+type Repository interface {
+	Exist(id string) (bool, error)
 }
 
-func New(sourceRepo, projectRepo Repo) Validator {
+type Validator struct {
+	sourceRepo  Repository
+	projectRepo Repository
+}
+
+func New(sourceRepo, projectRepo Repository) Validator {
 	return Validator{
 		sourceRepo:  sourceRepo,
 		projectRepo: projectRepo,
@@ -41,7 +42,7 @@ func (v Validator) isSourceExist(value interface{}) error {
 		return errors.New("error while reflection interface")
 	}
 
-	exist, err := v.sourceRepo.IsExist(s)
+	exist, err := v.sourceRepo.Exist(s)
 	if err != nil {
 		return err
 	}
@@ -59,7 +60,7 @@ func (v Validator) isProjectExist(value interface{}) error {
 		return errors.New("error while reflection interface")
 	}
 
-	exist, err := v.projectRepo.IsExist(s)
+	exist, err := v.projectRepo.Exist(s)
 	if err != nil {
 		return err
 	}

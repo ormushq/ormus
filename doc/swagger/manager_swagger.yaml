@@ -22,11 +22,11 @@ definitions:
     type: object
   entity.Source:
     properties:
-      createdAt:
+      created_at:
         type: string
       deleted:
         type: boolean
-      deletedAt:
+      deleted_at:
         type: string
       description:
         type: string
@@ -36,15 +36,17 @@ definitions:
         $ref: '#/definitions/entity.SourceMetadata'
       name:
         type: string
-      ownerID:
+      owner_id:
         type: string
-      projectID:
+      project_id:
         type: string
       status:
         $ref: '#/definitions/entity.Status'
-      updatedAt:
+      token_id:
         type: string
-      writeKey:
+      updated_at:
+        type: string
+      write_key:
         type: string
     type: object
   entity.SourceMetadata:
@@ -178,10 +180,10 @@ definitions:
   sourceparam.CreateRequest:
     properties:
       description:
-        example: description
+        example: test description
         type: string
       name:
-        example: test
+        example: test name
         type: string
       project_id:
         type: string
@@ -190,6 +192,11 @@ definitions:
     properties:
       source:
         $ref: '#/definitions/entity.Source'
+    type: object
+  sourceparam.DeleteResponse:
+    properties:
+      message:
+        type: string
     type: object
   sourceparam.ListResponse:
     properties:
@@ -203,6 +210,23 @@ definitions:
         items:
           $ref: '#/definitions/entity.Source'
         type: array
+    type: object
+  sourceparam.UpdateRequest:
+    properties:
+      description:
+        example: updated description
+        type: string
+      name:
+        example: updated name
+        type: string
+      status:
+        example: active
+        type: string
+    type: object
+  sourceparam.UpdateResponse:
+    properties:
+      source:
+        $ref: '#/definitions/entity.Source'
     type: object
 info:
   contact:
@@ -444,6 +468,81 @@ paths:
       security:
       - JWTToken: []
       summary: Create source
+      tags:
+      - Source
+  /sources/{source_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete source
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sourceparam.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Delete source
+      tags:
+      - Source
+    post:
+      consumes:
+      - application/json
+      description: Update source
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      - description: Update source request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/sourceparam.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.UpdateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Update source
       tags:
       - Source
   /users/login:
