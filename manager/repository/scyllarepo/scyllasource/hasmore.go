@@ -7,7 +7,7 @@ import (
 
 func init() {
 	statements["HaseMore"] = scyllarepo.Statement{
-		Query:  "SELECT COUNT(id) as total FROM sources where owner_id = ? and token(id) > ?;",
+		Query:  "SELECT COUNT(id) as total FROM sources where owner_id = ? and token(id) > ?  ALLOW FILTERING;",
 		Values: []string{"owner_id", "last_token"},
 	}
 }

@@ -13,7 +13,7 @@ func init() {
 	}
 }
 
-func (r Repository) IsExist(sourceID string) (bool, error) {
+func (r Repository) Exist(sourceID string) (bool, error) {
 	var id string
 	query, err := r.db.GetStatement(statements["IsSourceExist"])
 	if err != nil {

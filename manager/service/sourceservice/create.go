@@ -33,6 +33,7 @@ func (s Service) CreateSource(req sourceparam.CreateRequest) (sourceparam.Create
 	source, err = s.repo.Create(source)
 	if err != nil {
 		logger.L().Error(err.Error())
+
 		return sourceparam.CreateResponse{}, richerror.New(op).WithWrappedError(err).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 

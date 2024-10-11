@@ -2,16 +2,15 @@ package sourcevalidator
 
 import (
 	"errors"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
-
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateUpdateSourceForm(req sourceparam.UpdateRequest) *validator.Error {
+func (v Validator) ValidateUpdateRequest(req sourceparam.UpdateRequest) *validator.Error {
 	const op = "sourcevalidator.ValidateUpdateRequest"
 
 	minNameLength := 5
@@ -51,15 +50,14 @@ func (v Validator) ValidateUpdateSourceForm(req sourceparam.UpdateRequest) *vali
 }
 
 func (v Validator) validateStatus(value interface{}) error {
-	s, ok := value.(entity.Status)
+	s, ok := value.(string)
 	if !ok {
 		return errors.New("error while reflection interface")
 	}
-
 	switch s {
-	case "active":
+	case string(entity.SourceStatusActive):
 		return nil
-	case "not active":
+	case string(entity.SourceStatusNotActive):
 		return nil
 	}
 

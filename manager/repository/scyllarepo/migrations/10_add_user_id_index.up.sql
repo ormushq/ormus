@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS user_id_idx ON projects (user_id);

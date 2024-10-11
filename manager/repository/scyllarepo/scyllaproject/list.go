@@ -8,7 +8,7 @@ import (
 
 func init() {
 	statements["List"] = scyllarepo.Statement{
-		Query:  "SELECT id,token(id) as token_id, user_id, name, description, created_at, updated_at, deleted_at FROM projects where user_id = ?  and token(id) >  ?  and deleted = false  LIMIT ?;",
+		Query:  "SELECT id,token(id) as token_id, user_id, name, description, created_at, updated_at, deleted_at FROM projects where user_id = ?  and token(id) >  ?  and deleted = false  LIMIT ? ALLOW FILTERING;",
 		Values: []string{"user_id", "last_token", "limit"},
 	}
 }

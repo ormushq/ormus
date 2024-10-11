@@ -1,39 +1,65 @@
 package sourcehandler
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
+	"github.com/ormushq/ormus/manager/service/authservice"
+	"github.com/ormushq/ormus/manager/validator"
+	"github.com/ormushq/ormus/pkg/errmsg"
+	"github.com/ormushq/ormus/pkg/httpmsg"
+	"github.com/ormushq/ormus/pkg/httputil"
 )
 
+// Update godoc
+//
+//	@Summary		Update source
+//	@Description	Update source
+//	@Tags			Source
+//	@Accept			json
+//	@Produce		json
+//	@Param			source_id	path		string						true	"Source identifier"
+//	@Param			request		body		sourceparam.UpdateRequest	true	"Update source request body"
+//	@Success		201			{object}	sourceparam.UpdateResponse
+//	@Failure		400			{object}	httputil.HTTPError
+//	@Failure		401			{object}	httputil.HTTPError
+//	@Failure		500			{object}	httputil.HTTPError
+//	@Security		JWTToken
+//	@Router			/sources/{source_id} [post]
 func (h Handler) Update(ctx echo.Context) error {
-	panic("implement me")
-
 	// get user id from context
-	//u := ctx.Get("userID")
-	//userID, ok := u.(string)
-	//if !ok {
-	//	return echo.NewHTTPError(http.StatusInternalServerError, EchoErrorMessage("can not get userID"))
-	//}
+	claim, ok := ctx.Get(h.authSvc.GetConfig().ContextKey).(*authservice.Claims)
+	if !ok {
+		return ctx.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid auth token",
+		})
+	}
 
-	// TODO  get project id ?
+	var req sourceparam.UpdateRequest
+	if err := ctx.Bind(&req); err != nil {
+		return httputil.NewError(ctx, http.StatusBadRequest, errmsg.ErrBadRequest)
+	}
 
-	// get source id
-	//sourceID := ctx.Param("sourceID")
+	req.UserID = claim.UserID
 
-	// binding addsource request form
-	//updateSourceReq := new(managerparam.UpdateSourceRequest)
-	//if err := ctx.Bind(updateSourceReq); err != nil {
-	//	return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
-	//}
+	resp, err := h.sourceSvc.Update(req)
+	logger.LogError(err)
+	var vErr *validator.Error
+	if errors.As(err, &vErr) {
+		msg, code := httpmsg.Error(vErr.Err)
 
-	//if err := h.validateSvc.ValidateUpdateSourceForm(updateSourceReq); err != nil {
-	//	return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
-	//}
+		return ctx.JSON(code, echo.Map{
+			"message": msg,
+			"errors":  vErr.Fields,
+		})
+	}
 
-	// call save method in service
-	//sourceResp, err := h.sourceSvc.UpdateSource(userID, sourceID, updateSourceReq)
-	//if err != nil {
-	//	return echo.NewHTTPError(http.StatusBadRequest, EchoErrorMessage(err.Error()))
-	//}
-	//
-	//return ctx.JSON(http.StatusCreated, sourceResp)
+	if err != nil {
+		return httputil.NewErrorWithError(ctx, err)
+	}
+
+	return ctx.JSON(http.StatusOK, resp)
 }

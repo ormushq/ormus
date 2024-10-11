@@ -4,15 +4,19 @@ import (
 	"errors"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
+	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
-	if err := validation.Validate(id,
-		validation.By(v.isSourceExist),
-	); err != nil {
+func (v Validator) ValidateDeleteRequest(req sourceparam.DeleteRequest) *validator.Error {
+	const op = "sourcevalidator.ValidateDeleteRequest"
 
+	if err := validation.ValidateStruct(&req,
+		validation.Field(&req.UserID, validation.Required),
+		validation.Field(&req.SourceID, validation.Required, validation.By(v.isSourceExist)),
+	); err != nil {
 		fieldErr := make(map[string]string)
 
 		var errV validation.Errors
@@ -26,10 +30,10 @@ func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
 			}
 		}
 
-		return &ValidatorError{
+		return &validator.Error{
 			Fields: fieldErr,
-			Err: richerror.New("sourcevalidator.ValidateIDToDelete").WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
-				WhitMeta(map[string]interface{}{"request:": id}).WithWrappedError(err),
+			Err: richerror.New(op).WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
+				WhitMeta(map[string]interface{}{"request:": req}).WithWrappedError(err),
 		}
 	}
 
