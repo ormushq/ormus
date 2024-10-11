@@ -272,6 +272,121 @@ const docTemplatemanager = `{
                 }
             }
         },
+        "/sources": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "List sources",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "List sources",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Last token fetched",
+                        "name": "last_token_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Per page count",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Create source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Create source",
+                "parameters": [
+                    {
+                        "description": "Create source request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.CreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "security": [
@@ -388,8 +503,11 @@ const docTemplatemanager = `{
                 "created_at": {
                     "type": "string"
                 },
+                "deleted": {
+                    "type": "boolean"
+                },
                 "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -406,10 +524,79 @@ const docTemplatemanager = `{
                 "updated_at": {
                     "type": "string"
                 },
-                "user": {
+                "user_id": {
                     "type": "string"
                 }
             }
+        },
+        "entity.Source": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/entity.SourceMetadata"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerID": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/entity.Status"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "writeKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.SourceMetadata": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Status": {
+            "type": "string",
+            "enum": [
+                "active",
+                "not active"
+            ],
+            "x-enum-varnames": [
+                "SourceStatusActive",
+                "SourceStatusNotActive"
+            ]
         },
         "httputil.HTTPError": {
             "type": "object",
@@ -575,15 +762,47 @@ const docTemplatemanager = `{
                 }
             }
         },
-        "sql.NullTime": {
+        "sourceparam.CreateRequest": {
             "type": "object",
             "properties": {
-                "time": {
-                    "type": "string"
+                "description": {
+                    "type": "string",
+                    "example": "description"
                 },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
+                "name": {
+                    "type": "string",
+                    "example": "test"
+                },
+                "project_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "sourceparam.CreateResponse": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "$ref": "#/definitions/entity.Source"
+                }
+            }
+        },
+        "sourceparam.ListResponse": {
+            "type": "object",
+            "properties": {
+                "has_more": {
                     "type": "boolean"
+                },
+                "last_token": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Source"
+                    }
                 }
             }
         }

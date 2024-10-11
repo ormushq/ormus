@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
@@ -8,19 +8,19 @@ import (
 
 func init() {
 	statements["List"] = scyllarepo.Statement{
-		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM sources where owner_id = ?  and token(id) >  ?  and deleted = false  LIMIT ?;",
+		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM sources where owner_id = ? AND token(id) >  ?  AND deleted = false  LIMIT ?;",
 		Values: []string{"owner_id", "last_token", "limit"},
 	}
 }
 
-func (r Repository) List(userID, lastToken string, limit int) ([]entity.Source, error) {
+func (r Repository) List(ownerID string, lastToken int64, limit int) ([]entity.Source, error) {
 	query, err := r.db.GetStatement(statements["List"])
 	if err != nil {
 		return nil, err
 	}
 
 	query.BindMap(qb.M{
-		"owner_id":   userID,
+		"owner_id":   ownerID,
 		"limit":      limit,
 		"last_token": lastToken,
 	})

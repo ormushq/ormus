@@ -28,7 +28,7 @@ import (
 //	@Failure		401				{object}	httputil.HTTPError
 //	@Failure		500				{object}	httputil.HTTPError
 //	@Security		JWTToken
-//	@Router			/projects [get]
+//	@Router			/sources [get]
 func (h Handler) List(ctx echo.Context) error {
 	// get user id from context
 	claim, ok := ctx.Get(h.authSvc.GetConfig().ContextKey).(*authservice.Claims)

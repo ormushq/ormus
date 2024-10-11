@@ -2,6 +2,7 @@ package sourcevalidator
 
 import (
 	"errors"
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -16,12 +17,12 @@ func (v Validator) ValidateCreateRequest(req sourceparam.CreateRequest) *validat
 
 	minDescriptionLength := 5
 	maxDescriptionLength := 100
-
+	logger.L().Debug("Request", req)
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength), validation.By(v.isSourceAlreadyCreated)),
+		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(&req.ProjectID, validation.Required, validation.By(v.validateULID)),
-		validation.Field(&req.UserID, validation.Required, validation.By(v.validateULID)),
+		validation.Field(&req.ProjectID, validation.Required, validation.By(v.isProjectExist)),
+		validation.Field(&req.UserID, validation.Required),
 	); err != nil {
 
 		fieldErr := make(map[string]string)

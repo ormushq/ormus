@@ -10,7 +10,7 @@ import (
 
 func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
 	if err := validation.Validate(id,
-		validation.By(v.isSourceAlreadyCreated),
+		validation.By(v.isSourceExist),
 	); err != nil {
 
 		fieldErr := make(map[string]string)
@@ -31,24 +31,6 @@ func (v Validator) ValidateIDToDelete(id string) *ValidatorError {
 			Err: richerror.New("sourcevalidator.ValidateIDToDelete").WithMessage(errmsg.ErrorMsgInvalidInput).WhitKind(richerror.KindInvalid).
 				WhitMeta(map[string]interface{}{"request:": id}).WithWrappedError(err),
 		}
-	}
-
-	return nil
-}
-
-func (v Validator) isSourceAlreadyCreated(value interface{}) error {
-	s, ok := value.(string)
-	if !ok {
-		return errors.New("error while reflection interface")
-	}
-
-	exist, err := v.repo.IsSourceAlreadyCreatedByName(s)
-	if err != nil {
-		return err
-	}
-
-	if exist {
-		return errors.New("this name is already usesd")
 	}
 
 	return nil

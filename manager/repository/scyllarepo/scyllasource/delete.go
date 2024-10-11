@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"time"
@@ -10,7 +10,7 @@ import (
 
 func init() {
 	statements["Delete"] = scyllarepo.Statement{
-		Query:  "update source set deleted_at = ?,deleted = ?,status = ? where id = ?",
+		Query:  "update sources set deleted_at = ?,deleted = ?,status = ? where id = ?",
 		Values: []string{"deleted_at", "deleted", "status", "id"},
 	}
 }

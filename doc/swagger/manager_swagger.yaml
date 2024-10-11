@@ -3,8 +3,10 @@ definitions:
     properties:
       created_at:
         type: string
+      deleted:
+        type: boolean
       deleted_at:
-        $ref: '#/definitions/sql.NullTime'
+        type: string
       description:
         type: string
       id:
@@ -15,9 +17,55 @@ definitions:
         type: string
       updated_at:
         type: string
-      user:
+      user_id:
         type: string
     type: object
+  entity.Source:
+    properties:
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      deletedAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      metadata:
+        $ref: '#/definitions/entity.SourceMetadata'
+      name:
+        type: string
+      ownerID:
+        type: string
+      projectID:
+        type: string
+      status:
+        $ref: '#/definitions/entity.Status'
+      updatedAt:
+        type: string
+      writeKey:
+        type: string
+    type: object
+  entity.SourceMetadata:
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  entity.Status:
+    enum:
+    - active
+    - not active
+    type: string
+    x-enum-varnames:
+    - SourceStatusActive
+    - SourceStatusNotActive
   httputil.HTTPError:
     properties:
       message:
@@ -127,13 +175,34 @@ definitions:
       project:
         $ref: '#/definitions/entity.Project'
     type: object
-  sql.NullTime:
+  sourceparam.CreateRequest:
     properties:
-      time:
+      description:
+        example: description
         type: string
-      valid:
-        description: Valid is true if Time is not NULL
+      name:
+        example: test
+        type: string
+      project_id:
+        type: string
+    type: object
+  sourceparam.CreateResponse:
+    properties:
+      source:
+        $ref: '#/definitions/entity.Source'
+    type: object
+  sourceparam.ListResponse:
+    properties:
+      has_more:
         type: boolean
+      last_token:
+        type: integer
+      per_page:
+        type: integer
+      sources:
+        items:
+          $ref: '#/definitions/entity.Source'
+        type: array
     type: object
 info:
   contact:
@@ -304,6 +373,79 @@ paths:
       summary: Update project
       tags:
       - Project
+  /sources:
+    get:
+      consumes:
+      - application/json
+      description: List sources
+      parameters:
+      - description: Last token fetched
+        in: query
+        name: last_token_id
+        type: string
+      - description: Per page count
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sourceparam.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: List sources
+      tags:
+      - Source
+    post:
+      consumes:
+      - application/json
+      description: Create source
+      parameters:
+      - description: Create source request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/sourceparam.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Create source
+      tags:
+      - Source
   /users/login:
     post:
       consumes:

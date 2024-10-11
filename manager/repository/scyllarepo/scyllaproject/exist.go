@@ -13,7 +13,7 @@ func init() {
 	}
 }
 
-func (r Repository) IsProjectExist(projectID string) (bool, error) {
+func (r Repository) IsExist(projectID string) (bool, error) {
 	var id string
 	query, err := r.db.GetStatement(statements["IsProjectExist"])
 	if err != nil {
