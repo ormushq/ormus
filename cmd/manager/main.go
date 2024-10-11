@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/ormushq/ormus/manager/delivery/httpserver/sourcehandler"
+	"github.com/ormushq/ormus/manager/repository/scyllarepo/scyllasource"
+	"github.com/ormushq/ormus/manager/service/sourceservice"
+	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
 	"log/slog"
 	"sync"
 
@@ -64,6 +68,11 @@ func main() {
 	projectSvc := projectservice.New(projectRepo, internalBroker, projectValidator)
 	projectHandler := projecthandler.New(authSvc, projectSvc)
 
+	sourceRepo := scyllasource.New(scylla)
+	sourceValidator := sourcevalidator.New(sourceRepo, projectRepo)
+	sourceSvc := sourceservice.New(sourceRepo, sourceValidator)
+	sourceHandler := sourcehandler.New(authSvc, sourceSvc)
+
 	userRepo := scyllauser.New(scylla)
 	userValidator := uservalidator.New(userRepo)
 	userSvc := userservice.New(authSvc, userRepo, internalBroker, userValidator)
@@ -74,6 +83,7 @@ func main() {
 	server := httpserver.New(cfg, httpserver.SetupServicesResponse{
 		UserHandler:    userHand,
 		ProjectHandler: projectHandler,
+		SourceHandler:  sourceHandler,
 	})
 
 	server.Server()

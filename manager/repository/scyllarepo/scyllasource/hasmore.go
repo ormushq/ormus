@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/manager/repository/scyllarepo"
@@ -7,12 +7,12 @@ import (
 
 func init() {
 	statements["HaseMore"] = scyllarepo.Statement{
-		Query:  "SELECT COUNT(id) as total FROM source where owner_id = ? and token(id) > ?;",
+		Query:  "SELECT COUNT(id) as total FROM sources where owner_id = ? and token(id) > ?;",
 		Values: []string{"owner_id", "last_token"},
 	}
 }
 
-func (r Repository) HaseMore(ownerID, lastToken string, perPage int) (bool, error) {
+func (r Repository) HaseMore(ownerID string, lastToken int64, perPage int) (bool, error) {
 	query, err := r.db.GetStatement(statements["HaseMore"])
 	if err != nil {
 		return false, err

@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/logger"
@@ -8,12 +8,12 @@ import (
 
 func init() {
 	statements["IsSourceExist"] = scyllarepo.Statement{
-		Query:  "SELECT id FROM source WHERE id = ? LIMIT 1",
+		Query:  "SELECT id FROM sources WHERE id = ? LIMIT 1",
 		Values: []string{"id"},
 	}
 }
 
-func (r Repository) IsSourceExist(sourceID string) (bool, error) {
+func (r Repository) IsExist(sourceID string) (bool, error) {
 	var id string
 	query, err := r.db.GetStatement(statements["IsSourceExist"])
 	if err != nil {

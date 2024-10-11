@@ -23,7 +23,7 @@ func (v Validator) ValidateUpdateSourceForm(req sourceparam.UpdateRequest) *vali
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(&req.UserID, validation.Required, validation.By(v.validateULID)),
+		validation.Field(&req.UserID, validation.Required),
 		validation.Field(&req.Status, validation.Required, validation.By(v.validateStatus)),
 	); err != nil {
 

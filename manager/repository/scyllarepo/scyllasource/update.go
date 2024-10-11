@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"time"
@@ -10,7 +10,7 @@ import (
 
 func init() {
 	statements["Update"] = scyllarepo.Statement{
-		Query:  "update source set name = ?,description = ?, status = ?, updated_at = ? where id = ?",
+		Query:  "update sources set name = ?,description = ?, status = ?, updated_at = ? where id = ?",
 		Values: []string{"name", "description", "status", "updated_at", "id"},
 	}
 }

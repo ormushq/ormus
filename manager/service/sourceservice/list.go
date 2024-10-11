@@ -1,6 +1,7 @@
 package sourceservice
 
 import (
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
 	"github.com/ormushq/ormus/pkg/richerror"
 )
@@ -9,11 +10,13 @@ func (s Service) List(req sourceparam.ListRequest) (sourceparam.ListResponse, er
 	const op = "projectService.List"
 
 	sources, err := s.repo.List(req.UserID, req.LastTokenID, req.PerPage)
+	logger.LogError(err)
 	if err != nil {
 		return sourceparam.ListResponse{}, richerror.New(op).WithWrappedError(err)
 	}
 
 	haseMore, err := s.repo.HaseMore(req.UserID, req.LastTokenID, req.PerPage)
+	logger.LogError(err)
 	if err != nil {
 		return sourceparam.ListResponse{}, richerror.New(op).WithWrappedError(err)
 	}

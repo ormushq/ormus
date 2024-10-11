@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"time"
@@ -11,7 +11,7 @@ import (
 
 func init() {
 	statements["Create"] = scyllarepo.Statement{
-		Query:  "Insert into source(id, write_key, name, description, project_id, owner_id, status, created_at,updated_at, deleted)values(?,?,?,?,?,?,?)",
+		Query:  "Insert into sources(id, write_key, name, description, project_id, owner_id, status, created_at,updated_at, deleted)values(?,?,?,?,?,?,?,?,?,?)",
 		Values: []string{"id", "write_key", "name", "description", "project_id", "owner_id", "status", "created_at", "updated_at", "deleted"},
 	}
 }

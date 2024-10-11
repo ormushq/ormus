@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sources (
     project_id TEXT,
     owner_id TEXT,
     status TEXT,
-    create_at TIMESTAMP,
-    update_at TIMESTAMP,
-    delete_at TIMESTAMP
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );

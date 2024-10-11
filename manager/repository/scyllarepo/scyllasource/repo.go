@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/manager/repository/scyllarepo"

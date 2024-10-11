@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
@@ -8,24 +8,24 @@ import (
 
 func init() {
 	statements["GetWithId"] = scyllarepo.Statement{
-		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM source where id = ? and deleted = false;",
+		Query:  "SELECT id,token(id) as token_id, write_key, name, description, project_id, owner_id, status, created_at, updated_at, deleted_at FROM sources where id = ? and deleted = false;",
 		Values: []string{"id"},
 	}
 }
 
-func (r Repository) GetWithID(id string) (entity.Project, error) {
+func (r Repository) GetWithID(id string) (entity.Source, error) {
 	query, err := r.db.GetStatement(statements["GetWithId"])
 	if err != nil {
-		return entity.Project{}, err
+		return entity.Source{}, err
 	}
 
 	query.BindMap(qb.M{
 		"id": id,
 	})
 
-	var project entity.Project
+	var project entity.Source
 	if err := query.Get(&project); err != nil {
-		return entity.Project{}, err
+		return entity.Source{}, err
 	}
 
 	return project, nil
