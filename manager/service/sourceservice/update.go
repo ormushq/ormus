@@ -27,6 +27,7 @@ func (s Service) Update(req sourceparam.UpdateRequest) (sourceparam.UpdateRespon
 	switch req.Status {
 	case string(entity.SourceStatusActive):
 		source.Status = entity.SourceStatusActive
+		break
 	case string(entity.SourceStatusNotActive):
 		source.Status = entity.SourceStatusNotActive
 	}
