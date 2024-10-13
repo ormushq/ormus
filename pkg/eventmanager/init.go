@@ -12,6 +12,7 @@ func NewWriteKeyGeneratedEvent(ctx context.Context, ev *internalevent.WriteKeyGe
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
 	return &internalevent.Event{
 		EventName:     internalevent.EventName_EVENT_NAME_WRITE_KEY_GENERATED,
 		Time:          timestamppb.New(time.Now()),
@@ -24,6 +25,8 @@ func NewUserCreatedEvent(ctx context.Context, ev *internalevent.UserCreatedEvent
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
 		EventName:     internalevent.EventName_EVENT_NAME_USER_CREATED,
 		Time:          timestamppb.New(time.Now()),
@@ -36,6 +39,8 @@ func NewProjectCreatedEvent(ctx context.Context, ev *internalevent.ProjectCreate
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
 		EventName:     internalevent.EventName_EVENT_NAME_PROJECT_CREATED,
 		Time:          timestamppb.New(time.Now()),
@@ -48,6 +53,8 @@ func NewTaskCreatedEvent(ctx context.Context, ev *internalevent.TaskCreatedEvent
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
 		EventName:     internalevent.EventName_EVENT_NAME_TASK_CREATED,
 		Time:          timestamppb.New(time.Now()),
