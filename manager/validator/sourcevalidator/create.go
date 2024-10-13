@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
 	"github.com/ormushq/ormus/manager/validator"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -17,7 +16,6 @@ func (v Validator) ValidateCreateRequest(req sourceparam.CreateRequest) *validat
 
 	minDescriptionLength := 5
 	maxDescriptionLength := 100
-	logger.L().Debug("Request", req)
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
