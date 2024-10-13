@@ -1,4 +1,4 @@
-package scyllaproject
+package scyllasource
 
 import (
 	"github.com/ormushq/ormus/logger"
@@ -7,20 +7,20 @@ import (
 )
 
 func init() {
-	statements["IsProjectExist"] = scyllarepo.Statement{
-		Query:  "SELECT id FROM projects WHERE id = ? LIMIT 1",
+	statements["IsSourceExist"] = scyllarepo.Statement{
+		Query:  "SELECT id FROM sources WHERE id = ? LIMIT 1",
 		Values: []string{"id"},
 	}
 }
 
-func (r Repository) Exist(projectID string) (bool, error) {
+func (r Repository) Exist(sourceID string) (bool, error) {
 	var id string
-	query, err := r.db.GetStatement(statements["IsProjectExist"])
+	query, err := r.db.GetStatement(statements["IsSourceExist"])
 	if err != nil {
 		return false, err
 	}
 	query.BindMap(qb.M{
-		"id": projectID,
+		"id": sourceID,
 	})
 
 	found := query.Iter().Scan(&id)

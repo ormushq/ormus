@@ -2,23 +2,26 @@ package sourceservice
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
-	"github.com/ormushq/ormus/manager/managerparam"
+	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
 )
 
 type SourceRepo interface {
-	InsertSource(source *entity.Source) (*managerparam.AddSourceResponse, error)
-	UpdateSource(id string, source *entity.Source) (*managerparam.UpdateSourceResponse, error)
-	DeleteSource(id, userID string) error
-	GetUserSourceByID(ownerID, id string) (*entity.Source, error)
-	IsSourceAlreadyCreatedByName(name string) (bool, error)
+	Create(source entity.Source) (entity.Source, error)
+	GetWithID(id string) (entity.Source, error)
+	Update(source entity.Source) (entity.Source, error)
+	Delete(source entity.Source) error
+	List(ownerID string, lastToken int64, limit int) ([]entity.Source, error)
+	HaseMore(ownerID string, lastToken int64, perPage int) (bool, error)
 }
 
 type Service struct {
-	repo SourceRepo
+	repo      SourceRepo
+	validator sourcevalidator.Validator
 }
 
-func New(repo SourceRepo) *Service {
-	return &Service{
-		repo: repo,
+func New(repo SourceRepo, validator sourcevalidator.Validator) Service {
+	return Service{
+		repo:      repo,
+		validator: validator,
 	}
 }

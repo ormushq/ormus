@@ -70,9 +70,9 @@ func (m *MockRepo) InsertSource(source *entity.Source) (*managerparam.AddSourceR
 		ProjectID:   source.ProjectID,
 		OwnerID:     source.OwnerID,
 		Status:      source.Status,
-		CreateAt:    source.CreateAt,
-		UpdateAt:    source.UpdateAt,
-		DeleteAt:    source.DeleteAt,
+		CreateAt:    source.CreatedAt,
+		UpdateAt:    source.UpdatedAt,
+		DeleteAt:    source.DeletedAt,
 	}, nil
 }
 
@@ -93,9 +93,9 @@ func (m *MockRepo) UpdateSource(id string, source *entity.Source) (*managerparam
 				ProjectID:   source.ProjectID,
 				OwnerID:     source.OwnerID,
 				Status:      source.Status,
-				CreateAt:    source.CreateAt,
-				UpdateAt:    source.UpdateAt,
-				DeleteAt:    source.DeleteAt,
+				CreateAt:    source.CreatedAt,
+				UpdateAt:    source.UpdatedAt,
+				DeleteAt:    source.DeletedAt,
 			}, nil
 		}
 	}

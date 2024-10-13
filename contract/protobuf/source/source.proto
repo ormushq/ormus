@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package source;
-option go_package = "github.com/ormushq/ormus/contract/go/manager";
+option go_package = "github.com/ormushq/ormus/contract/go/source";
 
 import "google/protobuf/timestamp.proto";
 
