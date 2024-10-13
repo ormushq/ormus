@@ -1,12 +1,12 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -42,14 +42,18 @@ func New() Client {
 		Source:      source.New(),
 		Project:     project.New(),
 	}
-	client.readConfig()
+	err := client.readConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return client
 }
 
-func (c *Client) StoreToken(token string) {
+func (c *Client) StoreToken(token string) error {
 	c.config.Token = token
-	c.storeConfig()
+
+	return c.storeConfig()
 }
 
 func (c *Client) ReadToken() string {
@@ -65,9 +69,8 @@ func (c *Client) SetConfig(key, value string) error {
 	default:
 		return fmt.Errorf("key is invalid %s", key)
 	}
-	c.storeConfig()
 
-	return nil
+	return c.storeConfig()
 }
 
 func (c *Client) GetConfig(key string) (string, error) {
@@ -95,23 +98,29 @@ func (c *Client) ListConfig() (map[string]string, error) {
 	return result, nil
 }
 
-func (c *Client) getURL(path string) string {
-	return fmt.Sprintf("%s/%s", c.config.BaseURL, path)
-}
-
 func (c *Client) SendRequest(req types.Request) (*http.Response, error) {
 	cl := &http.Client{
 		// Timeout: 2000,
 	}
-	var respBody []byte
 
-	r, err := http.NewRequestWithContext(context.Background(), req.Method, c.getURL(req.Path), bytes.NewBuffer(respBody))
+	reqBody, err := req.GetBody()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+	r, err := http.NewRequestWithContext(context.Background(), req.Method, req.GetURL(c.config.BaseURL), reqBody)
+	if err != nil {
+		return nil, err
+	}
+
 	if req.AuthorizationRequired {
 		r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.config.Token))
 	}
+
+	for n, v := range req.Header {
+		r.Header.Set(n, v)
+	}
+	r.Header.Set("Content-Type", "application/json")
+	r.Header.Set("Accept", "application/json")
 
 	return cl.Do(r)
 }
@@ -122,53 +131,56 @@ func (c *Client) checkFileExists(filePath string) bool {
 	return !errors.Is(err, os.ErrNotExist)
 }
 
-func (c *Client) storeConfig() {
+func (c *Client) storeConfig() error {
 	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, configFilePermission)
 	if err != nil {
-		panic(fmt.Sprintf("can't create or open file, ERR: %s", err))
+		return fmt.Errorf("can't create or open file, ERR: %w", err)
 	}
-	defer func(file *os.File) {
+	defer func() {
 		err = file.Close()
 		if err != nil {
 			println(err)
 		}
-	}(file)
+	}()
 	j, err := json.Marshal(c.config)
 	if err != nil {
-		panic(fmt.Sprintf("can't marshal json %v\n", err))
+		return fmt.Errorf("can't marshal json %w", err)
 	}
 	_, wErr := file.Write(j)
 	if wErr != nil {
-		panic(fmt.Sprintf("can't write to the file %v\n", wErr))
+		return fmt.Errorf("can't write to the file %w", wErr)
 	}
+
+	return nil
 }
 
-func (c *Client) initConfig() {
+func (c *Client) initConfig() error {
 	c.config = Config{
 		Token:   "",
 		BaseURL: "http://manager.ormus.local",
 	}
-	c.storeConfig()
+
+	return c.storeConfig()
 }
 
-func (c *Client) readConfig() {
+func (c *Client) readConfig() error {
 	if !c.checkFileExists(configFIlePath) {
-		c.initConfig()
-
-		return
+		return c.initConfig()
 	}
 	file, err := os.OpenFile(configFIlePath, os.O_CREATE|os.O_RDONLY, configFilePermission)
 	if err != nil {
-		panic(fmt.Sprintf("can't create or open file, ERR: %s", err))
+		return fmt.Errorf("can't create or open file, ERR: %w", err)
 	}
 	j, err := io.ReadAll(file)
 	if err != nil {
-		panic(fmt.Sprintf("can't read to the file %v\n", err))
+		return fmt.Errorf("can't read to the file %w", err)
 	}
 	config := Config{}
 	err = json.Unmarshal(j, &config)
 	if err != nil {
-		panic(fmt.Sprintf("can't unmarshal json %v\n", err))
+		return fmt.Errorf("can't unmarshal json %w", err)
 	}
 	c.config = config
+
+	return nil
 }

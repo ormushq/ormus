@@ -5,6 +5,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
@@ -18,7 +19,7 @@ var listCmd = &cobra.Command{
 	Run: func(cmdCobra *cobra.Command, args []string) {
 		config, err := cmd.Client.ListConfig()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		for k, v := range config {
 			fmt.Printf("%s => %s\n", k, v)

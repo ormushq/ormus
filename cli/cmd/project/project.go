@@ -15,10 +15,10 @@ var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Create, View, and Manage Projects",
 	Long: `Create, View, and Manage Projects
-ormus project create --name <project-name>: Create a new project.
+ormus project create --name <new-name> --description <new-description>: Create a new project.
 ormus project list: List all projects associated with the user.
 ormus project show --project-id <project-id>: Display details of a specific project.
-ormus project update --project-id <project-id> --name <new-name>: Update project details.
+ormus project update --project-id <project-id> --name <new-name> --description <new-description>: Update project details.
 ormus project delete --project-id <project-id>: Delete a specific project.
 `,
 	Run: func(cmd *cobra.Command, args []string) {

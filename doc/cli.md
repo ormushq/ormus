@@ -13,7 +13,7 @@ Based on the core entities in your **Ormus** CDP platform **User**, **Project**,
 
 ### 2. **Project Management**
    - **Create, View, and Manage Projects**
-     - `ormus project create --name <project-name>`: Create a new project.
+     - `ormus project create --name <project-name> --desscription <project-description>`: Create a new project.
      - `ormus project list`: List all projects associated with the user.
      - `ormus project show --project-id <project-id>`: Display details of a specific project.
      - `ormus project update --project-id <project-id> --name <new-name>`: Update project details.

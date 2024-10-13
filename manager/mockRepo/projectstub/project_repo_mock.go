@@ -79,7 +79,7 @@ func (m *MockProject) Delete(project entity.Project) error {
 	return nil
 }
 
-func (m *MockProject) List(userID string, _ int64, limit int) ([]entity.Project, error) {
+func (m *MockProject) List(userID, _ string, limit int) ([]entity.Project, error) {
 	li := []entity.Project{}
 	count := 0
 	for _, val := range m.projects {
@@ -95,7 +95,7 @@ func (m *MockProject) List(userID string, _ int64, limit int) ([]entity.Project,
 	return li, nil
 }
 
-func (m *MockProject) HaseMore(_ string, _ int64, _ int) (bool, error) {
+func (m *MockProject) HaseMore(_, _ string, _ int) (bool, error) {
 	return false, nil
 }
 
