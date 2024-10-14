@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// nolint:contextcheck //We use ctx just for extract tracer carrier.
 func NewWriteKeyGeneratedEvent(ctx context.Context, ev *internalevent.WriteKeyGeneratedEvent) *internalevent.Event {
 	if ctx == nil {
 		ctx = context.WithoutCancel(context.Background())
@@ -21,6 +22,7 @@ func NewWriteKeyGeneratedEvent(ctx context.Context, ev *internalevent.WriteKeyGe
 	}
 }
 
+// nolint:contextcheck //We use ctx just for extract tracer carrier.
 func NewUserCreatedEvent(ctx context.Context, ev *internalevent.UserCreatedEvent) *internalevent.Event {
 	if ctx == nil {
 		ctx = context.WithoutCancel(context.Background())
@@ -34,6 +36,7 @@ func NewUserCreatedEvent(ctx context.Context, ev *internalevent.UserCreatedEvent
 	}
 }
 
+// nolint:contextcheck //We use ctx just for extract tracer carrier.
 func NewProjectCreatedEvent(ctx context.Context, ev *internalevent.ProjectCreatedEvent) *internalevent.Event {
 	if ctx == nil {
 		ctx = context.WithoutCancel(context.Background())
@@ -47,6 +50,7 @@ func NewProjectCreatedEvent(ctx context.Context, ev *internalevent.ProjectCreate
 	}
 }
 
+// nolint:contextcheck //We use ctx just for extract tracer carrier.
 func NewTaskCreatedEvent(ctx context.Context, ev *internalevent.TaskCreatedEvent) *internalevent.Event {
 	if ctx == nil {
 		ctx = context.WithoutCancel(context.Background())
