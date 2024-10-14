@@ -14,8 +14,9 @@ func NewWriteKeyGeneratedEvent(ctx context.Context, ev *internalevent.WriteKeyGe
 	}
 
 	return &internalevent.Event{
-		EventName:     internalevent.EventName_EVENT_NAME_WRITE_KEY_GENERATED,
-		Time:          timestamppb.New(time.Now()),
+		EventName: internalevent.EventName_EVENT_NAME_WRITE_KEY_GENERATED,
+		Time:      timestamppb.New(time.Now()),
+		//nolint:contextcheck //We use ctx just for extract tracer carrier.
 		TracerCarrier: otela.GetCarrierFromContext(ctx),
 		Payload:       &internalevent.Event_WriteKeyGeneratedEvent{WriteKeyGeneratedEvent: ev},
 	}
@@ -26,10 +27,10 @@ func NewUserCreatedEvent(ctx context.Context, ev *internalevent.UserCreatedEvent
 		ctx = context.Background()
 	}
 
-	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
-		EventName:     internalevent.EventName_EVENT_NAME_USER_CREATED,
-		Time:          timestamppb.New(time.Now()),
+		EventName: internalevent.EventName_EVENT_NAME_USER_CREATED,
+		Time:      timestamppb.New(time.Now()),
+		//nolint:contextcheck //We use ctx just for extract tracer carrier.
 		TracerCarrier: otela.GetCarrierFromContext(ctx),
 		Payload:       &internalevent.Event_UserCreatedEvent{UserCreatedEvent: ev},
 	}
@@ -40,10 +41,10 @@ func NewProjectCreatedEvent(ctx context.Context, ev *internalevent.ProjectCreate
 		ctx = context.Background()
 	}
 
-	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
-		EventName:     internalevent.EventName_EVENT_NAME_PROJECT_CREATED,
-		Time:          timestamppb.New(time.Now()),
+		EventName: internalevent.EventName_EVENT_NAME_PROJECT_CREATED,
+		Time:      timestamppb.New(time.Now()),
+		//nolint:contextcheck //We use ctx just for extract tracer carrier.
 		TracerCarrier: otela.GetCarrierFromContext(ctx),
 		Payload:       &internalevent.Event_ProjectCreatedEvent{ProjectCreatedEvent: ev},
 	}
@@ -54,10 +55,10 @@ func NewTaskCreatedEvent(ctx context.Context, ev *internalevent.TaskCreatedEvent
 		ctx = context.Background()
 	}
 
-	//nolint:contextcheck //We use ctx just for extract tracer carrier.
 	return &internalevent.Event{
-		EventName:     internalevent.EventName_EVENT_NAME_TASK_CREATED,
-		Time:          timestamppb.New(time.Now()),
+		EventName: internalevent.EventName_EVENT_NAME_TASK_CREATED,
+		Time:      timestamppb.New(time.Now()),
+		//nolint:contextcheck //We use ctx just for extract tracer carrier.
 		TracerCarrier: otela.GetCarrierFromContext(ctx),
 		Payload:       &internalevent.Event_TaskCreatedEvent{TaskCreatedEvent: ev},
 	}
