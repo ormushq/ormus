@@ -1,16 +1,22 @@
 package main
 
 import (
+	"context"
+	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/adapter/redis"
+	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/source"
+	"github.com/ormushq/ormus/source/adapter/rabbitmq"
+	"github.com/ormushq/ormus/source/delivery/httpserver"
+	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
+	sourceevent "github.com/ormushq/ormus/source/eventhandler"
+	writekeyrepo "github.com/ormushq/ormus/source/repository/redis/rediswritekey"
+	"github.com/ormushq/ormus/source/service/writekey"
 	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
-
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/logger"
-	"github.com/ormushq/ormus/source/delivery/httpserver"
-	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
 )
 
 //	@termsOfService	http://swagger.io/terms/
@@ -59,6 +65,22 @@ func main() {
 		statushandler.New(),
 	}
 
+	cfg := config.Config{
+		Source: source.Config{
+			AMPQURI:                 "amqp://guest:guest@localhost:5672/",
+			WriteKeyRedisExpiration: 60,
+		},
+		Redis: redis.Config{
+			Host:     "127.0.0.1",
+			Port:     6379,
+			Password: "",
+			DB:       0,
+		},
+	}
+
+	_, Consumer := SetupSourceServices(cfg)
+	Consumer.ConsumeWriteKey(context.Background(), "new-source-event", done, wg)
+
 	//----------------- Setup Tracer -----------------//
 	otelcfg := otela.Config{
 		Endpoint:           config.C().Source.Otel.Endpoint,
@@ -85,4 +107,26 @@ func main() {
 
 	close(done)
 	wg.Wait()
+}
+
+func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consumer) {
+	pub, err := rabbitmq.NewRabbitMQAdapter(cfg.Source.AMPQURI)
+	if err != nil {
+		panic(err)
+	}
+	sub, err := rabbitmq.NewRabbitMQAdapter(cfg.Source.AMPQURI)
+	if err != nil {
+		panic(err)
+	}
+	adapter, err := redis.New(cfg.Redis)
+	if err != nil {
+		panic(err)
+	}
+
+	writekeyrepo := writekeyrepo.New(adapter)
+	writekeysvc := writekey.New(pub, sub, &writekeyrepo, cfg.Source)
+	writekeysvc.CreateNewWriteKey(context.Background(), "1", "20", "3")
+	eventhandler := sourceevent.New(sub, writekeysvc)
+
+	return writekeysvc, *eventhandler
 }
