@@ -2,11 +2,11 @@ package eventmanager
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/ormushq/ormus/contract/go/internalevent"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	"sync"
-
 	"google.golang.org/protobuf/proto"
 )
 
@@ -36,7 +36,7 @@ func (h Manager) Publish(msg *internalevent.Event) error {
 		return err
 	}
 
-	err = h.createChannelFunc(channelName)
+	err = h.createChannel(channelName)
 	if err != nil {
 		return err
 	}
@@ -55,10 +55,8 @@ func (h Manager) Publish(msg *internalevent.Event) error {
 	return nil
 }
 
-func (h Manager) Consume(eventNames ...internalevent.EventName) (<-chan EventMessage, error) {
-	if len(eventNames) == 0 {
-		return nil, fmt.Errorf("no event name provided")
-	}
+func (h Manager) Consume(eventName internalevent.EventName, eventNames ...internalevent.EventName) (<-chan EventMessage, error) {
+	eventNames = append(eventNames, eventName)
 	channelNames := make([]string, 0)
 	for _, eventName := range eventNames {
 		channelName, err := h.getChannelName(eventName)
@@ -69,7 +67,7 @@ func (h Manager) Consume(eventNames ...internalevent.EventName) (<-chan EventMes
 	}
 	chs := make([]<-chan channel.Message, 0)
 	for _, channelName := range channelNames {
-		err := h.createChannelFunc(channelName)
+		err := h.createChannel(channelName)
 		if err != nil {
 			return nil, err
 		}
@@ -84,20 +82,21 @@ func (h Manager) Consume(eventNames ...internalevent.EventName) (<-chan EventMes
 }
 
 func (h Manager) createChannel(channelName string) error {
-	var err error = nil
+	var err error
 	once[h.adapter][channelName].Do(func() {
 		err = h.createChannelFunc(channelName)
 	})
+
 	return err
 }
+
 func (h Manager) covertChannel(chs ...<-chan channel.Message) <-chan EventMessage {
 	newCh := make(chan EventMessage, len(chs))
 
 	for _, ch := range chs {
 		h.wg.Add(1)
-		go func() {
+		go func(ch <-chan channel.Message) {
 			defer h.wg.Done()
-
 			for {
 				select {
 				case <-h.done:
@@ -114,7 +113,7 @@ func (h Manager) covertChannel(chs ...<-chan channel.Message) <-chan EventMessag
 
 				}
 			}
-		}()
+		}(ch)
 	}
 
 	return newCh

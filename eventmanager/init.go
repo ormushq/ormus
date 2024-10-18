@@ -2,10 +2,11 @@ package eventmanager
 
 import (
 	"context"
+	"time"
+
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/contract/go/internalevent"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
 //nolint:contextcheck //We use ctx just for extract tracer carrier.
