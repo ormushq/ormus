@@ -2,6 +2,7 @@ package sourceservice
 
 import (
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/manager/validator/sourcevalidator"
 )
 
@@ -14,14 +15,19 @@ type SourceRepo interface {
 	HaseMore(ownerID string, lastToken int64, perPage int) (bool, error)
 }
 
+type ProjectSvc interface {
+	Get(projectparam.GetRequest) (projectparam.GetResponse, error)
+}
 type Service struct {
-	repo      SourceRepo
-	validator sourcevalidator.Validator
+	repo       SourceRepo
+	validator  sourcevalidator.Validator
+	projectSvc ProjectSvc
 }
 
-func New(repo SourceRepo, validator sourcevalidator.Validator) Service {
+func New(repo SourceRepo, validator sourcevalidator.Validator, projectSvc ProjectSvc) Service {
 	return Service{
-		repo:      repo,
-		validator: validator,
+		repo:       repo,
+		validator:  validator,
+		projectSvc: projectSvc,
 	}
 }

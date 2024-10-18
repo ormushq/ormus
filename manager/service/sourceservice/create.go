@@ -3,6 +3,7 @@ package sourceservice
 import (
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
+	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/manager/managerparam/sourceparam"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
@@ -20,6 +21,15 @@ func (s Service) CreateSource(req sourceparam.CreateRequest) (sourceparam.Create
 	w, err := writekey.GenerateNewWriteKey()
 	if err != nil {
 		return sourceparam.CreateResponse{}, err
+	}
+
+	getProjectReq := projectparam.GetRequest{
+		UserID:    req.UserID,
+		ProjectID: req.ProjectID,
+	}
+	_, err = s.projectSvc.Get(getProjectReq)
+	if err != nil {
+		return sourceparam.CreateResponse{}, richerror.New(op).WithKind(richerror.KindNotFound).WithMessage(errmsg.ErrProjectNotFound)
 	}
 
 	source := entity.Source{
