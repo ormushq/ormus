@@ -848,7 +848,7 @@ const docTemplatemanager = `{
                     "type": "boolean"
                 },
                 "last_token": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "per_page": {
                     "type": "integer"
