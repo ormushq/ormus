@@ -272,6 +272,238 @@ const docTemplatemanager = `{
                 }
             }
         },
+        "/sources": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "List sources",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "List sources",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Last token fetched",
+                        "name": "last_token_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Per page count",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Create source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Create source",
+                "parameters": [
+                    {
+                        "description": "Create source request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.CreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/sources/{source_id}": {
+            "post": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Update source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Update source",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update source request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.UpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.UpdateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Delete source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Delete source",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.DeleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "security": [
@@ -388,8 +620,11 @@ const docTemplatemanager = `{
                 "created_at": {
                     "type": "string"
                 },
+                "deleted": {
+                    "type": "boolean"
+                },
                 "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -406,10 +641,82 @@ const docTemplatemanager = `{
                 "updated_at": {
                     "type": "string"
                 },
-                "user": {
+                "user_id": {
                     "type": "string"
                 }
             }
+        },
+        "entity.Source": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/entity.SourceMetadata"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/entity.Status"
+                },
+                "token_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "write_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.SourceMetadata": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Status": {
+            "type": "string",
+            "enum": [
+                "active",
+                "not active"
+            ],
+            "x-enum-varnames": [
+                "SourceStatusActive",
+                "SourceStatusNotActive"
+            ]
         },
         "httputil.HTTPError": {
             "type": "object",
@@ -541,7 +848,7 @@ const docTemplatemanager = `{
                     "type": "boolean"
                 },
                 "last_token": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "per_page": {
                     "type": "integer"
@@ -575,15 +882,80 @@ const docTemplatemanager = `{
                 }
             }
         },
-        "sql.NullTime": {
+        "sourceparam.CreateRequest": {
             "type": "object",
             "properties": {
-                "time": {
-                    "type": "string"
+                "description": {
+                    "type": "string",
+                    "example": "test description"
                 },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
+                "name": {
+                    "type": "string",
+                    "example": "test name"
+                },
+                "project_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "sourceparam.CreateResponse": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "$ref": "#/definitions/entity.Source"
+                }
+            }
+        },
+        "sourceparam.DeleteResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "sourceparam.ListResponse": {
+            "type": "object",
+            "properties": {
+                "has_more": {
                     "type": "boolean"
+                },
+                "last_token": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Source"
+                    }
+                }
+            }
+        },
+        "sourceparam.UpdateRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "updated description"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "updated name"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                }
+            }
+        },
+        "sourceparam.UpdateResponse": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "$ref": "#/definitions/entity.Source"
                 }
             }
         }

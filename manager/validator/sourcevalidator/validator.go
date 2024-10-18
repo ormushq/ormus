@@ -1,9 +1,8 @@
 package sourcevalidator
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/ormushq/ormus/manager/service/sourceservice"
 )
 
 type ValidatorError struct {
@@ -21,10 +20,34 @@ func (v ValidatorError) Error() string {
 	return err
 }
 
-type Validator struct {
-	repo sourceservice.SourceRepo
+type Repository interface {
+	Exist(id string) (bool, error)
 }
 
-func New(repo sourceservice.SourceRepo) Validator {
-	return Validator{repo: repo}
+type Validator struct {
+	sourceRepo Repository
+}
+
+func New(sourceRepo Repository) Validator {
+	return Validator{
+		sourceRepo: sourceRepo,
+	}
+}
+
+func (v Validator) isSourceExist(value interface{}) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("error while reflection interface")
+	}
+
+	exist, err := v.sourceRepo.Exist(s)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		return errors.New("source does not exist")
+	}
+
+	return nil
 }

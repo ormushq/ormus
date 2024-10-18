@@ -7,7 +7,7 @@ import (
 )
 
 func (s Service) Delete(req projectparam.DeleteRequest) (projectparam.DeleteResponse, error) {
-	const op = "projectService.Update"
+	const op = "projectService.Delete"
 
 	vErr := s.validator.ValidateDeleteRequest(req)
 	if vErr != nil {

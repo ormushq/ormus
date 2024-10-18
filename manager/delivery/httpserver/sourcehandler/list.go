@@ -14,21 +14,22 @@ import (
 	"github.com/ormushq/ormus/pkg/httputil"
 )
 
-// Create godoc
+// List godoc
 //
-//	@Summary		Create source
-//	@Description	Create source
+//	@Summary		List sources
+//	@Description	List sources
 //	@Tags			Source
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body		sourceparam.CreateRequest	true	"Create source request body"
-//	@Success		201		{object}	sourceparam.CreateResponse
-//	@Failure		400		{object}	httputil.HTTPError
-//	@Failure		401		{object}	httputil.HTTPError
-//	@Failure		500		{object}	httputil.HTTPError
+//	@Param			last_token_id	query		string	false	"Last token fetched"
+//	@Param			per_page		query		int		false	"Per page count"
+//	@Success		200				{object}	sourceparam.ListResponse
+//	@Failure		400				{object}	httputil.HTTPError
+//	@Failure		401				{object}	httputil.HTTPError
+//	@Failure		500				{object}	httputil.HTTPError
 //	@Security		JWTToken
-//	@Router			/sources [post]
-func (h Handler) Create(ctx echo.Context) error {
+//	@Router			/sources [get]
+func (h Handler) List(ctx echo.Context) error {
 	// get user id from context
 	claim, ok := ctx.Get(h.authSvc.GetConfig().ContextKey).(*authservice.Claims)
 	if !ok {
@@ -37,14 +38,24 @@ func (h Handler) Create(ctx echo.Context) error {
 		})
 	}
 
-	var req sourceparam.CreateRequest
+	var req sourceparam.ListRequest
 	if err := ctx.Bind(&req); err != nil {
 		return httputil.NewError(ctx, http.StatusBadRequest, errmsg.ErrBadRequest)
 	}
 
 	req.UserID = claim.UserID
 
-	resp, err := h.sourceSvc.CreateSource(req)
+	if req.PerPage == 0 {
+		req.PerPage = 10
+	}
+	var lastTokenID int64 = -9223372036854775808
+	if req.LastTokenID == 0 {
+		req.LastTokenID = lastTokenID
+	}
+
+	// call save method in service
+	resp, err := h.sourceSvc.List(req)
+
 	logger.LogError(err)
 	var vErr *validator.Error
 	if errors.As(err, &vErr) {
@@ -60,5 +71,5 @@ func (h Handler) Create(ctx echo.Context) error {
 		return httputil.NewErrorWithError(ctx, err)
 	}
 
-	return ctx.JSON(http.StatusCreated, resp)
+	return ctx.JSON(http.StatusOK, resp)
 }
