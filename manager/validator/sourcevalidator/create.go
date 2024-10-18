@@ -19,7 +19,7 @@ func (v Validator) ValidateCreateRequest(req sourceparam.CreateRequest) *validat
 	if err := validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
 		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
-		validation.Field(&req.ProjectID, validation.Required, validation.By(v.isProjectExist)),
+		validation.Field(&req.ProjectID, validation.Required),
 		validation.Field(&req.UserID, validation.Required),
 	); err != nil {
 

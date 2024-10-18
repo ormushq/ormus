@@ -78,8 +78,8 @@ func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) htt
 	projectHandler := projecthandler.New(authSvc, projectSvc)
 
 	sourceRepo := scyllasource.New(scylla)
-	sourceValidator := sourcevalidator.New(sourceRepo, projectRepo)
-	sourceSvc := sourceservice.New(sourceRepo, sourceValidator)
+	sourceValidator := sourcevalidator.New(sourceRepo)
+	sourceSvc := sourceservice.New(sourceRepo, sourceValidator, projectSvc)
 	sourceHandler := sourcehandler.New(authSvc, sourceSvc)
 
 	userRepo := scyllauser.New(scylla)
