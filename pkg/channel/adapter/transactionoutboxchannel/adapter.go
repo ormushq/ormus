@@ -100,6 +100,7 @@ func (ca *ChannelAdapter) start(name string) error {
 					msg, ack, err := ca.storage.GetMessage(name)
 					if err != nil {
 						ca.logger.Error(err.Error())
+
 						continue
 					}
 					inputChannel <- channel.Message{
