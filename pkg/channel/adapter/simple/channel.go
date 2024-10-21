@@ -12,7 +12,7 @@ type simpleChannel struct {
 	wg             *sync.WaitGroup
 	done           <-chan bool
 	mode           channel.Mode
-	inputChannel   chan []byte
+	inputChannel   chan channel.Message
 	outputChannel  chan channel.Message
 	numberInstants int
 	maxRetryPolicy int
@@ -29,7 +29,7 @@ func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
 		mode:           mode,
 		numberInstants: numberInstants,
 		maxRetryPolicy: maxRetryPolicy,
-		inputChannel:   make(chan []byte, bufferSize),
+		inputChannel:   make(chan channel.Message, bufferSize),
 		outputChannel:  make(chan channel.Message, bufferSize),
 	}
 	sc.startConsume()
@@ -41,7 +41,7 @@ func (sc simpleChannel) GetMode() channel.Mode {
 	return sc.mode
 }
 
-func (sc simpleChannel) GetInputChannel() chan<- []byte {
+func (sc simpleChannel) GetInputChannel() chan<- channel.Message {
 	return sc.inputChannel
 }
 
@@ -68,7 +68,7 @@ func (sc simpleChannel) startConsume() {
 	}
 }
 
-func (sc simpleChannel) startDelivery(msg []byte) {
+func (sc simpleChannel) startDelivery(msg channel.Message) {
 	sc.wg.Add(1)
 	ackChan := make(chan bool)
 	go func() {
@@ -84,12 +84,12 @@ func (sc simpleChannel) startDelivery(msg []byte) {
 	}()
 }
 
-func (sc simpleChannel) publishMessage(msg []byte, c chan<- bool) {
+func (sc simpleChannel) publishMessage(msg channel.Message, c chan<- bool) {
 	sc.wg.Add(1)
-	go func(msg []byte, c chan<- bool) {
+	go func(msg channel.Message, c chan<- bool) {
 		defer sc.wg.Done()
 		sc.outputChannel <- channel.Message{
-			Body: msg,
+			Body: msg.Body,
 			Ack: func() error {
 				c <- true
 

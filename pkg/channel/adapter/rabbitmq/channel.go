@@ -21,7 +21,7 @@ type rabbitmqChannel struct {
 	done           <-chan bool
 	mode           channel.Mode
 	rabbitmq       *Rabbitmq
-	inputChannel   chan []byte
+	inputChannel   chan channel.Message
 	outputChannel  chan channel.Message
 	exchange       string
 	queue          string
@@ -92,7 +92,7 @@ func newChannelWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitG
 		rabbitmq:       rabbitmqChannelParams.rabbitmq,
 		numberInstants: rabbitmqChannelParams.numberInstants,
 		maxRetryPolicy: rabbitmqChannelParams.maxRetryPolicy,
-		inputChannel:   make(chan []byte, rabbitmqChannelParams.bufferSize),
+		inputChannel:   make(chan channel.Message, rabbitmqChannelParams.bufferSize),
 		outputChannel:  make(chan channel.Message, rabbitmqChannelParams.bufferSize),
 		bufferSize:     rabbitmqChannelParams.bufferSize,
 	}
@@ -214,7 +214,7 @@ func (rc *rabbitmqChannel) GetMode() channel.Mode {
 	return rc.mode
 }
 
-func (rc *rabbitmqChannel) GetInputChannel() chan<- []byte {
+func (rc *rabbitmqChannel) GetInputChannel() chan<- channel.Message {
 	return rc.inputChannel
 }
 
@@ -399,7 +399,7 @@ func (rc *rabbitmqChannel) startInputWithContext(ctx context.Context) {
 	}()
 }
 
-func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries int) {
+func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg channel.Message, tries int) {
 	if tries > rc.maxRetryPolicy {
 		logger.WithGroup(loggerGroupName).Error(fmt.Sprintf("job failed after %d tries", tries))
 
@@ -416,13 +416,18 @@ func (rc *rabbitmqChannel) publishToRabbitmq(ch *amqp.Channel, msg []byte, tries
 			false,       // immediate
 			amqp.Publishing{
 				ContentType: "text/plain",
-				Body:        msg,
+				Body:        msg.Body,
 			})
 		if errPWC != nil {
 			logger.WithGroup(loggerGroupName).Error("error on publish to rabbitmq",
 				slog.String("error", errPWC.Error()))
 
 			rc.publishToRabbitmq(ch, msg, tries+1)
+		}
+		if msg.Ack != nil {
+			err := msg.Ack()
+			logger.WithGroup(loggerGroupName).Error("error on ack on publish message",
+				slog.String("error", err.Error()))
 		}
 	}()
 }

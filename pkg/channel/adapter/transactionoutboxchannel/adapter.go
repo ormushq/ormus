@@ -11,7 +11,7 @@ import (
 
 type Storage interface {
 	StoreMessage(channelName string, body []byte) error
-	GetMessage(channelName string, limit int) ([][]byte, error)
+	GetMessage(channelName string) (body []byte, ack func() error, err error)
 }
 
 type ChannelAdapter struct {
@@ -96,14 +96,18 @@ func (ca *ChannelAdapter) start(name string) error {
 			case <-ca.done:
 				return
 			default:
-				result, err := ca.storage.GetMessage(name, ca.cfg.NumberMsgSendPerRun)
-				if err != nil {
-					ca.logger.Error(err.Error())
-					continue
+				for i := 0; i < ca.cfg.NumberMsgSendPerRun; i++ {
+					msg, ack, err := ca.storage.GetMessage(name)
+					if err != nil {
+						ca.logger.Error(err.Error())
+						continue
+					}
+					inputChannel <- channel.Message{
+						Body: msg,
+						Ack:  ack,
+					}
 				}
-				for _, msg := range result {
-					inputChannel <- msg
-				}
+
 				time.Sleep(time.Duration(ca.cfg.SendIntervalSec) * time.Second)
 			}
 		}

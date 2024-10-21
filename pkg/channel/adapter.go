@@ -1,7 +1,7 @@
 package channel
 
 type Adapter interface {
-	GetInputChannel(name string) (chan<- []byte, error)
+	GetInputChannel(name string) (chan<- Message, error)
 	GetOutputChannel(name string) (<-chan Message, error)
 	GetMode(name string) (Mode, error)
 	NewChannel(name string, mode Mode, bufferSize, numberInstants, maxRetryPolicy int) error

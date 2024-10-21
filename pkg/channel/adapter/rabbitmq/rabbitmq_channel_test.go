@@ -71,7 +71,7 @@ func TestRabbitmqChannel(t *testing.T) {
 
 			for workerId := 0; workerId < tc.numWorkers; workerId++ {
 				workerwg.Add(1)
-				go func(wi int, ic chan<- []byte) {
+				go func(wi int, ic chan<- channel.Message) {
 					defer workerwg.Done()
 					for messageId := 0; messageId < tc.numMessages; messageId++ {
 						msg := message{
@@ -83,7 +83,7 @@ func TestRabbitmqChannel(t *testing.T) {
 							t.Error(err.Error())
 							t.Fail()
 						}
-						inputChannel <- m
+						inputChannel <- channel.Message{Body: m}
 					}
 				}(workerId, inputChannel)
 			}

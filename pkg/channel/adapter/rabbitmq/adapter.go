@@ -152,7 +152,7 @@ func (ca *ChannelAdapter) NewChannelWithContext(ctx context.Context, name string
 	return nil
 }
 
-func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
+func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- channel.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetInputChannel(), nil
 	}

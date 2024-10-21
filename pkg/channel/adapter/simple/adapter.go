@@ -30,7 +30,7 @@ func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize,
 	return nil
 }
 
-func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
+func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- channel.Message, error) {
 	if c, ok := ca.channels[name]; ok {
 		return c.GetInputChannel(), nil
 	}

@@ -51,11 +51,11 @@ func main() {
 		}
 	}()
 
-	inputChannel <- []byte("Hello form input channel" + time.Now().UTC().String())
+	inputChannel <- channel.Message{Body: []byte("Hello form input channel" + time.Now().UTC().String())}
 	wg.Add(1)
 	go func() {
 		for {
-			inputChannel <- []byte("Hello form input channel" + time.Now().UTC().String())
+			inputChannel <- channel.Message{Body: []byte("Hello form input channel" + time.Now().UTC().String())}
 			time.Sleep(time.Second)
 		}
 	}()

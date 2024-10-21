@@ -86,7 +86,7 @@ func main() {
 					}
 					fmt.Printf("encode message %s\n", encode)
 
-					inputChannel <- encode
+					inputChannel <- channel.Message{Body: encode}
 					sleepTime := 5
 					time.Sleep(time.Second * time.Duration(sleepTime))
 				}()

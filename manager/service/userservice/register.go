@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"encoding/json"
+	"github.com/ormushq/ormus/pkg/channel"
 
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
@@ -52,7 +53,7 @@ func (s Service) Register(req param.RegisterRequest) (*param.RegisterResponse, e
 	if err != nil {
 		logger.L().Error(err.Error())
 	} else {
-		inputChan <- js
+		inputChan <- channel.Message{Body: js}
 	}
 
 	return &param.RegisterResponse{

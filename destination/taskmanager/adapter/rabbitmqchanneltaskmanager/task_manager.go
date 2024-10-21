@@ -2,13 +2,14 @@ package rabbitmqchanneltaskmanager
 
 import (
 	"github.com/ormushq/ormus/event"
+	"github.com/ormushq/ormus/pkg/channel"
 )
 
 type TaskPublisher struct {
 	queue *Queue
 }
 
-func NewTaskPublisher(inputChannel chan<- []byte) *TaskPublisher {
+func NewTaskPublisher(inputChannel chan<- channel.Message) *TaskPublisher {
 	q := newQueue(inputChannel)
 
 	return &TaskPublisher{
