@@ -20,7 +20,7 @@ type ChannelAdapter struct {
 	adapter       channel.Adapter
 	storage       Storage
 	logger        *zap.Logger
-	inputChannels map[string]chan []byte
+	inputChannels map[string]chan channel.Message
 	cfg           Config
 }
 
@@ -36,13 +36,13 @@ func New(done <-chan bool, wg *sync.WaitGroup, logger *zap.Logger, cfg Config, a
 		logger:        logger,
 		adapter:       adapter,
 		storage:       storage,
-		inputChannels: make(map[string]chan []byte),
+		inputChannels: make(map[string]chan channel.Message),
 		cfg:           cfg,
 	}
 }
 
 func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
-	ca.inputChannels[name] = make(chan []byte, bufferSize)
+	ca.inputChannels[name] = make(chan channel.Message, bufferSize)
 	err := ca.start(name)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize,
 	return ca.adapter.NewChannel(name, mode, bufferSize, numberInstants, maxRetryPolicy)
 }
 
-func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- []byte, error) {
+func (ca *ChannelAdapter) GetInputChannel(name string) (chan<- channel.Message, error) {
 	if c, ok := ca.inputChannels[name]; ok {
 		return c, nil
 	}
@@ -76,7 +76,7 @@ func (ca *ChannelAdapter) start(name string) error {
 			case <-ca.done:
 				return
 			case msg := <-ca.inputChannels[name]:
-				err := ca.storage.StoreMessage(name, msg)
+				err := ca.storage.StoreMessage(name, msg.Body)
 				if err != nil {
 					ca.logger.Error(err.Error())
 				}
