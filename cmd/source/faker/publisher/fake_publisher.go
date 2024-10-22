@@ -19,7 +19,7 @@ func main() {
 
 	pub := rabbitmq.NewRabbitMQAdapter(r)
 
-	for range 200 {
+	for i := 1; i <= 200; i++ {
 		msg := source.NewSourceEvent{
 			ProjectId: uuid.New().String(),
 			OwnerId:   uuid.New().String(),

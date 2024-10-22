@@ -6,23 +6,25 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func EncodeNewSourceEvent(NewSource source.NewSourceEvent) string {
-	payload, err := proto.Marshal(&NewSource)
+func EncodeNewSourceEvent(newSource source.NewSourceEvent) string {
+	payload, err := proto.Marshal(&newSource)
 	if err != nil {
 		return ""
+
 	}
 	return base64.StdEncoding.EncodeToString(payload)
 
 }
 
-func DecodeNewSourceEvent(NewSourceEvent string) *source.NewSourceEvent {
-	payload, err := base64.StdEncoding.DecodeString(NewSourceEvent)
+func DecodeNewSourceEvent(newSourceEvent string) *source.NewSourceEvent {
+	payload, err := base64.StdEncoding.DecodeString(newSourceEvent)
 	if err != nil {
 		return nil
 	}
 	mu := source.NewSourceEvent{}
 	if err := proto.Unmarshal(payload, &mu); err != nil {
 		return nil
+
 	}
 
 	return &source.NewSourceEvent{

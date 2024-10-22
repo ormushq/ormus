@@ -6,17 +6,17 @@ import (
 	"log"
 )
 
-type RabbitMQAdapter struct {
+type rabbitMQAdapter struct {
 	adapter rabbitmq.Adapter
 }
 
-func NewRabbitMQAdapter(adapter rabbitmq.Adapter) RabbitMQAdapter {
-	return RabbitMQAdapter{
+func NewRabbitMQAdapter(adapter rabbitmq.Adapter) rabbitMQAdapter {
+	return rabbitMQAdapter{
 		adapter: adapter,
 	}
 }
 
-func (r RabbitMQAdapter) QueueDeclare(queueName string) error {
+func (r rabbitMQAdapter) QueueDeclare(queueName string) error {
 	_, err := r.adapter.GetChannel().QueueDeclare(
 		queueName,
 		true,  // durable
@@ -28,10 +28,12 @@ func (r RabbitMQAdapter) QueueDeclare(queueName string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
+
 }
 
-func (r RabbitMQAdapter) Publish(queueName string, message []byte) error {
+func (r rabbitMQAdapter) Publish(queueName string, message []byte) error {
 	err := r.QueueDeclare(queueName)
 	if err != nil {
 		return err
@@ -47,15 +49,19 @@ func (r RabbitMQAdapter) Publish(queueName string, message []byte) error {
 			Body:        message,
 		},
 	)
+
 	return err
+
 }
 
-func (r RabbitMQAdapter) Subscribe(queueName string) (chan *rabbitmq.Message, error) {
+func (r rabbitMQAdapter) Subscribe(queueName string) (chan *rabbitmq.Message, error) {
 	err := r.QueueDeclare(queueName)
 	if err != nil {
 		return nil, err
 	}
-	err = r.adapter.GetChannel().Qos(7, 0, false)
+	prefetchCount := 7
+	prefetchSize := 0
+	err = r.adapter.GetChannel().Qos(prefetchCount, prefetchSize, false)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +87,11 @@ func (r RabbitMQAdapter) Subscribe(queueName string) (chan *rabbitmq.Message, er
 	return r.adapter.GetMessage(), nil
 }
 
-func (r RabbitMQAdapter) Ack(msg *rabbitmq.Message) error { // Acknowledge specific message
+func (r rabbitMQAdapter) Ack(msg *rabbitmq.Message) error { // Acknowledge specific message
 	return r.adapter.GetChannel().Ack(msg.DeliveryTag, false)
 }
 
-func (r RabbitMQAdapter) Close() {
+func (r rabbitMQAdapter) Close() {
 	if err := r.adapter.GetChannel().Close(); err != nil {
 		log.Println("Error closing channel:", err)
 	}

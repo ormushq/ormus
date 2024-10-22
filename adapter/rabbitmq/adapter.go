@@ -38,16 +38,20 @@ func New(cfg Config) (Adapter, error) {
 		channel:    ch,
 		messages:   make(chan *Message), // Initialize channel
 	}, nil
+
 }
 
 func (a Adapter) GetChannel() *amqp.Channel {
 	return a.channel
+
 }
 
 func (a Adapter) GetMessage() chan *Message {
 	return a.messages
+
 }
 
 func (a Adapter) GetConnection() *amqp.Connection {
 	return a.connection
+	
 }

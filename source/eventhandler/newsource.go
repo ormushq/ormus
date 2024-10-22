@@ -10,14 +10,14 @@ import (
 )
 
 type Consumer struct {
-	Broker          writekey.ConsumerRepo
-	WriteKeyService writekey.Service
+	broker          writekey.ConsumerRepo
+	writeKeyService writekey.Service
 }
 
 func New(Broker writekey.ConsumerRepo, WriteKeyService writekey.Service) *Consumer {
 	return &Consumer{
-		Broker:          Broker,
-		WriteKeyService: WriteKeyService,
+		broker:          Broker,
+		writeKeyService: WriteKeyService,
 	}
 }
 func (c Consumer) ConsumeWriteKey(ctx context.Context, queueName string, done <-chan bool, wg *sync.WaitGroup) {
@@ -25,24 +25,25 @@ func (c Consumer) ConsumeWriteKey(ctx context.Context, queueName string, done <-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		msgchan, err := c.Broker.Subscribe(queueName)
+		msgchan, err := c.broker.Subscribe(queueName)
 		if err != nil {
 			logger.L().Debug("error while subscribing to source topic")
 		}
 		for {
 			select {
 			case msg := <-msgchan:
-				decoded_event := encoder.DecodeNewSourceEvent(string(msg.Body))
+				decodedEvent := encoder.DecodeNewSourceEvent(string(msg.Body))
 				logger.L().Info(fmt.Sprintf("project id : %s, write key: %s, owner id: %s:  has been retrieved",
-					decoded_event.ProjectId, decoded_event.WriteKey, decoded_event.OwnerId))
-				err = c.WriteKeyService.CreateNewWriteKey(ctx, decoded_event.OwnerId, decoded_event.ProjectId, decoded_event.WriteKey)
+					decodedEvent.ProjectId, decodedEvent.WriteKey, decodedEvent.OwnerId))
+				err = c.writeKeyService.CreateNewWriteKey(ctx, decodedEvent.OwnerId, decodedEvent.ProjectId, decodedEvent.WriteKey)
 				if err != nil {
 					logger.L().Error("err on creating writekey in redis", "err msg:", err.Error())
+
 					break
 				}
 
 				logger.L().Debug("the message has been received")
-				err = c.Broker.Ack(msg)
+				err = c.broker.Ack(msg)
 				if err != nil {
 					logger.L().Debug("ack failed in source")
 				}
