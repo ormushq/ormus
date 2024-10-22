@@ -2,37 +2,52 @@ package writekey
 
 import (
 	"context"
+	rabbitmq "github.com/ormushq/ormus/adapter/rabbitmq"
+	proto_source "github.com/ormushq/ormus/contract/go/source"
+	"github.com/ormushq/ormus/pkg/richerror"
+	"github.com/ormushq/ormus/source"
 )
 
-// Repository is an interface representing what methods should be implemented by the repository.
-type Repository interface {
-	// TODO - implementation redis
-	IsValidWriteKey(ctx context.Context, writeKey string) (bool, error)
+type WriteKeyRepo interface {
+	CreateNewWriteKey(ctx context.Context, writeKey proto_source.NewSourceEvent, ExpirationTime uint) error
+	GetWriteKey(ctx context.Context, ownerID string, projectID string) (*proto_source.NewSourceEvent, error)
 }
 
-// Service show dependencies writeKey authservice.
+type PublisherRepo interface {
+	Publish(queueName string, message []byte) error
+	Close()
+}
+
+type ConsumerRepo interface {
+	Subscribe(queueName string) (chan *rabbitmq.Message, error)
+	Close()
+	Ack(msg *rabbitmq.Message) error
+}
+
 type Service struct {
-	repo Repository
+	Publisher    PublisherRepo
+	Consumer     ConsumerRepo
+	WriteKeyRepo WriteKeyRepo
+	config       source.Config
 }
 
-// Constructor writeKey authservice.
-func New(repo Repository) Service {
+func New(Publisher PublisherRepo, Consumer ConsumerRepo, WriteKeyRepo WriteKeyRepo, config source.Config) Service {
 	return Service{
-		repo: repo,
+		Publisher:    Publisher,
+		Consumer:     Consumer,
+		WriteKeyRepo: WriteKeyRepo,
+		config:       config,
 	}
 }
 
-// IsValid checks whether the writeKey is valid or not.
-func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
-	// TODO - How errmsg handling ? Rich-errmsg or ...?
-	isValid, err := s.repo.IsValidWriteKey(ctx, writeKey)
+func (s Service) CreateNewWriteKey(ctx context.Context, ownerID string, projectID string, writeKey string) error {
+	err := s.WriteKeyRepo.CreateNewWriteKey(ctx, proto_source.NewSourceEvent{
+		ProjectId: projectID,
+		OwnerId:   ownerID,
+		WriteKey:  writeKey,
+	}, s.config.WriteKeyRedisExpiration)
 	if err != nil {
-		// TODO - logger
-		return false, err
+		return richerror.New("source.service").WithWrappedError(err)
 	}
-	if !isValid {
-		return false, err
-	}
-
-	return true, nil
+	return nil
 }
