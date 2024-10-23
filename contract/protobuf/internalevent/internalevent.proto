@@ -18,9 +18,10 @@ message Event {
   string id = 1;
   EventName event_name = 2;
   google.protobuf.Timestamp time = 3;
+  map<string, string> tracer_carrier = 4;
   oneof payload {
       UserCreatedEvent user_created_event = 100;
-      DefaultProjectCreatedEvent default_project_created_event = 101;
+      ProjectCreatedEvent project_created_event = 101;
       WriteKeyGeneratedEvent write_key_generated_event = 102;
       TaskCreatedEvent task_created_event = 103;
   }
@@ -31,7 +32,7 @@ message UserCreatedEvent {
   google.protobuf.Timestamp created_at = 2;
 }
 
-message DefaultProjectCreatedEvent {
+message ProjectCreatedEvent {
   project.Project project = 1;
 }
 
