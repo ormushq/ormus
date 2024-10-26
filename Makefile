@@ -2,6 +2,8 @@
 
 ROOT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
+OS := $(shell uname -s)
+
 lint:
 	which golangci-lint || (go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0)
 	golangci-lint run --config=$(ROOT)/.golangci.yml $(ROOT)/...
@@ -14,6 +16,9 @@ docker-test-up:
 
 docker-test-down:
 	docker compose -f $(ROOT)/deployment/test/docker-compose.yml down
+
+docker-local-up:
+	sh -c "$(ROOT)/deployment/local/docker-compose.bash up -d"
 
 logs:
 	docker compose -f $(ROOT)/deployment/test/docker-compose.yml logs
