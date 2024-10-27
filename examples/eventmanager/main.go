@@ -18,14 +18,16 @@ func main() {
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
 
+	port := 5672
+	reconnectSecond := 2
 	// Init channel package you can use rabbitmqchannel or simple
 	rc := rbbitmqchannel.New(done, wg, rbbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",
-		Port:            5672,
+		Port:            port,
 		Vhost:           "/",
-		ReconnectSecond: 2,
+		ReconnectSecond: reconnectSecond,
 	})
 	fmt.Println("RabbitMQ channel initialized")
 
