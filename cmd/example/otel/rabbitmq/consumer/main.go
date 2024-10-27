@@ -8,9 +8,8 @@ import (
 	"sync"
 
 	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	rabitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 type MyMessage struct {
@@ -35,7 +34,7 @@ func main() {
 
 	port := 5672
 	reconnectSecond := 10
-	channelAdapter := rbbitmqchannel.New(done, wg, dconfig.RabbitMQConsumerConnection{
+	channelAdapter := rabitmqchannel.New(done, wg, rabitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "rabbitmq",
@@ -44,9 +43,8 @@ func main() {
 		ReconnectSecond: reconnectSecond,
 	})
 	bufferSize := 100
-	numberInstants := 1
 	maxRetryPolicy := 10
-	err = channelAdapter.NewChannel("test", channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+	err = channelAdapter.NewChannel("test", channel.OutputOnly, bufferSize, maxRetryPolicy)
 	if err != nil {
 		panic(err)
 	}

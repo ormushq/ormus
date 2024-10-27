@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
 )
 
@@ -36,7 +35,7 @@ func TestRabbitmqChannel(t *testing.T) {
 	}
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
-	config := dconfig.RabbitMQConsumerConnection{
+	config := Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",
@@ -45,7 +44,6 @@ func TestRabbitmqChannel(t *testing.T) {
 		ReconnectSecond: 1,
 	}
 	bufferSize := 100
-	numberInstants := 10
 	maxRetryPolicy := 5
 
 	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
@@ -58,7 +56,7 @@ func TestRabbitmqChannel(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
 			inputAdapter := New(done, wg, config)
-			err = inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+			err = inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, maxRetryPolicy)
 			if err != nil {
 				t.Error(err.Error())
 				t.Fail()
@@ -89,7 +87,7 @@ func TestRabbitmqChannel(t *testing.T) {
 			}
 			time.Sleep(time.Second * tc.receiveTimeout / 2)
 			outputAdapter := New(done, wg, config)
-			err = outputAdapter.NewChannel(tc.name, channel.OutputOnly, bufferSize, numberInstants, maxRetryPolicy)
+			err = outputAdapter.NewChannel(tc.name, channel.OutputOnly, bufferSize, maxRetryPolicy)
 			if err != nil {
 				t.Error(err.Error())
 				t.FailNow()

@@ -52,7 +52,6 @@ func Default() Config {
 			},
 			InternalBrokerConfig: manager.InternalBrokerConfig{
 				ChannelSize:    ChannelSize,
-				NumberInstant:  NumberInstant,
 				MaxRetryPolicy: MaxRetryPolicy,
 			},
 		},
