@@ -18,6 +18,5 @@ type ApplicationConfig struct {
 
 type InternalBrokerConfig struct {
 	ChannelSize    int `koanf:"channel_size"`
-	NumberInstant  int `koanf:"number_instant"`
 	MaxRetryPolicy int `koanf:"max_retry_policy"`
 }

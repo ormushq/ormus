@@ -68,7 +68,7 @@ func TestIntegrationHandler_Register(t *testing.T) {
 	wg := sync.WaitGroup{}
 	internalBroker := simple.New(done, &wg)
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
-		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	repo := usermock.NewMockRepository(false)
 	jwt := authservice.New(cfg.AuthConfig)
 	validator := uservalidator.New(repo)

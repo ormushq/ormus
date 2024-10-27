@@ -37,7 +37,6 @@ func TestSimpleChannel(t *testing.T) {
 	wg := &sync.WaitGroup{}
 
 	bufferSize := 100
-	numberInstants := 10
 	maxRetryPolicy := 5
 
 	for _, tc := range cases {
@@ -45,7 +44,7 @@ func TestSimpleChannel(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
 			adapter := New(done, wg)
-			err := adapter.NewChannel(tc.name, channel.BothMode, bufferSize, numberInstants, maxRetryPolicy)
+			err := adapter.NewChannel(tc.name, channel.BothMode, bufferSize, maxRetryPolicy)
 			if err != nil {
 				t.Error(err.Error())
 				t.Fail()
