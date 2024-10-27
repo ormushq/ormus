@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"sync"
+	"time"
+
 	"github.com/ormushq/ormus/contract/go/internalevent"
 	"github.com/ormushq/ormus/contract/go/project"
 	"github.com/ormushq/ormus/eventmanager"
 	"github.com/ormushq/ormus/pkg/channel"
 	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"log"
-	"sync"
-	"time"
 )
 
 func main() {
@@ -81,5 +82,4 @@ func main() {
 	close(done)
 
 	wg.Wait()
-
 }

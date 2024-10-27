@@ -39,7 +39,6 @@ func New(wg *sync.WaitGroup, done <-chan bool, adapter channel.Adapter, events m
 }
 
 func (h Manager) Publish(msg *internalevent.Event) error {
-
 	channelName, err := h.checkChannel(msg.EventName)
 	if err != nil {
 		return err
