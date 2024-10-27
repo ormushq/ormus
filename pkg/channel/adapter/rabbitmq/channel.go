@@ -309,6 +309,7 @@ func (rc *rabbitmqChannel) startInput() {
 			logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
 				slog.String("error", err.Error()))
 			rc.callMeNextTime(rc.startInput)
+
 			return
 		}
 

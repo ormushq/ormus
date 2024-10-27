@@ -18,27 +18,25 @@ func main() {
 
 	maxRetryPolicy := 5
 	bufferSize := 5
-	inputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
+	port := 5672
+	reconnectSecond := 2
+
+	cfg := rabbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",
-		Port:            5672,
+		Port:            port,
 		Vhost:           "/",
-		ReconnectSecond: 2,
-	})
+		ReconnectSecond: reconnectSecond,
+	}
+
+	inputChannelAdapter := rabbitmqchannel.New(done, &wg, cfg)
 	err := inputChannelAdapter.NewChannel(channelName, channel.InputOnlyMode, bufferSize, maxRetryPolicy)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	outputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
-		User:            "guest",
-		Password:        "guest",
-		Host:            "127.0.0.1",
-		Port:            5672,
-		Vhost:           "/",
-		ReconnectSecond: 2,
-	})
+	outputChannelAdapter := rabbitmqchannel.New(done, &wg, cfg)
 	err = outputChannelAdapter.NewChannel(channelName, channel.OutputOnly, bufferSize, maxRetryPolicy)
 	if err != nil {
 		log.Fatal(err)
