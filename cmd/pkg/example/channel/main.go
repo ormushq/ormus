@@ -7,7 +7,7 @@ import (
 
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	rabitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	rabbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 
 	maxRetryPolicy := 5
 	bufferSize := 5
-	inputChannelAdapter := rabitmqchannel.New(done, &wg, rabitmqchannel.Config{
+	inputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",
@@ -31,7 +31,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	outputChannelAdapter := rabitmqchannel.New(done, &wg, rabitmqchannel.Config{
+	outputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",
