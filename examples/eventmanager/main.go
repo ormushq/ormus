@@ -31,9 +31,12 @@ func main() {
 	})
 	fmt.Println("RabbitMQ channel initialized")
 
+	bufferSize := 1
+	maxRetryPolicy := 10
+
 	// Init event manager with list of internal event you want to use with this manager
 	eveMnger, err := eventmanager.New(wg, done, rc, map[internalevent.EventName]eventmanager.CreateChannelFunc{
-		internalevent.EventName_EVENT_NAME_PROJECT_CREATED: eventmanager.NewCreateChannelFunc(rc, channel.BothMode, 1, 10),
+		internalevent.EventName_EVENT_NAME_PROJECT_CREATED: eventmanager.NewCreateChannelFunc(rc, channel.BothMode, bufferSize, maxRetryPolicy),
 	})
 	if err != nil {
 		log.Fatal(err)
