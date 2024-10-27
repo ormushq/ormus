@@ -1,14 +1,11 @@
 package rbbitmqchannel
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"sync"
 	"time"
 
-	"github.com/ormushq/ormus/adapter/otela"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/errmsg"
@@ -19,7 +16,7 @@ type ChannelAdapter struct {
 	wg                       *sync.WaitGroup
 	done                     <-chan bool
 	channels                 map[string]*rabbitmqChannel
-	config                   dconfig.RabbitMQConsumerConnection
+	config                   Config
 	rabbitmq                 *Rabbitmq
 	rabbitmqConnectionClosed chan bool
 }
@@ -28,18 +25,18 @@ type Rabbitmq struct {
 	connection *amqp.Connection
 	cond       *sync.Cond
 }
+type Config struct {
+	User            string `koanf:"user"`
+	Password        string `koanf:"password"`
+	Host            string `koanf:"host"`
+	Port            int    `koanf:"port"`
+	Vhost           string `koanf:"vhost"`
+	ReconnectSecond int    `koanf:"reconnect_second"`
+}
 
 const loggerGroupName = "pkg.channel.rabbit"
 
-func New(done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerConnection) *ChannelAdapter {
-	return NewWithContext(context.Background(), done, wg, config)
-}
-
-func NewWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitGroup, config dconfig.RabbitMQConsumerConnection) *ChannelAdapter {
-	tracer := otela.NewTracer("rbbitmqchannel")
-	_, span := tracer.Start(ctx, "rbbitmqchannel@NewWithContext")
-	defer span.End()
-
+func New(done <-chan bool, wg *sync.WaitGroup, config Config) *ChannelAdapter {
 	cond := sync.NewCond(&sync.Mutex{})
 	rabbitmq := Rabbitmq{
 		cond:       cond,
@@ -64,7 +61,6 @@ func NewWithContext(ctx context.Context, done <-chan bool, wg *sync.WaitGroup, c
 		logger.WithGroup(loggerGroupName).Error("rabbitmq connection failed",
 			slog.String("error", err.Error()))
 	}
-	span.AddEvent("connection-established")
 
 	return c
 }
@@ -121,17 +117,8 @@ func (ca *ChannelAdapter) waitForConnectionClose() {
 	}()
 }
 
-func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
-	return ca.NewChannelWithContext(context.Background(), name, mode, bufferSize, numberInstants, maxRetryPolicy)
-}
-
-func (ca *ChannelAdapter) NewChannelWithContext(ctx context.Context, name string, mode channel.Mode, bufferSize, numberInstants, maxRetryPolicy int) error {
-	tracer := otela.NewTracer("rbbitmqchannel")
-	_, span := tracer.Start(ctx, "rbbitmqchannel@NewChannel")
-	defer span.End()
-
-	ch, err := newChannelWithContext(
-		ctx,
+func (ca *ChannelAdapter) NewChannel(name string, mode channel.Mode, bufferSize, maxRetryPolicy int) error {
+	ch, err := newChannel(
 		ca.done,
 		ca.wg,
 		rabbitmqChannelParams{
@@ -140,13 +127,11 @@ func (ca *ChannelAdapter) NewChannelWithContext(ctx context.Context, name string
 			exchange:       name + "-exchange",
 			queue:          name + "-queue",
 			bufferSize:     bufferSize,
-			numberInstants: numberInstants,
 			maxRetryPolicy: maxRetryPolicy,
 		})
 	if err != nil {
 		return err
 	}
-	span.AddEvent("channel-created")
 	ca.channels[name] = ch
 
 	return nil

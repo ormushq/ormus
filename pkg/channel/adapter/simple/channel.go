@@ -14,20 +14,17 @@ type simpleChannel struct {
 	mode           channel.Mode
 	inputChannel   chan []byte
 	outputChannel  chan channel.Message
-	numberInstants int
 	maxRetryPolicy int
 }
 
 const timeForCallAgainDuration = 10
 
-func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode,
-	bufferSize, numberInstants, maxRetryPolicy int,
+func newChannel(done <-chan bool, wg *sync.WaitGroup, mode channel.Mode, bufferSize, maxRetryPolicy int,
 ) *simpleChannel {
 	sc := &simpleChannel{
 		done:           done,
 		wg:             wg,
 		mode:           mode,
-		numberInstants: numberInstants,
 		maxRetryPolicy: maxRetryPolicy,
 		inputChannel:   make(chan []byte, bufferSize),
 		outputChannel:  make(chan channel.Message, bufferSize),
@@ -50,22 +47,20 @@ func (sc simpleChannel) GetOutputChannel() <-chan channel.Message {
 }
 
 func (sc simpleChannel) startConsume() {
-	for i := 0; i < sc.numberInstants; i++ {
-		sc.wg.Add(1)
-		go func() {
-			defer sc.wg.Done()
-			for {
-				select {
-				case <-sc.done:
+	sc.wg.Add(1)
+	go func() {
+		defer sc.wg.Done()
+		for {
+			select {
+			case <-sc.done:
 
-					return
-				case msg := <-sc.inputChannel:
-					logger.WithGroup(loggerGroupName).Debug("New message received in simple/adapter.go ca.inputChannel")
-					sc.startDelivery(msg)
-				}
+				return
+			case msg := <-sc.inputChannel:
+				logger.WithGroup(loggerGroupName).Debug("New message received in simple/adapter.go ca.inputChannel")
+				sc.startDelivery(msg)
 			}
-		}()
-	}
+		}
+	}()
 }
 
 func (sc simpleChannel) startDelivery(msg []byte) {
