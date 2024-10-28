@@ -7,7 +7,7 @@ import (
 
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	rabbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 )
 
 func main() {

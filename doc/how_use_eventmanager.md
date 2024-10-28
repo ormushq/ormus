@@ -19,7 +19,7 @@ import (
 	"github.com/ormushq/ormus/contract/go/project"
 	"github.com/ormushq/ormus/eventmanager"
 	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"sync"
@@ -31,7 +31,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 
 	// Init channel package you can use rabbitmqchannel or simple
-	rc := rbbitmqchannel.New(done, wg, rbbitmqchannel.Config{
+	rc := rabbitmqchannel.New(done, wg, rabbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "127.0.0.1",

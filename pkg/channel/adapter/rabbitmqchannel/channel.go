@@ -1,4 +1,4 @@
-package rbbitmqchannel
+package rabbitmqchannel
 
 import (
 	"context"

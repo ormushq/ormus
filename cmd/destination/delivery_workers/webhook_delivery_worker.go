@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"log"
 	"log/slog"
 	"os"
@@ -22,7 +23,6 @@ import (
 	"github.com/ormushq/ormus/destination/worker"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	rabitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -113,7 +113,7 @@ func main() {
 	maxRetryPolicy := 5
 	taskConsumerConf := config.C().Destination.RabbitMQTaskManagerConnection
 	queueName := "webhook_tasks"
-	outputChannelAdapter := rabitmqchannel.New(done, &wg, rabitmqchannel.Config{
+	outputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
 		User:            taskConsumerConf.User,
 		Password:        taskConsumerConf.Password,
 		Host:            taskConsumerConf.Host,

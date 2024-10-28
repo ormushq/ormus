@@ -8,15 +8,15 @@ import (
 	"github.com/ormushq/ormus/manager/managerparam"
 	"github.com/ormushq/ormus/manager/managerparam/projectparam"
 	"github.com/ormushq/ormus/manager/service/projectservice"
-	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simplechannel"
 )
 
 type Worker struct {
 	prSvc          projectservice.Service
-	internalBroker *simple.ChannelAdapter
+	internalBroker *simplechannel.ChannelAdapter
 }
 
-func New(prSvc projectservice.Service, internalBroker *simple.ChannelAdapter) *Worker {
+func New(prSvc projectservice.Service, internalBroker *simplechannel.ChannelAdapter) *Worker {
 	return &Worker{
 		prSvc:          prSvc,
 		internalBroker: internalBroker,

@@ -9,7 +9,7 @@ import (
 
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/pkg/channel"
-	rabitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 )
 
 type MyMessage struct {
@@ -34,7 +34,7 @@ func main() {
 
 	port := 5672
 	reconnectSecond := 10
-	channelAdapter := rabitmqchannel.New(done, wg, rabitmqchannel.Config{
+	channelAdapter := rabbitmqchannel.New(done, wg, rabbitmqchannel.Config{
 		User:            "guest",
 		Password:        "guest",
 		Host:            "rabbitmq",

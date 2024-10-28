@@ -1,4 +1,4 @@
-package simple
+package rabbitmqchannel
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/pkg/channel"
-	"github.com/stretchr/testify/assert"
 )
 
 type testCase struct {
@@ -23,7 +23,7 @@ type message struct {
 	MessageId int `json:"message_id"`
 }
 
-func TestSimpleChannel(t *testing.T) {
+func TestRabbitmqChannel(t *testing.T) {
 	cases := []testCase{
 		{
 			name:           "small test",
@@ -35,21 +35,33 @@ func TestSimpleChannel(t *testing.T) {
 	}
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
-
+	config := Config{
+		User:            "guest",
+		Password:        "guest",
+		Host:            "127.0.0.1",
+		Port:            5672,
+		Vhost:           "/",
+		ReconnectSecond: 1,
+	}
 	bufferSize := 100
 	maxRetryPolicy := 5
+
+	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
+	if err != nil {
+		t.Error(err.Error())
+	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			workerwg := &sync.WaitGroup{}
 
-			adapter := New(done, wg)
-			err := adapter.NewChannel(tc.name, channel.BothMode, bufferSize, maxRetryPolicy)
+			inputAdapter := New(done, wg, config)
+			err = inputAdapter.NewChannel(tc.name, channel.InputOnlyMode, bufferSize, maxRetryPolicy)
 			if err != nil {
 				t.Error(err.Error())
 				t.Fail()
 			}
-			inputChannel, err := adapter.GetInputChannel(tc.name)
+			inputChannel, err := inputAdapter.GetInputChannel(tc.name)
 			if err != nil {
 				t.Error(err.Error())
 				t.Fail()
@@ -73,12 +85,17 @@ func TestSimpleChannel(t *testing.T) {
 					}
 				}(workerId, inputChannel)
 			}
-
-			outputChannel, err := adapter.GetOutputChannel(tc.name)
-			assert.NoError(t, err)
+			time.Sleep(time.Second * tc.receiveTimeout / 2)
+			outputAdapter := New(done, wg, config)
+			err = outputAdapter.NewChannel(tc.name, channel.OutputOnly, bufferSize, maxRetryPolicy)
 			if err != nil {
 				t.Error(err.Error())
-				t.Fail()
+				t.FailNow()
+			}
+			outputChannel, err := outputAdapter.GetOutputChannel(tc.name)
+			if err != nil {
+				t.Error(err.Error())
+				t.FailNow()
 			}
 			msgReceivedCount := atomic.Int32{}
 
@@ -155,6 +172,5 @@ func TestSimpleChannel(t *testing.T) {
 	t.Log("Before close done channel")
 	close(done)
 	t.Log("Before final wait")
-
 	wg.Wait()
 }
