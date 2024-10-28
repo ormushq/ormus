@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"log"
 	"log/slog"
 	"os"
@@ -17,7 +18,6 @@ import (
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager/entity"
 	"github.com/ormushq/ormus/pkg/channel"
-	rabitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -103,7 +103,7 @@ func main() {
 
 	taskPublisherCnf := config.C().Destination.RabbitMQTaskManagerConnection
 
-	inputChannelAdapter := rabitmqchannel.New(done, &wg, rabitmqchannel.Config{
+	inputChannelAdapter := rabbitmqchannel.New(done, &wg, rabbitmqchannel.Config{
 		User:            taskPublisherCnf.User,
 		Password:        taskPublisherCnf.Password,
 		Host:            taskPublisherCnf.Host,

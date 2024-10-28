@@ -1,4 +1,4 @@
-package rbbitmqchannel
+package rabbitmqchannel
 
 type RabbitMQConsumerConnection struct {
 	User            string

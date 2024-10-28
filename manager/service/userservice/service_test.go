@@ -16,7 +16,7 @@ import (
 	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/param"
 	"github.com/ormushq/ormus/pkg/channel"
-	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simplechannel"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +27,7 @@ func TestService_Register(t *testing.T) {
 	cfg := config.C().Manager
 	done := make(chan bool)
 	wg := sync.WaitGroup{}
-	internalBroker := simple.New(done, &wg)
+	internalBroker := simplechannel.New(done, &wg)
 	internalBroker.NewChannel("CreateDefaultProject", channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	RepoPr := projectstub.New(false)
