@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"log"
 	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
 	"time"
+
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 
 	"github.com/ormushq/ormus/adapter/etcd"
 	"github.com/ormushq/ormus/adapter/otela"
