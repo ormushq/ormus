@@ -1,16 +1,24 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
 
 	"github.com/ormushq/ormus/adapter/otela"
+	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
+	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/logger"
+	"github.com/ormushq/ormus/pkg/channel"
+	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
 	"github.com/ormushq/ormus/source/delivery/httpserver"
 	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
+	sourceevent "github.com/ormushq/ormus/source/eventhandler"
+	writekeyrepo "github.com/ormushq/ormus/source/repository/redis/rediswritekey"
+	"github.com/ormushq/ormus/source/service/writekey"
 )
 
 //	@termsOfService	http://swagger.io/terms/
@@ -58,6 +66,14 @@ func main() {
 	handlers := []httpserver.Handler{
 		statushandler.New(),
 	}
+	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	cfg := config.C()
+	_, Consumer := SetupSourceServices(cfg)
+	Consumer.Consume(context.Background(), cfg.Source.NewSourceEventName, done, wg, Consumer.ProcessNewSourceEvent)
 
 	//----------------- Setup Tracer -----------------//
 	otelcfg := otela.Config{
@@ -68,7 +84,7 @@ func main() {
 		MetricExposePort:   config.C().Source.Otel.MetricExposePort,
 		Exporter:           otela.ExporterGrpc,
 	}
-	err := otela.Configure(wg, done, otelcfg)
+	err = otela.Configure(wg, done, otelcfg)
 	if err != nil {
 		l.Error(err.Error())
 	}
@@ -85,4 +101,33 @@ func main() {
 
 	close(done)
 	wg.Wait()
+}
+
+func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consumer) {
+	done := make(chan bool)
+	wg := &sync.WaitGroup{}
+	dbConfig := dconfig.RabbitMQConsumerConnection{
+		User:            cfg.RabbitMq.UserName,
+		Password:        cfg.RabbitMq.Password,
+		Host:            cfg.RabbitMq.Host,
+		Port:            cfg.RabbitMq.Port,
+		Vhost:           cfg.RabbitMq.Vhost,
+		ReconnectSecond: cfg.RabbitMq.ReconnectSecond,
+	}
+	outputAdapter := rbbitmqchannel.New(done, wg, dbConfig)
+	err := outputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.OutputOnly, cfg.Source.BufferSize, cfg.Source.NumberInstants, cfg.Source.MaxRetry)
+	if err != nil {
+		panic(err)
+	}
+
+	adapter, err := redis.New(cfg.Redis)
+	if err != nil {
+		panic(err)
+	}
+
+	writeKeyRepo := writekeyrepo.New(adapter)
+	writeKeySvc := writekey.New(&writeKeyRepo, cfg.Source)
+	eventHandler := sourceevent.New(outputAdapter, writeKeySvc)
+
+	return writeKeySvc, *eventHandler
 }

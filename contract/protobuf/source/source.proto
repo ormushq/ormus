@@ -30,3 +30,9 @@ message Source {
   google.protobuf.Timestamp updated_at = 10;
   google.protobuf.Timestamp deleted_at = 11;
 }
+
+message NewSourceEvent {
+  string project_id = 1;
+  string owner_id = 2;
+  string write_key = 3;
+}
