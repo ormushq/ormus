@@ -12,5 +12,10 @@ type HTTPServer struct {
 type Config struct {
 	HTTPServer HTTPServer `koanf:"http_server"`
 	// TODO - add source, auth and etc configurations
-	Otel otela.Otel `koanf:"otel"`
+	Otel                    otela.Otel `koanf:"otel"`
+	WriteKeyRedisExpiration uint       `koanf:"write_key_expiration"`
+	NewSourceEventName      string     `koanf:"new_source_event_name"`
+	BufferSize              int        `koanf:"buffersize"`
+	NumberInstants          int        `koanf:"number_instants"`
+	MaxRetry                int        `koanf:"maxretry"`
 }

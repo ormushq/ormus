@@ -2,37 +2,38 @@ package writekey
 
 import (
 	"context"
+
+	proto_source "github.com/ormushq/ormus/contract/go/source"
+	"github.com/ormushq/ormus/pkg/richerror"
+	"github.com/ormushq/ormus/source"
 )
 
-// Repository is an interface representing what methods should be implemented by the repository.
 type Repository interface {
-	// TODO - implementation redis
-	IsValidWriteKey(ctx context.Context, writeKey string) (bool, error)
+	CreateNewWriteKey(ctx context.Context, writeKey *proto_source.NewSourceEvent, expirationTime uint) error
+	GetWriteKey(ctx context.Context, ownerID, projectID string) (*proto_source.NewSourceEvent, error)
 }
 
-// Service show dependencies writeKey authservice.
 type Service struct {
-	repo Repository
+	writeKeyRepo Repository
+	config       source.Config
 }
 
-// Constructor writeKey authservice.
-func New(repo Repository) Service {
+func New(writeKeyRepo Repository, config source.Config) Service {
 	return Service{
-		repo: repo,
+		writeKeyRepo: writeKeyRepo,
+		config:       config,
 	}
 }
 
-// IsValid checks whether the writeKey is valid or not.
-func (s Service) IsValid(ctx context.Context, writeKey string) (bool, error) {
-	// TODO - How errmsg handling ? Rich-errmsg or ...?
-	isValid, err := s.repo.IsValidWriteKey(ctx, writeKey)
+func (s Service) CreateNewWriteKey(ctx context.Context, ownerID, projectID, writeKey string) error {
+	err := s.writeKeyRepo.CreateNewWriteKey(ctx, &proto_source.NewSourceEvent{
+		ProjectId: projectID,
+		OwnerId:   ownerID,
+		WriteKey:  writeKey,
+	}, s.config.WriteKeyRedisExpiration)
 	if err != nil {
-		// TODO - logger
-		return false, err
-	}
-	if !isValid {
-		return false, err
+		return richerror.New("source.service").WithWrappedError(err)
 	}
 
-	return true, nil
+	return nil
 }
