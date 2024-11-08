@@ -9,8 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
-
 	"github.com/ormushq/ormus/adapter/etcd"
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/adapter/redis"
@@ -24,6 +22,7 @@ import (
 	"github.com/ormushq/ormus/destination/worker"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )

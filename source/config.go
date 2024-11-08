@@ -16,6 +16,5 @@ type Config struct {
 	WriteKeyRedisExpiration uint       `koanf:"write_key_expiration"`
 	NewSourceEventName      string     `koanf:"new_source_event_name"`
 	BufferSize              int        `koanf:"buffersize"`
-	NumberInstants          int        `koanf:"number_instants"`
 	MaxRetry                int        `koanf:"maxretry"`
 }

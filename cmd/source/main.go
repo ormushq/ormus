@@ -10,10 +10,9 @@ import (
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/adapter/redis"
 	"github.com/ormushq/ormus/config"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"github.com/ormushq/ormus/source/delivery/httpserver"
 	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
 	sourceevent "github.com/ormushq/ormus/source/eventhandler"
@@ -106,16 +105,9 @@ func main() {
 func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consumer) {
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
-	dbConfig := dconfig.RabbitMQConsumerConnection{
-		User:            cfg.RabbitMq.UserName,
-		Password:        cfg.RabbitMq.Password,
-		Host:            cfg.RabbitMq.Host,
-		Port:            cfg.RabbitMq.Port,
-		Vhost:           cfg.RabbitMq.Vhost,
-		ReconnectSecond: cfg.RabbitMq.ReconnectSecond,
-	}
-	outputAdapter := rbbitmqchannel.New(done, wg, dbConfig)
-	err := outputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.OutputOnly, cfg.Source.BufferSize, cfg.Source.NumberInstants, cfg.Source.MaxRetry)
+
+	outputAdapter := rabbitmqchannel.New(done, wg, cfg.RabbitMq)
+	err := outputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.OutputOnly, cfg.Source.BufferSize, cfg.Source.MaxRetry)
 	if err != nil {
 		panic(err)
 	}
