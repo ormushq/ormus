@@ -13,30 +13,33 @@ import (
 type RegisterEventChannel func(channelName string) error
 
 type Manager struct {
-	adapter           channel.Adapter
-	wg                *sync.WaitGroup
-	done              <-chan bool
-	createChannelFunc func(channelName string) error
+	adapter channel.Adapter
+	wg      *sync.WaitGroup
+	done    <-chan bool
+	events  map[internalevent.EventName]CreateChannelFunc
 }
 
 var once = make(map[channel.Adapter]map[string]*sync.Once)
 
-func New(wg *sync.WaitGroup, done <-chan bool, adapter channel.Adapter, createChannelFunc func(channelName string) error) Manager {
-	return Manager{
-		wg:                wg,
-		done:              done,
-		adapter:           adapter,
-		createChannelFunc: createChannelFunc,
+func New(wg *sync.WaitGroup, done <-chan bool, adapter channel.Adapter, events map[internalevent.EventName]CreateChannelFunc) (Manager, error) {
+	manager := Manager{
+		wg:      wg,
+		done:    done,
+		adapter: adapter,
+		events:  events,
 	}
+	for eventType, createChannelFunc := range events {
+		err := manager.createChannel(createChannelFunc, eventType)
+		if err != nil {
+			return Manager{}, err
+		}
+	}
+
+	return manager, nil
 }
 
 func (h Manager) Publish(msg *internalevent.Event) error {
-	channelName, err := h.getChannelName(msg.EventName)
-	if err != nil {
-		return err
-	}
-
-	err = h.createChannel(channelName)
+	channelName, err := h.checkChannel(msg.EventName)
 	if err != nil {
 		return err
 	}
@@ -55,22 +58,27 @@ func (h Manager) Publish(msg *internalevent.Event) error {
 	return nil
 }
 
-func (h Manager) Consume(eventName internalevent.EventName, eventNames ...internalevent.EventName) (<-chan EventMessage, error) {
-	eventNames = append(eventNames, eventName)
-	channelNames := make([]string, 0)
-	for _, eventName := range eventNames {
-		channelName, err := h.getChannelName(eventName)
-		if err != nil {
-			return nil, err
-		}
-		channelNames = append(channelNames, channelName)
+func (h Manager) checkChannel(eventName internalevent.EventName) (string, error) {
+	_, ok := h.events[eventName]
+	if !ok {
+		return "", fmt.Errorf("unknown event name %s", eventName)
 	}
+
+	return h.getChannelName(eventName)
+}
+
+func (h Manager) Consume(eventTypes ...internalevent.EventName) (<-chan EventMessage, error) {
+	if len(eventTypes) == 0 {
+		return nil, fmt.Errorf("no event types provided")
+	}
+
 	chs := make([]<-chan channel.Message, 0)
-	for _, channelName := range channelNames {
-		err := h.createChannel(channelName)
+	for _, eventType := range eventTypes {
+		channelName, err := h.checkChannel(eventType)
 		if err != nil {
 			return nil, err
 		}
+
 		ch, err := h.adapter.GetOutputChannel(channelName)
 		if err != nil {
 			return nil, err
@@ -78,19 +86,30 @@ func (h Manager) Consume(eventName internalevent.EventName, eventNames ...intern
 		chs = append(chs, ch)
 	}
 
-	return h.covertChannel(chs...), nil
+	return h.convertChannel(chs...), nil
 }
 
-func (h Manager) createChannel(channelName string) error {
-	var err error
+func (h Manager) createChannel(createChannelFunc CreateChannelFunc, eventType internalevent.EventName) error {
+	channelName, err := h.getChannelName(eventType)
+	if err != nil {
+		return err
+	}
+	_, ok := once[h.adapter]
+	if !ok {
+		once[h.adapter] = make(map[string]*sync.Once)
+	}
+	_, ok = once[h.adapter][channelName]
+	if !ok {
+		once[h.adapter][channelName] = &sync.Once{}
+	}
 	once[h.adapter][channelName].Do(func() {
-		err = h.createChannelFunc(channelName)
+		err = createChannelFunc(channelName)
 	})
 
 	return err
 }
 
-func (h Manager) covertChannel(chs ...<-chan channel.Message) <-chan EventMessage {
+func (h Manager) convertChannel(chs ...<-chan channel.Message) <-chan EventMessage {
 	newCh := make(chan EventMessage, len(chs))
 
 	for _, ch := range chs {
@@ -102,14 +121,14 @@ func (h Manager) covertChannel(chs ...<-chan channel.Message) <-chan EventMessag
 				case <-h.done:
 					return
 				case msg := <-ch:
-					var ev *internalevent.Event
-					err := proto.Unmarshal(msg.Body, ev)
+					var ev internalevent.Event
+					err := proto.Unmarshal(msg.Body, &ev)
 					if err != nil {
 						logger.LogError(err)
 
 						continue
 					}
-					newCh <- NewEventMessage(ev, msg.Ack)
+					newCh <- NewEventMessage(&ev, msg.Ack)
 
 				}
 			}

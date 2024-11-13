@@ -26,7 +26,7 @@ import (
 	"github.com/ormushq/ormus/manager/validator/uservalidator"
 	"github.com/ormushq/ormus/manager/workers"
 	"github.com/ormushq/ormus/pkg/channel"
-	"github.com/ormushq/ormus/pkg/channel/adapter/simple"
+	"github.com/ormushq/ormus/pkg/channel/adapter/simplechannel"
 )
 
 //	@termsOfService	http://swagger.io/terms/
@@ -59,9 +59,9 @@ func main() {
 }
 
 func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) httpserver.SetupServices {
-	internalBroker := simple.New(done, wg)
+	internalBroker := simplechannel.New(done, wg)
 	err := internalBroker.NewChannel(managerparam.CreateDefaultProject, channel.BothMode,
-		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.NumberInstant, cfg.InternalBrokerConfig.MaxRetryPolicy)
+		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.MaxRetryPolicy)
 	if err != nil {
 		logger.L().Error("error on creating internal broker channel", err)
 	}

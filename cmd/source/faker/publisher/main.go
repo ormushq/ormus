@@ -7,9 +7,8 @@ import (
 	"github.com/ormushq/ormus/adapter/otela"
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/contract/go/source"
-	"github.com/ormushq/ormus/destination/dconfig"
 	"github.com/ormushq/ormus/pkg/channel"
-	rbbitmqchannel "github.com/ormushq/ormus/pkg/channel/adapter/rabbitmq"
+	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"github.com/ormushq/ormus/pkg/encoder"
 )
 
@@ -17,16 +16,7 @@ func main() {
 	cfg := config.C()
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
-	dbConfig := dconfig.RabbitMQConsumerConnection{
-		User:            cfg.RabbitMq.UserName,
-		Password:        cfg.RabbitMq.Password,
-		Host:            cfg.RabbitMq.Host,
-		Port:            cfg.RabbitMq.Port,
-		Vhost:           cfg.RabbitMq.Vhost,
-		ReconnectSecond: cfg.RabbitMq.ReconnectSecond,
-	}
 	bufferSize := cfg.Source.BufferSize
-	numberInstants := cfg.Source.NumberInstants
 	maxRetryPolicy := cfg.Source.MaxRetry
 	testCount := 100
 
@@ -34,8 +24,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	inputAdapter := rbbitmqchannel.New(done, wg, dbConfig)
-	err = inputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.InputOnlyMode, bufferSize, numberInstants, maxRetryPolicy)
+	inputAdapter := rabbitmqchannel.New(done, wg, cfg.RabbitMq)
+	err = inputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.InputOnlyMode, bufferSize, maxRetryPolicy)
 	if err != nil {
 		panic(err.Error())
 	}
