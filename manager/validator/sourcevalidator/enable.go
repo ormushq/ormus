@@ -10,18 +10,10 @@ import (
 	"github.com/ormushq/ormus/pkg/richerror"
 )
 
-func (v Validator) ValidateUpdateRequest(req sourceparam.UpdateRequest) *validator.Error {
-	const op = "sourcevalidator.ValidateUpdateRequest"
-
-	minNameLength := 5
-	maxNameLength := 30
-
-	minDescriptionLength := 5
-	maxDescriptionLength := 100
+func (v Validator) ValidateEnableRequest(req sourceparam.EnableRequest) *validator.Error {
+	const op = "sourcevalidator.ValidateEnableRequest"
 
 	if err := validation.ValidateStruct(&req,
-		validation.Field(&req.Name, validation.Required, validation.Length(minNameLength, maxNameLength)),
-		validation.Field(&req.Description, validation.Required, validation.Length(minDescriptionLength, maxDescriptionLength)),
 		validation.Field(&req.UserID, validation.Required),
 	); err != nil {
 
