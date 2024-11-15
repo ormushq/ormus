@@ -28,7 +28,7 @@ rabbitmq:
   host: "localhost"
   port: 5672
   password: "guest"
-  username: "guest"
+  user: "guest"
   reconnect_second: 1
   vhost: "/"
 etcd:
