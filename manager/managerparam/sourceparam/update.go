@@ -7,7 +7,6 @@ type UpdateRequest struct {
 	SourceID    string `json:"-" param:"SourceID"`
 	Name        string `json:"name" example:"updated name"`
 	Description string `json:"description"  example:"updated description"`
-	Status      string `json:"status"  example:"active"`
 }
 
 type UpdateResponse struct {

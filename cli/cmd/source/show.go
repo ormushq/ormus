@@ -5,7 +5,11 @@ package source
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 
+	"github.com/ormushq/ormus/cli/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -13,14 +17,41 @@ import (
 var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Show details of a specific source.",
-	Long:  `ormus source show --project-id <project-id> --source-id <source-id>`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("show called")
+	Long:  `ormus source show --source-id <source-id>`,
+	Run: func(cmdCobra *cobra.Command, args []string) {
+		sourceID, err := cmdCobra.Flags().GetString("source-id")
+		if err != nil {
+			fmt.Println("error on get source id flag", err)
+
+			return
+		}
+
+		if sourceID == "" {
+			fmt.Println("source id is required")
+
+			return
+		}
+		resp, err := cmd.Client.SendRequest(cmd.Client.Source.Show(sourceID))
+		if err != nil {
+			log.Fatal(err)
+		}
+		j, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			log.Fatal(fmt.Errorf("status not Ok ,status code %d, body: %s", resp.StatusCode, j))
+		}
+
+		fmt.Printf("success response : \n%s\n", j)
 	},
 }
 
 func init() {
 	sourceCmd.AddCommand(showCmd)
+
+	showCmd.Flags().String("source-id", "", "source-id")
 
 	// Here you will define your flags and configuration settings.
 

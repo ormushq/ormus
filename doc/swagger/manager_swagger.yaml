@@ -198,6 +198,16 @@ definitions:
       message:
         type: string
     type: object
+  sourceparam.DisableResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  sourceparam.EnableResponse:
+    properties:
+      message:
+        type: string
+    type: object
   sourceparam.ListResponse:
     properties:
       has_more:
@@ -210,6 +220,11 @@ definitions:
         items:
           $ref: '#/definitions/entity.Source'
         type: array
+    type: object
+  sourceparam.ShowResponse:
+    properties:
+      source:
+        $ref: '#/definitions/entity.Source'
     type: object
   sourceparam.UpdateRequest:
     properties:
@@ -505,6 +520,40 @@ paths:
       summary: Delete source
       tags:
       - Source
+    get:
+      consumes:
+      - application/json
+      description: Show source
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.ShowResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Show source
+      tags:
+      - Source
     post:
       consumes:
       - application/json
@@ -543,6 +592,111 @@ paths:
       security:
       - JWTToken: []
       summary: Update source
+      tags:
+      - Source
+  /sources/{source_id}/disable:
+    get:
+      consumes:
+      - application/json
+      description: Disable source
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.DisableResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Disable source
+      tags:
+      - Source
+  /sources/{source_id}/enable:
+    get:
+      consumes:
+      - application/json
+      description: Enable source
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.EnableResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Enable source
+      tags:
+      - Source
+  /sources/{source_id}/rotate-write-key:
+    get:
+      consumes:
+      - application/json
+      description: Rotate writekey
+      parameters:
+      - description: Source identifier
+        in: path
+        name: source_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sourceparam.ShowResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - JWTToken: []
+      summary: Rotate writekey
       tags:
       - Source
   /users/login:

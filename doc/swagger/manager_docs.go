@@ -388,6 +388,59 @@ const docTemplatemanager = `{
             }
         },
         "/sources/{source_id}": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Show source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Show source",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.ShowResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -481,6 +534,171 @@ const docTemplatemanager = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/sourceparam.DeleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/sources/{source_id}/disable": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Disable source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Disable source",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.DisableResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/sources/{source_id}/enable": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Enable source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Enable source",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.EnableResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/sources/{source_id}/rotate-write-key": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "description": "Rotate writekey",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Rotate writekey",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source identifier",
+                        "name": "source_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sourceparam.ShowResponse"
                         }
                     },
                     "400": {
@@ -914,6 +1132,22 @@ const docTemplatemanager = `{
                 }
             }
         },
+        "sourceparam.DisableResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "sourceparam.EnableResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "sourceparam.ListResponse": {
             "type": "object",
             "properties": {
@@ -931,6 +1165,14 @@ const docTemplatemanager = `{
                     "items": {
                         "$ref": "#/definitions/entity.Source"
                     }
+                }
+            }
+        },
+        "sourceparam.ShowResponse": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "$ref": "#/definitions/entity.Source"
                 }
             }
         },
