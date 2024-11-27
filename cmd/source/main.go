@@ -14,10 +14,15 @@ import (
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
 	"github.com/ormushq/ormus/source/delivery/httpserver"
+	"github.com/ormushq/ormus/source/delivery/httpserver/eventhandler"
 	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
 	sourceevent "github.com/ormushq/ormus/source/eventhandler"
 	writekeyrepo "github.com/ormushq/ormus/source/repository/redis/rediswritekey"
+	"github.com/ormushq/ormus/source/repository/scylladb"
+	eventrepo "github.com/ormushq/ormus/source/repository/scylladb/event"
+	eventsvc "github.com/ormushq/ormus/source/service/event"
 	"github.com/ormushq/ormus/source/service/writekey"
+	"github.com/ormushq/ormus/source/validator/eventvalidator/eventvalidator"
 )
 
 //	@termsOfService	http://swagger.io/terms/
@@ -62,16 +67,13 @@ func main() {
 	// use slog as default logger.
 	slog.SetDefault(l)
 
-	handlers := []httpserver.Handler{
-		statushandler.New(),
-	}
 	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
 	if err != nil {
 		panic(err.Error())
 	}
 
 	cfg := config.C()
-	_, Consumer := SetupSourceServices(cfg)
+	_, Consumer, eventSvc, eventValidator := SetupSourceServices(cfg)
 	Consumer.Consume(context.Background(), cfg.Source.NewSourceEventName, done, wg, Consumer.ProcessNewSourceEvent)
 
 	//----------------- Setup Tracer -----------------//
@@ -87,7 +89,10 @@ func main() {
 	if err != nil {
 		l.Error(err.Error())
 	}
-
+	handlers := []httpserver.Handler{
+		statushandler.New(),
+		eventhandler.New(eventSvc, eventValidator),
+	}
 	httpServer := httpserver.New(config.C().Source, handlers)
 
 	httpServer.Serve()
@@ -102,7 +107,7 @@ func main() {
 	wg.Wait()
 }
 
-func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consumer) {
+func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, eventHandler sourceevent.Consumer, eventSvc eventsvc.Service, eventValidator eventvalidator.Validator) {
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
 
@@ -118,8 +123,17 @@ func SetupSourceServices(cfg config.Config) (writekey.Service, sourceevent.Consu
 	}
 
 	writeKeyRepo := writekeyrepo.New(adapter)
-	writeKeySvc := writekey.New(&writeKeyRepo, cfg.Source)
-	eventHandler := sourceevent.New(outputAdapter, writeKeySvc)
+	writeKeySvc = writekey.New(&writeKeyRepo, cfg.Source)
+	eventHandler = *sourceevent.New(outputAdapter, writeKeySvc)
 
-	return writeKeySvc, *eventHandler
+	DB, err := scylladb.New(cfg.Scylladb)
+	if err != nil {
+		panic(err)
+	}
+	eventRepo := eventrepo.New(DB)
+	eventSvc = *eventsvc.New(eventRepo)
+
+	eventValidator = eventvalidator.New(&writeKeyRepo)
+
+	return writeKeySvc, eventHandler, eventSvc, eventValidator
 }

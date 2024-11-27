@@ -10,7 +10,6 @@ import (
 
 type Repository interface {
 	CreateNewWriteKey(ctx context.Context, writeKey *proto_source.NewSourceEvent, expirationTime uint) error
-	GetWriteKey(ctx context.Context, ownerID, projectID string) (*proto_source.NewSourceEvent, error)
 }
 
 type Service struct {
