@@ -82,6 +82,7 @@ require (
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/scylladb/go-reflectx v1.0.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
