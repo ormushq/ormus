@@ -1,43 +1,9 @@
-/*
-Package initializedb provides functions for initializing a ScyllaDB connection and obtaining a database session.
-
-Usage:
-
-	func main() {
-	    // Create a new ScyllaDB connection instance
-	    connection := initializedb.NewScyllaDBConnection(gocql.Quorum, "example_keyspace", "127.0.0.1")
-
-	    // Get a ScyllaDB session using the created connection
-	    session, err := initializedb.GetConnection(connection)
-	    if err != nil {
-	        log.Fatal("Failed to get ScyllaDB session:", err)
-	    }
-
-	    // Use the 'session' for database operations
-
-	    // Close the session when done
-	    defer session.Close()
-	}
-
-This package includes functions for creating a new ScyllaDB connection and obtaining a ScyllaDB session.
-It utilizes the gocql library for interacting with ScyllaDB.
-
-Functions:
-
-  - NewScyllaDBConnection: Creates and returns a new instance of the 'scyllaDBConnection' type with the specified connection parameters.
-    func NewScyllaDBConnection(consistency gocql.Consistency, keyspace string, hosts ...string) *scyllaDBConnection
-
-  - GetConnection: Returns a ScyllaDB session using the provided 'scyllaDBConnection' instance.
-    It internally creates a ScyllaDB cluster configuration and session.
-    func GetConnection(conn *scyllaDBConnection) (scylladb.SessionxInterface, error)
-*/
 package scyllainitialize
 
 import (
 	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/adapter/scylladb"
 	"github.com/ormushq/ormus/logger"
-	scyllaMigrate "github.com/ormushq/ormus/source/repository/scylladb/migrate"
 )
 
 func NewScyllaDBConnection(consistency gocql.Consistency, keyspace string, hosts ...string) *ScyllaDBConnection {
@@ -70,8 +36,8 @@ func CreateKeySpace(consistency gocql.Consistency, keyspace string, hosts ...str
 func RunMigrations(dbConn *ScyllaDBConnection, dir string) error {
 	logger.L().Debug("running migrations...")
 	for _, host := range dbConn.hosts {
-		manager := scyllaMigrate.New(dir, host, dbConn.keyspace)
-		err := manager.Run()
+		migration := New(dir, host, dbConn.keyspace)
+		err := migration.Run()
 		if err != nil {
 			return err
 		}

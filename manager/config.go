@@ -13,7 +13,8 @@ type Config struct {
 }
 
 type ApplicationConfig struct {
-	Port int `koanf:"port"`
+	HTTPPort int `koanf:"http_port"`
+	GrpcPort int `koanf:"grpc_port"`
 }
 
 type InternalBrokerConfig struct {
