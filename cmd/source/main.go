@@ -13,6 +13,7 @@ import (
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
+	writekeymanagervalidation "github.com/ormushq/ormus/source/adapter/manager"
 	"github.com/ormushq/ormus/source/delivery/httpserver"
 	"github.com/ormushq/ormus/source/delivery/httpserver/eventhandler"
 	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
@@ -21,6 +22,7 @@ import (
 	"github.com/ormushq/ormus/source/repository/scylladb"
 	eventrepo "github.com/ormushq/ormus/source/repository/scylladb/event"
 	eventsvc "github.com/ormushq/ormus/source/service/event"
+
 	"github.com/ormushq/ormus/source/service/writekey"
 	"github.com/ormushq/ormus/source/validator/eventvalidator/eventvalidator"
 )
@@ -133,7 +135,9 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 	eventRepo := eventrepo.New(DB)
 	eventSvc = *eventsvc.New(eventRepo)
 
-	eventValidator = eventvalidator.New(&writeKeyRepo)
+	writeKeyManagerRepo := writekeymanagervalidation.New(cfg.Source)
+
+	eventValidator = eventvalidator.New(&writeKeyRepo, writeKeyManagerRepo, cfg.Source)
 
 	return writeKeySvc, eventHandler, eventSvc, eventValidator
 }
