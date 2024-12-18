@@ -27,14 +27,52 @@ func (r *DB) CreateNewWriteKey(ctx context.Context, writeKey *proto_source.NewSo
 	return nil
 }
 
-func (r *DB) IsWriteKeyValid(ctx context.Context, writeKey string) (bool, error) {
-	err := r.adapter.Client().Get(ctx, writeKey).Err()
-	if errors.Is(err, redis.Nil) { // Use errors.Is to check for redis.Nil
-		return false, nil
-	}
+func (r *DB) IsWriteKeyValid(ctx context.Context, writeKey string, expirationTime uint) (bool, error) {
+	result, err, _ := r.singleFlight.Do(writeKey, func() (interface{}, error) {
+		err := r.adapter.Client().Get(ctx, writeKey).Err()
+		if errors.Is(err, redis.Nil) { // Cache miss, need to validate the write key
+			resp, err := r.ManagerAdapter.IsWriteKeyValid(ctx, &proto_source.ValidateWriteKeyReq{
+				WriteKey: writeKey,
+			})
+			if err != nil {
+				return nil, richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(err.Error())
+			}
+
+			// If valid, create a new write key in the cache
+			if resp.IsValid {
+				err := r.CreateNewWriteKey(ctx,
+					&proto_source.NewSourceEvent{
+						WriteKey:  resp.WriteKey,
+						ProjectId: resp.ProjectId,
+						OwnerId:   resp.OwnerId,
+					}, expirationTime,
+				)
+				if err != nil {
+					return nil, richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(err.Error())
+				}
+
+				return true, nil
+			}
+			// If the write key is not valid, return false
+			return false, nil
+		}
+
+		if err != nil {
+			return false, richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(err.Error())
+		}
+
+		// If the key is found in Redis, return true as it's valid
+		return true, nil
+	})
+
 	if err != nil {
-		return false, richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(err.Error())
+		return false, err
 	}
 
-	return true, nil
+	valid, ok := result.(bool)
+	if !ok {
+		return false, richerror.New("source.repository").WithMessage("invalid result type, expected bool")
+	}
+
+	return valid, nil
 }

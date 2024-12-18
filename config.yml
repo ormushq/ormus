@@ -2,8 +2,9 @@ type: yml
 
 source:
   http_server:
-    port: 8080
+    port: 8082
     network: "tcp"
+  write_key_validation_address: "127.0.0.1:8081"
   write_key_expiration: 120
   new_source_event_name: "new-source-event"
   buffersize: 100
@@ -15,6 +16,15 @@ source:
     enable_metric_expose: true
     metric_expose_port: 8081
     metric_expose_path: "metrics"
+  scylla_db_config:
+    hosts:
+      - 127.0.0.1:9042
+    consistency: 4
+    keyspace: "source"
+    timeout_cluster: 5s
+    num_retries: 10
+    min_retry_delay: 1s
+    max_retry_delay: 10s
 scylladb:
   hosts:
     - 127.0.0.1:9042
@@ -83,7 +93,8 @@ swagger:
 
 manager:
   application:
-    port: 8080
+    http_port: 8080
+    grpc_port: 8081
 
 
   internal_broker_config:

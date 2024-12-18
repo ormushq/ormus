@@ -13,6 +13,7 @@ import (
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/pkg/channel"
 	"github.com/ormushq/ormus/pkg/channel/adapter/rabbitmqchannel"
+	"github.com/ormushq/ormus/source/adapter/manager"
 	"github.com/ormushq/ormus/source/delivery/httpserver"
 	"github.com/ormushq/ormus/source/delivery/httpserver/eventhandler"
 	"github.com/ormushq/ormus/source/delivery/httpserver/statushandler"
@@ -117,23 +118,25 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 		panic(err)
 	}
 
-	adapter, err := redis.New(cfg.Redis)
+	redisAdapter, err := redis.New(cfg.Redis)
 	if err != nil {
 		panic(err)
 	}
 
-	writeKeyRepo := writekeyrepo.New(adapter)
+	ManagerAdapter := manager.New(cfg.Source)
+
+	writeKeyRepo := writekeyrepo.New(redisAdapter, *ManagerAdapter)
 	writeKeySvc = writekey.New(&writeKeyRepo, cfg.Source)
 	eventHandler = *sourceevent.New(outputAdapter, writeKeySvc)
 
-	DB, err := scylladb.New(cfg.Scylladb)
+	DB, err := scylladb.New(cfg.Source.ScyllaDBConfig)
 	if err != nil {
 		panic(err)
 	}
 	eventRepo := eventrepo.New(DB)
 	eventSvc = *eventsvc.New(eventRepo)
 
-	eventValidator = eventvalidator.New(&writeKeyRepo)
+	eventValidator = eventvalidator.New(&writeKeyRepo, cfg.Source)
 
 	return writeKeySvc, eventHandler, eventSvc, eventValidator
 }

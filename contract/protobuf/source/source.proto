@@ -36,3 +36,18 @@ message NewSourceEvent {
   string owner_id = 2;
   string write_key = 3;
 }
+
+message ValidateWriteKeyReq {
+  string write_key = 1;
+}
+
+message ValidateWriteKeyResp {
+  bool is_valid= 1;
+  string project_id = 2;
+  string owner_id = 3;
+  string write_key = 4;
+}
+
+service IsWriteKeyValid {
+  rpc IsWriteKeyValid(ValidateWriteKeyReq) returns (ValidateWriteKeyResp);
+}

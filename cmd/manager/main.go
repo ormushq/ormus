@@ -8,6 +8,8 @@ import (
 	"github.com/ormushq/ormus/config"
 	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/manager"
+	"github.com/ormushq/ormus/manager/delivery/grpcserver"
+	grpcsourcehandler "github.com/ormushq/ormus/manager/delivery/grpcserver/sourcehandler"
 	"github.com/ormushq/ormus/manager/delivery/httpserver"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/projecthandler"
 	"github.com/ormushq/ormus/manager/delivery/httpserver/sourcehandler"
@@ -51,14 +53,19 @@ func main() {
 	logger.L().Debug(fmt.Sprintf("%+v", cfg))
 	logger.L().Debug(fmt.Sprintf("%+v", cfg.ScyllaDBConfig))
 
-	svcs := setupServices(wg, done, cfg)
+	httpSvcs, grpcSvcs := setupServices(wg, done, cfg)
 
-	server := httpserver.New(cfg, svcs)
+	go func() {
+		server := httpserver.New(cfg, httpSvcs)
 
-	server.Server()
+		server.Server()
+	}()
+
+	grpcServer := grpcserver.New(grpcSvcs, cfg)
+	grpcServer.Server()
 }
 
-func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) httpserver.SetupServices {
+func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) (httpHandler httpserver.SetupServices, grpcHandler grpcserver.SetupServices) {
 	internalBroker := simplechannel.New(done, wg)
 	err := internalBroker.NewChannel(managerparam.CreateDefaultProject, channel.BothMode,
 		cfg.InternalBrokerConfig.ChannelSize, cfg.InternalBrokerConfig.MaxRetryPolicy)
@@ -82,6 +89,8 @@ func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) htt
 	sourceSvc := sourceservice.New(sourceRepo, sourceValidator, projectSvc)
 	sourceHandler := sourcehandler.New(authSvc, sourceSvc)
 
+	writeKeyHandler := grpcsourcehandler.New(sourceSvc)
+
 	userRepo := scyllauser.New(scylla)
 	userValidator := uservalidator.New(userRepo)
 	userSvc := userservice.New(authSvc, userRepo, internalBroker, userValidator)
@@ -90,8 +99,10 @@ func setupServices(wg *sync.WaitGroup, done <-chan bool, cfg manager.Config) htt
 	workers.New(projectSvc, internalBroker).Run(done, wg)
 
 	return httpserver.SetupServices{
-		UserHandler:    userHand,
-		ProjectHandler: projectHandler,
-		SourceHandler:  sourceHandler,
-	}
+			UserHandler:    userHand,
+			ProjectHandler: projectHandler,
+			SourceHandler:  sourceHandler,
+		}, grpcserver.SetupServices{
+			WriteKeyValidationHandler: *writeKeyHandler,
+		}
 }

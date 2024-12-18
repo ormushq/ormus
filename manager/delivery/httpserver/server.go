@@ -97,5 +97,5 @@ func (s *Server) Server() {
 	}
 	fmt.Println(string(routes))
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", s.config.Application.Port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", s.config.Application.HTTPPort)))
 }

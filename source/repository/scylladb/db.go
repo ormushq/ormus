@@ -42,7 +42,7 @@ func New(scylladbConfig scylladb.Config) (*DB, error) {
 	if err != nil {
 		log.Fatal("Failed to create ScyllaDB keyspace:", err)
 	}
-	err = scyllainitialize.RunMigrations(Sconn, "./manager/repository/scyllarepo/")
+	err = scyllainitialize.RunMigrations(Sconn, "./source/repository/scylladb/")
 	if err != nil {
 		panic(err)
 	}

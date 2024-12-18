@@ -8,14 +8,13 @@ import (
 )
 
 func (v Validator) ValidateWriteKey(ctx context.Context, writeKey string) (bool, error) {
-	isValid, err := v.repo.IsWriteKeyValid(ctx, writeKey)
+	isValid, err := v.repo.IsWriteKeyValid(ctx, writeKey, v.config.WriteKeyRedisExpiration)
 	if err != nil {
 		return false, richerror.New("source.service").WithMessage(errmsg.ErrSomeThingWentWrong).WhitKind(richerror.KindUnexpected).WithWrappedError(err)
 	}
-
-	if isValid {
-		return true, nil
+	if !isValid {
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
