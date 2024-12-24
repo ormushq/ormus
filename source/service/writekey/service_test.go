@@ -33,7 +33,7 @@ func TestCreateNewWriteKey_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestCreateNewWriteKey_Error(t *testing.T) {
+func TestCreateNewWriteKey_Has_Error(t *testing.T) {
 	mockRepo := new(MockRepository)
 	mockRepo.On("CreateNewWriteKey", mock.Anything, mock.Anything, mock.Anything).
 		Return(richerror.New("source.service").WithMessage("some error"))
