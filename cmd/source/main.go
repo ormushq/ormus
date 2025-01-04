@@ -118,6 +118,14 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 		panic(err)
 	}
 
+	inputAdapter := rabbitmqchannel.New(done, wg, cfg.RabbitMq)
+	err = inputAdapter.NewChannel(cfg.Source.NewEventQueueName, channel.InputOnlyMode, cfg.Source.BufferSize, cfg.Source.MaxRetry)
+	if err != nil {
+		panic(err)
+	}
+
+	Publisher := sourceevent.NewPublisher(inputAdapter)
+
 	redisAdapter, err := redis.New(cfg.Redis)
 	if err != nil {
 		panic(err)
@@ -127,14 +135,14 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 
 	writeKeyRepo := writekeyrepo.New(redisAdapter, *ManagerAdapter)
 	writeKeySvc = writekey.New(&writeKeyRepo, cfg.Source)
-	eventHandler = *sourceevent.New(outputAdapter, writeKeySvc)
+	eventHandler = *sourceevent.NewConsumer(outputAdapter, writeKeySvc)
 
 	DB, err := scylladb.New(cfg.Source.ScyllaDBConfig)
 	if err != nil {
 		panic(err)
 	}
-	eventRepo := eventrepo.New(DB)
-	eventSvc = *eventsvc.New(eventRepo)
+	eventRepo := eventrepo.New(DB, Publisher)
+	eventSvc = *eventsvc.New(eventRepo, cfg.Source, wg)
 
 	eventValidator = eventvalidator.New(&writeKeyRepo, cfg.Source)
 

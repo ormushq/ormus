@@ -15,11 +15,13 @@ type HTTPServer struct {
 type Config struct {
 	HTTPServer HTTPServer `koanf:"http_server"`
 	// TODO - add source, auth and etc configurations
-	Otel                      otela.Otel      `koanf:"otel"`
-	WriteKeyRedisExpiration   uint            `koanf:"write_key_expiration"`
-	NewSourceEventName        string          `koanf:"new_source_event_name"`
-	BufferSize                int             `koanf:"buffersize"`
-	MaxRetry                  int             `koanf:"maxretry"`
-	WriteKeyValidationAddress string          `koanf:"write_key_validation_address"`
-	ScyllaDBConfig            scylladb.Config `koanf:"scylla_db_config"`
+	Otel                             otela.Otel      `koanf:"otel"`
+	WriteKeyRedisExpiration          uint            `koanf:"write_key_expiration"`
+	NewSourceEventName               string          `koanf:"new_source_event_name"`
+	BufferSize                       int             `koanf:"buffersize"`
+	MaxRetry                         int             `koanf:"maxretry"`
+	WriteKeyValidationAddress        string          `koanf:"write_key_validation_address"`
+	ScyllaDBConfig                   scylladb.Config `koanf:"scylla_db_config"`
+	NewEventQueueName                string          `koanf:"new_event_queue_name"`
+	UndeliveredEventRetransmitPeriod int             `koanf:"undelivered_event_retransmit_period"`
 }

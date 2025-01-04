@@ -1,7 +1,0 @@
-debug: false
-multi_word_var: "I'm complex in config.yml"
-db:
-  host: "localhost"
-  username: "ali"
-  password: "passwd"
-  multi_word_nested_var: "WHAT??"

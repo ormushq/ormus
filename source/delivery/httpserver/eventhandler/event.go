@@ -1,6 +1,7 @@
 package eventhandler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -15,7 +16,7 @@ func (h Handler) NewEvent(ctx echo.Context) error {
 	if err := ctx.Bind(&req); err != nil {
 		return httputil.NewError(ctx, http.StatusBadRequest, errmsg.ErrBadRequest)
 	}
-	resp, err := h.eventSvc.CreateNewEvent(req)
+	resp, err := h.eventSvc.CreateNewEvent(context.Background(), req)
 	if err != nil {
 		msg, code := httpmsg.Error(err)
 

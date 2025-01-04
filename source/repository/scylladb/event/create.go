@@ -1,24 +1,28 @@
 package event
 
 import (
+	"context"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	proto "github.com/ormushq/ormus/contract/go/source"
 	"github.com/ormushq/ormus/event"
 	"github.com/ormushq/ormus/pkg/errmsg"
 	"github.com/ormushq/ormus/pkg/richerror"
 	"github.com/ormushq/ormus/source/repository/scylladb"
 	"github.com/scylladb/gocqlx/v2/qb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func init() {
 	statements["create"] = scylladb.Statement{
-		Query:  `INSERT INTO event (id, type, name, send_at, received_at, timestamp, event, write_key, created_at, updated_at, properties) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		Query:  `INSERT INTO event (id, type, name, send_at, received_at, timestamp, event, write_key, created_at, updated_at, properties,delivered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,false)`,
 		Values: []string{"id", "type", "name", "send_at", "received_at", "timestamp", "event", "write_key", "created_at", "updated_at", "properties"},
 	}
 }
 
-func (r Repository) CreateNewEvent(evt event.CoreEvent) (string, error) {
+func (r Repository) CreateNewEvent(ctx context.Context, evt event.CoreEvent, wg *sync.WaitGroup, queueName string) (string, error) {
 	query, err := r.db.GetStatement(statements["create"])
 	if err != nil {
 		return "", richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(errmsg.ErrSomeThingWentWrong)
@@ -40,6 +44,23 @@ func (r Repository) CreateNewEvent(evt event.CoreEvent) (string, error) {
 	})
 
 	if err := query.Exec(); err != nil {
+		return "", richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(errmsg.ErrSomeThingWentWrong)
+	}
+	messages := []*proto.NewEvent{
+		{
+			Id:         id,
+			Name:       evt.Name,
+			WriteKey:   evt.WriteKey,
+			Event:      evt.Event,
+			SendAt:     timestamppb.New(evt.SendAt),
+			ReceivedAt: timestamppb.New(evt.ReceivedAt),
+			Timestamp:  timestamppb.New(evt.Timestamp),
+			Type:       string(evt.Type),
+			Properties: *(evt.Properties),
+		},
+	}
+	err = r.eventBroker.Publish(ctx, queueName, wg, messages)
+	if err != nil {
 		return "", richerror.New("source.repository").WithWrappedError(err).WithKind(richerror.KindUnexpected).WithMessage(errmsg.ErrSomeThingWentWrong)
 	}
 

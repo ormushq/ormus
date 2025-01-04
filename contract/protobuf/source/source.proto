@@ -48,6 +48,20 @@ message ValidateWriteKeyResp {
   string write_key = 4;
 }
 
+message NewEvent {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  map<string, string> properties = 4;
+  google.protobuf.Timestamp send_at = 5;
+  google.protobuf.Timestamp received_at = 6;
+  google.protobuf.Timestamp timestamp = 7;
+  string event = 8;
+  string write_key = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
 service IsWriteKeyValid {
   rpc IsWriteKeyValid(ValidateWriteKeyReq) returns (ValidateWriteKeyResp);
 }
