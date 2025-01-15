@@ -18,7 +18,7 @@ func main() {
 
 	bufferSize := cfg.Source.BufferSize
 	maxRetryPolicy := cfg.Source.MaxRetry
-	eventName := cfg.Source.NewSourceEventName
+	eventName := cfg.Source.NewEventQueueName
 	err := otela.Configure(wg, done, otela.Config{Exporter: otela.ExporterConsole})
 	if err != nil {
 		panic(err.Error())
@@ -39,8 +39,8 @@ func main() {
 	go func() {
 		defer wg.Done()
 		for msg := range outputChannel {
-			m := encoder.DecodeNewSourceEvent(string(msg.Body))
-			log.Info(m.WriteKey)
+			m := encoder.DecodeNewEvent(string(msg.Body))
+			log.Info(m)
 
 			if err := msg.Ack(); err != nil {
 				panic(err)

@@ -2,9 +2,9 @@ package grpcserver
 
 import (
 	"fmt"
-	"log"
 	"net"
 
+	"github.com/ormushq/ormus/logger"
 	"github.com/ormushq/ormus/source"
 	"google.golang.org/grpc"
 )
@@ -24,13 +24,13 @@ func (s Server) Start() {
 	address := fmt.Sprintf(":%d", s.Config.HTTPServer.Port)
 	listener, err := net.Listen(s.Config.HTTPServer.Network, address)
 	if err != nil {
-		log.Fatal(err)
+		logger.L().Error(err.Error())
 	}
 
 	grpcserver := grpc.NewServer()
 
 	// start the grpc server
 	if err := grpcserver.Serve(listener); err != nil {
-		log.Fatal(err)
+		logger.L().Error(err.Error())
 	}
 }

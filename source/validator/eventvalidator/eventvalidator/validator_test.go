@@ -2,9 +2,9 @@ package eventvalidator
 
 import (
 	"context"
-	"github.com/ormushq/ormus/source"
 	"testing"
 
+	"github.com/ormushq/ormus/source"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
