@@ -16,5 +16,8 @@ type TrackEventRequest struct {
 }
 
 type TrackEventResponse struct {
-	ID string `json:"id"`
+	ID               []string `json:"ids"`
+	InvalidWriteKeys []string `json:"invalid_write_keys"`
+	Success          int      `json:"success"`
+	FAIL             int      `json:"failed"`
 }

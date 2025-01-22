@@ -168,3 +168,21 @@ func WaitForConnection(rabbitmq *Rabbitmq) {
 		rabbitmq.cond.Wait()
 	}
 }
+
+func (ca *ChannelAdapter) PurgeTheChannel(name string) (int, error) {
+	ch, err := ca.rabbitmq.connection.Channel()
+	if err != nil {
+		logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToOpenChannel,
+			slog.String("error", err.Error()))
+		return 0, err
+
+	}
+	purged, err := ch.QueueDelete(name+"-queue", false, false, false)
+	if err != nil {
+		logger.WithGroup(loggerGroupName).Error(errmsg.ErrFailedToCloseChannel,
+			slog.String("error", err.Error()))
+		return 0, err
+
+	}
+	return purged, err
+}

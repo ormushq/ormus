@@ -234,9 +234,6 @@ definitions:
       name:
         example: updated name
         type: string
-      status:
-        example: active
-        type: string
     type: object
   sourceparam.UpdateResponse:
     properties:

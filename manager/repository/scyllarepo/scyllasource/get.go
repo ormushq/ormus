@@ -46,7 +46,7 @@ func (r Repository) IsWriteKeyValid(writeKey string) (*source_proto.ValidateWrit
 			"write_key": writeKey,
 		})
 	var writeKeyResp source_proto.ValidateWriteKeyResp
-	if err := query.Get(&writeKeyResp); err != nil {
+	if err := query.Get(&writeKeyResp); err != nil && err.Error() != "not found" {
 		return nil, err
 	}
 

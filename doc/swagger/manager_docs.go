@@ -1186,10 +1186,6 @@ const docTemplatemanager = `{
                 "name": {
                     "type": "string",
                     "example": "updated name"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "active"
                 }
             }
         },
