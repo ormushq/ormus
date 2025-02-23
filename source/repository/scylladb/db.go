@@ -1,9 +1,12 @@
 package scylladb
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
 
+	"github.com/gocql/gocql"
 	"github.com/ormushq/ormus/adapter/scylladb"
 	"github.com/ormushq/ormus/adapter/scylladb/scyllainitialize"
 	"github.com/ormushq/ormus/logger"
@@ -42,8 +45,9 @@ func New(scylladbConfig scylladb.Config) (*DB, error) {
 	if err != nil {
 		log.Fatal("Failed to create ScyllaDB keyspace:", err)
 	}
-	err = scyllainitialize.RunMigrations(Sconn, "./source/repository/scylladb/")
+	err = scyllainitialize.RunMigrations(Sconn, fmt.Sprintf("%s/source/repository/scylladb/", os.Getenv("ROOT")))
 	if err != nil {
+		logger.L().Error(fmt.Sprintf("Failed to run migrations: %v", err))
 		panic(err)
 	}
 	Session, Err := scyllainitialize.GetConnection(Sconn)
@@ -71,7 +75,6 @@ func (d *DB) GetStatement(state Statement) (gocqlx.Queryx, error) {
 	if statement, ok := statements[state.Query]; ok {
 		return statement, nil
 	}
-
 	return gocqlx.Queryx{}, richerror.New("db.GetStatement").WhitKind(richerror.KindNotFound).WithMessage("statement not found")
 }
 
@@ -79,4 +82,12 @@ func (d *DB) RegisterStatements(states map[string]Statement) {
 	for _, stat := range states {
 		d.RegisterStatement(stat)
 	}
+}
+
+func (d *DB) NewBatch(ctx context.Context) *gocql.Batch {
+	return d.GetConn().NewBatch(ctx, gocql.UnloggedBatch)
+}
+
+func (d *DB) ExecuteBatch(batch *gocql.Batch) error {
+	return d.GetConn().ExecuteBatch(batch)
 }

@@ -17,6 +17,8 @@ type SessionxInterface interface {
 	ExecStmt(stmt string) error
 	AwaitSchemaAgreement(ctx context.Context) error
 	Close()
+	NewBatch(ctx context.Context, batchType gocql.BatchType) *gocql.Batch
+	ExecuteBatch(batch *gocql.Batch) error
 }
 
 type Session struct {
@@ -41,6 +43,16 @@ func (s *Session) AwaitSchemaAgreement(ctx context.Context) error {
 
 func (s *Session) Close() {
 	s.S.Close()
+}
+
+func (s *Session) NewBatch(ctx context.Context, batchType gocql.BatchType) *gocql.Batch {
+	batch := s.S.NewBatch(batchType)
+
+	return batch.WithContext(ctx)
+}
+
+func (s *Session) ExecuteBatch(batch *gocql.Batch) error {
+	return s.S.ExecuteBatch(batch)
 }
 
 func NewSession(session *gocql.Session) SessionxInterface {

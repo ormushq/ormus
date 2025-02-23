@@ -5,9 +5,11 @@ source:
     port: 8082
     network: "tcp"
   write_key_validation_address: "127.0.0.1:8081"
+  undelivered_events_queue_name: "undelivered_events"
   new_event_queue_name: "new-event-received"
   write_key_expiration: 120
   undelivered_event_retransmit_period: 1
+  retry_number: 1
   new_source_event_name: "new-source-event"
   buffersize: 100
   number_instants: 10

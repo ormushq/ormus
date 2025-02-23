@@ -36,6 +36,7 @@ func CreateKeySpace(consistency gocql.Consistency, keyspace string, hosts ...str
 func RunMigrations(dbConn *ScyllaDBConnection, dir string) error {
 	logger.L().Debug("running migrations...")
 	for _, host := range dbConn.hosts {
+		logger.L().Info(dir)
 		migration := New(dir, host, dbConn.keyspace)
 		err := migration.Run()
 		if err != nil {

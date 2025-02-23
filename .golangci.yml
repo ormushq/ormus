@@ -133,8 +133,6 @@ linters:
     - nilerr
     - nilnil
 
-    # Forces newlines in some places.
-    - nlreturn
 
     # Finds sending HTTP request without context.Context.
     - noctx
@@ -225,6 +223,7 @@ linters:
 
     # I'm fine to check the error from json.Marshal
     - errchkjson
+
 
     # All SQL queries MUST BE covered with tests.
     - execinquery

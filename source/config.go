@@ -24,4 +24,6 @@ type Config struct {
 	ScyllaDBConfig                   scylladb.Config `koanf:"scylla_db_config"`
 	NewEventQueueName                string          `koanf:"new_event_queue_name"`
 	UndeliveredEventRetransmitPeriod int             `koanf:"undelivered_event_retransmit_period"`
+	RetryNumber                      int             `koanf:"retry_number"`
+	UndeliveredEventsQueueName       string          `koanf:"undelivered_events_queue_name"`
 }
