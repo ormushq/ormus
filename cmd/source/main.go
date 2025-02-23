@@ -74,9 +74,9 @@ func main() {
 	}
 
 	cfg := config.C()
-	_, Consumer, eventSvc, eventValidator := SetupSourceServices(cfg)
-	Consumer.Consume(context.Background(), cfg.Source.NewSourceEventName, done, wg, Consumer.ProcessNewSourceEvent)
-
+	_, consumer, eventSvc, eventValidator := SetupSourceServices(cfg)
+	consumer.Consume(context.Background(), cfg.Source.NewSourceEventName, done, wg, consumer.ProcessNewSourceEvent)
+	consumer.Consume(context.Background(), cfg.Source.UndeliveredEventsQueueName, done, wg, consumer.EventHasDeliveredToDestination)
 	//----------------- Setup Tracer -----------------//
 	otelcfg := otela.Config{
 		Endpoint:           config.C().Source.Otel.Endpoint,
@@ -108,12 +108,17 @@ func main() {
 	wg.Wait()
 }
 
-func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, eventHandler sourceevent.Consumer, eventSvc eventsvc.Service, eventValidator eventvalidator.Validator) {
+func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, consumer sourceevent.Consumer, eventSvc eventsvc.Service, eventValidator eventvalidator.Validator) {
 	done := make(chan bool)
 	wg := &sync.WaitGroup{}
 
 	outputAdapter := rabbitmqchannel.New(done, wg, cfg.RabbitMq)
 	err := outputAdapter.NewChannel(cfg.Source.NewSourceEventName, channel.OutputOnly, cfg.Source.BufferSize, cfg.Source.MaxRetry)
+	if err != nil {
+		panic(err)
+	}
+
+	err = outputAdapter.NewChannel(cfg.Source.UndeliveredEventsQueueName, channel.OutputOnly, cfg.Source.BufferSize, cfg.Source.MaxRetry)
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +140,6 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 
 	writeKeyRepo := writekeyrepo.New(redisAdapter, *ManagerAdapter)
 	writeKeySvc = writekey.New(&writeKeyRepo, cfg.Source)
-	eventHandler = *sourceevent.NewConsumer(outputAdapter, writeKeySvc)
 
 	DB, err := scylladb.New(cfg.Source.ScyllaDBConfig)
 	if err != nil {
@@ -146,5 +150,7 @@ func SetupSourceServices(cfg config.Config) (writeKeySvc writekey.Service, event
 
 	eventValidator = eventvalidator.New(&writeKeyRepo, cfg.Source)
 
-	return writeKeySvc, eventHandler, eventSvc, eventValidator
+	consumer = *sourceevent.NewConsumer(outputAdapter, writeKeySvc, eventSvc, cfg.Source.RetryNumber)
+
+	return writeKeySvc, consumer, eventSvc, eventValidator
 }

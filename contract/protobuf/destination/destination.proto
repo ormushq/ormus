@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package destination;
+option go_package = "github.com/ormushq/ormus/contract/go/destination";
+
+import "google/protobuf/timestamp.proto";
+
+message DeliveredEvent {
+  string message_id = 1;
+}
+
+message DeliveredEventsList {
+  repeated DeliveredEvent events = 1;
+}

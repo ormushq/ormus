@@ -17,4 +17,5 @@ const (
 	ErrFailedToSetQosOnChannel = "failed to set QOS on channel"
 	ErrFailedToCloseChannel    = "failed to close rabbitmq channel"
 	ErrAccessDenied            = "Access denied"
+	ErrFailedToPurgeChannel    = "failed to purge channel"
 )

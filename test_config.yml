@@ -1,0 +1,49 @@
+type: yml
+
+source:
+  http_server:
+    port: 8082
+    network: "tcp"
+  write_key_validation_address: "127.0.0.1:8081"
+  new_event_queue_name: "test-new-event-received"
+  write_key_expiration: 120
+  undelivered_event_retransmit_period: 1
+  retry_number: 5
+  new_source_event_name: "test-new-source-event"
+  buffersize: 0
+  undelivered_events_queue_name: "undelivered_events"
+  number_instants: 10
+  maxretry: 0
+  otel:
+    endpoint: "otel_collector:4317"
+    service_name: "source"
+    enable_metric_expose: true
+    metric_expose_port: 8081
+    metric_expose_path: "metrics"
+  scylla_db_config:
+    hosts:
+      - 127.0.0.1:9042
+    consistency: 4
+    keyspace: "test_source"
+    timeout_cluster: 5s
+    num_retries: 10
+    min_retry_delay: 1s
+    max_retry_delay: 10s
+scylladb:
+  hosts:
+    - 127.0.0.1:9042
+  keyspace: ormus
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  password: "guest"
+  user: "guest"
+  reconnect_second: 1
+  vhost: "/"
+redis:
+  port: 6379
+  host: 127.0.0.1
+  db: 0
+  password: ""
+
+
